@@ -1,0 +1,169 @@
+body {
+  background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
+  /* padding-top: 20px; */
+  /* padding: 20px; */
+}
+
+/* NAVBAR */
+.navbar-app-name{
+  color: #d74242 !important;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.navbar-app-name:hover{
+  color: white !important;
+
+}
+
+.navbar-feat:hover{
+  color: #d74242 !important;
+
+}
+
+.navbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: last baseline;
+}
+.navbar-login{
+  color: #d74242 !important;
+  font-weight: 600;
+}
+
+.navbar-login:hover{
+  background-color: #d74242;
+  color: white !important;
+}
+
+/* LANDING PAGE */
+.landing-main-title {
+  font-size: 60px;
+}
+
+.landing-content-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+
+.landing-home-button{
+  width: 15em;
+  height: 3em;
+  border-radius: 10em;
+  background-color: #d74242;
+}
+
+
+.landing-home-button:hover{
+  width: 15em;
+  height: 3em;
+  border-radius: 10em;
+  background-color: rgb(130, 170, 222);
+}
+
+/* .login-whole-page{
+  padding: 20px;
+  width: 100%;
+  height: 100vh;
+} */
+
+.login-whole-page{
+  height: 100vh;
+  overflow: hidden;
+}
+
+.login-left-side img {
+  object-fit: cover;
+  width: 100%;
+}
+
+.login-right-side{
+  background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
+
+  align-items: start;
+
+}
+
+.login-header{
+  line-height: 15px;
+}
+
+
+.login-header-app{
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #d74242;
+}
+
+.login-sign-up-msg:hover{
+  border: 2px white;
+}
+.login-submit-button{
+  width: 100%;
+  background-color: #d74242;
+}
+
+.login-submit-button:hover{
+  width: 100%;
+  background-color: #ffebeb;
+  color: #d74242;
+}
+
+.register-right-side img {
+  object-fit: cover;
+  width: 100%;
+}
+
+/* REGISTER */
+
+.register-whole-page{
+  height: 100vh;
+  overflow: hidden;
+}
+
+.register-left-side img {
+  object-fit: cover;
+  width: 100%;
+}
+
+.register-right-side{
+  align-items: start;
+  background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
+
+
+}
+
+.register-header{
+  line-height: 15px;
+}
+
+
+.register-header-app{
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #d74242;
+}
+
+.register-sign-up-msg:hover{
+  border: 2px white;
+}
+.register-submit-button{
+  width: 100%;
+  background-color: #d74242;
+}
+
+.register-submit-button:hover{
+  width: 100%;
+  background-color: #ffebeb;
+  color: #d74242;
+}
+
+.form-group small{
+  font-weight: 600;
+}
+
