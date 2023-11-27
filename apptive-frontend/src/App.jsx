@@ -11,9 +11,6 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Profile from "./Views/Profile/Profile";
 import "./app.css";
 
-import Navbar from "./Views/Navbar/Navbar";
-
-
 function App() {
   return (
     <BrowserRouter>

@@ -9,7 +9,7 @@ function Dashboard() {
   const { username } = location.state;
 
   return (
-    <div className="user-dashboard mt-0 border border-white">
+    <div className="user-dashboard mt-0">
       <UserNavbar username={username} user_id={user_id}/>
       <h1 className="text-white justify-content-start align-items-start mb-0">Welcome, {username}!</h1>
       <h2 className="text-white">Your folders</h2>
