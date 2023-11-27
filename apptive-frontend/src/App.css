@@ -167,3 +167,40 @@ body {
   font-weight: 600;
 }
 
+
+.user-navbar-app-name{
+  color: #d74242 !important;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.user-navbar-app-name:hover{
+  color: white !important;
+
+}
+
+.user-navbar-feat:hover{
+  color: #d74242 !important;
+
+}
+
+.user-navbar{
+  display: flex;
+  justify-content: space-between;
+  align-items: last baseline;
+}
+
+.user-dashboard{
+  height: 100vh;
+  width: 100vw;
+}
+
+.user-navbar-dropdown:hover{
+  color: white !important;
+
+} 
+
+/* .user-navbar-dropdown{
+  color: #d74242;
+
+}  */

@@ -49,8 +49,29 @@ app.post("/register", (req, res) => {
     }
   );
 });
-// app.js (or your server file)
-// app.js (or your server file)
+
+
+app.get("/:user_id", (req, res) => {
+  const userId = req.params.user_id;
+
+  conn.query(
+    "SELECT * FROM user_credentials WHERE user_id = ?",
+    [userId],
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: "unexpected_error", message: error.message });
+      } else {
+        if (data.length > 0) {
+          const user = data[0];
+          res.status(200).json({ success: true, user });
+        } else {
+          res.status(404).json({ success: false, message: "User not found" });
+        }
+      }
+    }
+  );
+});
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
