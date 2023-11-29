@@ -208,3 +208,61 @@ body {
 .dropdown-item:hover{
   background-color: #0f233e;
 }
+
+
+
+.dashboard-body-folders {
+  width: 35vh;
+  height: 25vh;
+  background-color: #37425F;
+  /* border: #ddd 1px solid; */
+  border-radius: 10px;
+  flex-direction: column;
+}
+
+.dashboard-body-folders:hover {
+  background-color: #19233B;
+  cursor: pointer;
+}
+
+.dashboard-body-folders button {
+  height: 40px;
+  font-size: 40px;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.dashboard-body-folders button:hover {
+  color: #d74242;
+}
+
+.add-button-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: #4caf50; /* Green color, adjust as needed */
+  color: #fff; /* White text color */
+  border-radius: 50%;
+  font-size: 24px;
+  text-decoration: none;
+}
+.create-modal {
+  display: none;
+  /* ... other styles ... */
+}
+
+.create-modal.open {
+  display: flex;
+}
+
+.user-dashboard-bottom{
+  padding: 0px 200px;
+}

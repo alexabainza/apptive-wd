@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const mysql = require("mysql2");
+const { v4: uuidv4 } = require('uuid');
+
 const cors = require("cors");
 
 app.use(cors());
@@ -50,7 +52,6 @@ app.post("/register", (req, res) => {
   );
 });
 
-
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
 
@@ -73,6 +74,36 @@ app.get("/:user_id", (req, res) => {
   );
 });
 
+app.get("/:user_id/dashboard", (req, res) => {
+  const userId = req.params.user_id;
+
+  conn.query(
+    "SELECT * FROM folders f WHERE f.user_id = ? ORDER BY created_at DESC",
+    [userId],
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          error: "unexpected_error",
+          message: error.message,
+        });
+      } else {
+        if (data.length > 0) {
+          const user = data;
+          res.status(200).json({ success: true, user });
+        } else {
+          // Modify the response to include a specific message when there are no folders
+          res.status(200).json({
+            success: true,
+            message: "User has no folders yet",
+          });
+        }
+      }
+    }
+  );
+});
+
+
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -80,6 +111,7 @@ app.post("/login", (req, res) => {
     "SELECT user_id FROM user_credentials WHERE user_name = ? AND password = ?",
     [username, password],
     (error, data) => {
+      console.log(data)
       if (error) {
         console.error(error);
         res.status(500).json({
@@ -96,7 +128,6 @@ app.post("/login", (req, res) => {
             user_id: userId, // Include user_id in the response
           });
         } else {
-          // User not found or password does not match
           res.status(401).json({
             success: false,
             error: "invalid_credentials",
@@ -107,3 +138,76 @@ app.post("/login", (req, res) => {
     }
   );
 });
+
+
+app.post("/:user_id/dashboard/addFolder", (req, res) => {
+  const userId = req.params.user_id
+  const { folderName } = req.body
+
+  const folderId = `${userId}_${uuidv4()}`;
+
+  conn.query(
+    "INSERT INTO folders (folder_id, user_id, folder_name) VALUES (?, ?, ?)",
+    [folderId, userId, folderName],
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: "unexpected_error", message: error.message });
+      } else {
+        res.status(201).json({ success: true, message: "Folder added successfully" });
+      }
+    }
+  );
+  
+})
+
+app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res)=>{
+  const userId = req.params.user_id
+  const folderId = req.params.folder_id;
+
+  const { newFolderName } = req.body;
+
+
+  conn.query(
+    "UPDATE folders SET folder_name = ?, modified_at = NOW() WHERE user_id = ? AND folder_id = ?",
+    [newFolderName, userId, folderId],
+
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          error: "unexpected_error",
+          message: error.message,
+        });
+      } else {
+        if (data.affectedRows > 0) {
+          res.status(200).json({
+            success: true,
+            message: "Folder updated successfully",
+          });
+        } else {
+          res.status(404).json({
+            success: false,
+            message: "Folder not found",
+          });
+        }}
+  
+})})
+
+app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res)=>{
+  const userId = req.params.user_id;
+  const folderId = req.params.folder_id;
+
+  conn.query(
+    'DELETE FROM folders WHERE user_id = ? AND folder_id = ?', [userId, folderId],
+    (error, data) =>{
+      if(error){
+        console.error(error);
+        res.status(500).json({ error: 'unexpected_error', message: error.message });
+      }
+      else{
+        res.status(200).json({ success: true, message: 'Folder deleted successfully' });
+      }
+    }
+  )
+})

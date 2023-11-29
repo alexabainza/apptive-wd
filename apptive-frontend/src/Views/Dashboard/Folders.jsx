@@ -1,36 +1,26 @@
-import React from 'react';
+// Inside Folders.jsx
+import React from "react";
+import Folder from "./Folder";
 
-const Folders = ({ id, title, notesCount, onDelete, onEdit, onClick }) => {
-  const handleEdit = () => {
-    const newTitle = prompt('Enter new folder name:', title);
-    if (newTitle && newTitle !== title) {
-      onEdit(id, newTitle);
-    }
-  };
-
-  const handleDelete = () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${title}" folder?`);
-    if (confirmDelete) {
-      onDelete(id);
-    }
-  };
-
-  const handleFolderClick = () => {
-    onClick(title);
-  };
-
+const Folders = ({ folders, onDeleteFolder, onEditFolder }) => {
   return (
-    <div
-      className="dashboard-body-folders px-4 py-2 mb-3 d-flex flex-column justify-content-between align-items-start text-left"
-      onClick={handleFolderClick}
-    >
-      <div className="dashboard-body-left d-flex flex-column">
-        <h3 className="text-white mb-0">{title}</h3>
-        <p>{`${notesCount} notes`}</p>
-      </div>
-      <div className="three-dot-menu" onClick={handleFolderClick}>
-        &#8226;&#8226;&#8226;
-      </div>
+    <div className="row">
+      {folders.map((folder) => (
+        <div key={folder.folder_id} className="col-md-6 col-lg-4 col-xl-3 mb-3">
+          <Folder
+            key={folder.folder_id}
+            folderId={folder.folder_id}
+            folderName={folder.folder_name}
+            description={folder.description}
+            favorited={folder.favorited}
+            noOfNotes={folder.no_of_notes || 0}
+            createdAt={folder.created_at}
+            modifiedAt={folder.modified_at}
+            onDeleteFolder={onDeleteFolder}
+            onEditFolder={onEditFolder}
+          />
+        </div>
+      ))}
     </div>
   );
 };
