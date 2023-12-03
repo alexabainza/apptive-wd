@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const mysql = require("mysql2");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 const cors = require("cors");
 
@@ -61,7 +61,9 @@ app.get("/:user_id", (req, res) => {
     (error, data) => {
       if (error) {
         console.error(error);
-        res.status(500).json({ error: "unexpected_error", message: error.message });
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
       } else {
         if (data.length > 0) {
           const user = data[0];
@@ -103,7 +105,6 @@ app.get("/:user_id/dashboard", (req, res) => {
   );
 });
 
-
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -111,7 +112,7 @@ app.post("/login", (req, res) => {
     "SELECT user_id FROM user_credentials WHERE user_name = ? AND password = ?",
     [username, password],
     (error, data) => {
-      console.log(data)
+      console.log(data);
       if (error) {
         console.error(error);
         res.status(500).json({
@@ -139,10 +140,9 @@ app.post("/login", (req, res) => {
   );
 });
 
-
 app.post("/:user_id/dashboard/addFolder", (req, res) => {
-  const userId = req.params.user_id
-  const { folderName } = req.body
+  const userId = req.params.user_id;
+  const { folderName } = req.body;
 
   const folderId = `${userId}_${uuidv4()}`;
 
@@ -152,21 +152,23 @@ app.post("/:user_id/dashboard/addFolder", (req, res) => {
     (error, data) => {
       if (error) {
         console.error(error);
-        res.status(500).json({ error: "unexpected_error", message: error.message });
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
       } else {
-        res.status(201).json({ success: true, message: "Folder added successfully" });
+        res
+          .status(201)
+          .json({ success: true, message: "Folder added successfully" });
       }
     }
   );
-  
-})
+});
 
-app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res)=>{
-  const userId = req.params.user_id
+app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res) => {
+  const userId = req.params.user_id;
   const folderId = req.params.folder_id;
 
   const { newFolderName } = req.body;
-
 
   conn.query(
     "UPDATE folders SET folder_name = ?, modified_at = NOW() WHERE user_id = ? AND folder_id = ?",
@@ -190,24 +192,217 @@ app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res)=>{
             success: false,
             message: "Folder not found",
           });
-        }}
-  
-})})
+        }
+      }
+    }
+  );
+});
 
-app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res)=>{
+app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
   const userId = req.params.user_id;
   const folderId = req.params.folder_id;
 
   conn.query(
-    'DELETE FROM folders WHERE user_id = ? AND folder_id = ?', [userId, folderId],
-    (error, data) =>{
-      if(error){
+    "DELETE FROM folders WHERE user_id = ? AND folder_id = ?",
+    [userId, folderId],
+    (error, data) => {
+      if (error) {
         console.error(error);
-        res.status(500).json({ error: 'unexpected_error', message: error.message });
-      }
-      else{
-        res.status(200).json({ success: true, message: 'Folder deleted successfully' });
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
+      } else {
+        res
+          .status(200)
+          .json({ success: true, message: "Folder deleted successfully" });
       }
     }
-  )
-})
+  );
+});
+
+app.get("/:user_id/:folder_name", (req, res) => {
+  const folder_name = req.params.folder_name;
+  const user_id = req.params.user_id;
+  console.log("fldskfdsgsdg");
+  conn.query(
+    "SELECT f.folder_name, n.* FROM notes n INNER JOIN folders f ON f.folder_id = n.folder_id WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ?",
+    [user_id, user_id, folder_name],
+    (error, data) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        res.json(data);
+        console.log(data);
+      }
+    }
+  );
+});
+
+app.get("/:user_id/:folder_name/:notes_id", (req, res) => {
+  const folder_name = req.params.folder_name;
+  const user_id = req.params.user_id;
+  const note_id = req.params.notes_id;
+  conn.query(
+    "SELECT n.* FROM notes n INNER JOIN folders f ON f.folder_id = n.folder_id WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ? AND n.notes_id = ?",
+    [user_id, user_id, folder_name, note_id],
+
+    (error, data) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        if (data.length === 0) {
+          res.status(404).send("Note not found");
+        } else {
+          res.setHeader("Content-Type", "application/json");
+          const note = data[0]; // Assuming there is only one matching note
+          res.json(note);
+          // console.log(note);
+        }
+      }
+    }
+  );
+});
+
+app.post("/:user_id/:folder_name/addNote", (req, res) => {
+  const userId = req.params.user_id;
+  const folderName = req.params.folder_name;
+  console.log(req.body); // Log the request body to check if it's received correctly
+
+  const note_id = `${userId}_${uuidv4()}_${uuidv4()}`;
+  conn.query(
+    "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
+    [userId, folderName],
+    (error, result) => {
+      if (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
+      } else {
+        if (result.length > 0) {
+          const folderId = result[0].folder_id;
+          conn.query(
+            "INSERT INTO notes(user_id, folder_id, notes_id, note_title, contents) VALUES (?, ?, ?, ?, ?)",
+            [userId, folderId, note_id, req.body.noteTitle, req.body.contents],
+            (error, data) => {
+              if (error) {
+                console.error(error);
+                res
+                  .status(500)
+                  .json({ error: "unexpected_error", message: error.message });
+              } else {
+                res
+                  .status(201)
+                  .json({ success: true, message: "Note added successfully" });
+              }
+            }
+          );
+        } else {
+          res
+            .status(404)
+            .json({ error: "folder_not_found", message: "Folder not found" });
+        }
+      }
+    }
+  );
+});
+
+app.delete("/:user_id/:folder_name/delete/:note_id", (req, res) => {
+  const userId = req.params.user_id;
+  const folderName = req.params.folder_name;
+  const note_id = req.params.note_id;
+
+  // Query to get folder_id based on folder_name
+  conn.query(
+    "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
+    [userId, folderName],
+    (error, result) => {
+      if (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
+      } else {
+        if (result.length > 0) {
+          const folderId = result[0].folder_id;
+          conn.query(
+            "DELETE FROM notes WHERE user_id = ? AND folder_id = ? AND notes_id = ?",
+            [userId, folderId, note_id],
+            (error, data) => {
+              if (error) {
+                console.error(error);
+                res
+                  .status(500)
+                  .json({ error: "unexpected_error", message: error.message });
+              } else {
+                res
+                  .status(201)
+                  .json({
+                    success: true,
+                    message: "Note deleted successfully",
+                  });
+              }
+            }
+          );
+        } else {
+          res
+            .status(404)
+            .json({ error: "note_not_found", message: "Folder not found" });
+        }
+      }
+    }
+  );
+});
+app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
+  const userId = req.params.user_id;
+  const folderName = req.params.folder_name;
+  const noteId = req.params.note_id;
+
+  conn.query(
+    "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
+    [userId, folderName],
+    (error, result) => {
+      if (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
+      } else {
+        if (result.length > 0) {
+          const folderId = result[0].folder_id;
+          conn.query(
+            "UPDATE notes SET note_title = ?, contents = ?, modified_at = NOW() WHERE user_id = ? AND folder_id = ? AND notes_id = ?",
+            [req.body.note_title, req.body.contents, userId, folderId, noteId],
+            (updateError, data) => {
+              if (updateError) {
+                console.error(updateError);
+                res
+                  .status(500)
+                  .json({ error: "unexpected_error", message: updateError.message });
+              } else {
+                if (data.affectedRows > 0) {
+                  res.status(200).json({
+                    success: true,
+                    message: "Note updated successfully",
+                  });
+                } else {
+                  res.status(404).json({
+                    success: false,
+                    message: "Note not found",
+                  });
+                }
+              }
+            }
+          );
+        } else {
+          res.status(404).json({
+            error: "folder_not_found",
+            message: "Folder not found",
+          });
+        }
+      }
+    }
+  );
+});

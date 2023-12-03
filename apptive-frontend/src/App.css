@@ -266,3 +266,59 @@ body {
 .user-dashboard-bottom{
   padding: 0px 200px;
 }
+
+.sdsa{
+  background-color: #37425F;
+}
+
+/* notes */
+
+.notes-main-page{
+  height: 100vh;
+  width: 100vw;
+}
+
+.notes-main-page-content{
+  margin: 0px 20vw;
+
+
+}
+
+.note-list-item{
+  width: 50vw;
+  border-bottom: #8ea2ea 0.1px solid;
+
+}
+
+
+.notes-sidebar{
+  width: 30%;
+  border-right: white solid 2px;
+}
+
+
+
+.note-item:hover{
+  color: #d74242!important;
+
+}
+
+.individual-note{
+  height: 100vh;
+  width: 100vw;
+}
+
+.add-notes-page{
+  height: 100vh;
+  width: 100vw;  
+}
+
+.add-notes-page textarea{
+  height: 80vh;
+  overflow-y: scroll;
+
+}
+
+.notes-main-page-folder-text:hover{
+  color: #d74242!important;
+}

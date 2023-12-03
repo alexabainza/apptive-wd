@@ -35,8 +35,6 @@ const AddButton = ({ user_id, onFolderAdded }) => {
       } catch (error) {
         console.error('Error adding folder:', error.message);
       }
-  
-      // Close the modal regardless of the result
       closeModal();
     };
   

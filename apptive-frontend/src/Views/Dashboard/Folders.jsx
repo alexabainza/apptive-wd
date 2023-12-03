@@ -2,13 +2,14 @@
 import React from "react";
 import Folder from "./Folder";
 
-const Folders = ({ folders, onDeleteFolder, onEditFolder }) => {
+const Folders = ({ folders, onDeleteFolder, onEditFolder, user_id }) => {
   return (
     <div className="row">
       {folders.map((folder) => (
         <div key={folder.folder_id} className="col-md-6 col-lg-4 col-xl-3 mb-3">
           <Folder
             key={folder.folder_id}
+            user_id={folder.user_id}
             folderId={folder.folder_id}
             folderName={folder.folder_name}
             description={folder.description}

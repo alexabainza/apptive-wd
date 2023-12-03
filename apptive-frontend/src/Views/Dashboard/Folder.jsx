@@ -1,7 +1,8 @@
 // Inside Folder.jsx
 import React, { useState } from "react";
-
+import { Link } from 'react-router-dom';
 const Folder = ({
+  user_id,
     folderId,
     folderName,
   description,
@@ -56,8 +57,12 @@ setIsEditing(true);
         </div>
       ) : (
         <div className="dashboard-body-left d-flex flex-column">
-          <h4 className="text-white mt-3 mb-0">{folderName}</h4>
-          <p className="text-white">{`${noOfNotes} notes`}</p>
+              <Link to={`/${user_id}/${folderName}`} className="text-white">
+
+          <h4 className="mt-3 mb-0">{folderName}</h4>
+        <p className="text-white">{`${noOfNotes} notes`}</p>
+        </Link>
+
         </div>
       )}
       <div
@@ -75,6 +80,7 @@ setIsEditing(true);
         </div>
       )}
     </div>
+
   );}
 
 export default Folder;
