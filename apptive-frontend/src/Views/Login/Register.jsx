@@ -49,7 +49,8 @@ const Register = () => {
       .then((data) => {
         console.log(data);
         // Redirect to the dashboard after successful login
-        navigate("/dashboard");
+        navigate(`/${userData.id}/dashboard`);
+        
       })
       .catch((error) => console.error("Error during registration:", error));
 // hihelo
