@@ -135,12 +135,27 @@ app.get("/:user_id", (req, res) => {
     }
   );
 });
-
 app.get("/:user_id/dashboard", (req, res) => {
   const userId = req.params.user_id;
 
   conn.query(
-    "SELECT f.*, COUNT(n.notes_id) AS notesCount FROM folders f LEFT JOIN notes n ON f.folder_id = n.folder_id WHERE f.user_id = ? ORDER BY f.created_at DESC",
+    `SELECT
+      f.folder_id,
+      f.user_id,
+      f.folder_name,
+      f.description,
+      f.favorited,
+      COUNT(n.notes_id) AS notesCount,
+      f.created_at,
+      f.modified_at
+    FROM
+      folders f
+    LEFT JOIN
+      notes n ON f.folder_id = n.folder_id
+    WHERE
+      f.user_id = ?
+    GROUP BY
+      f.folder_id`,
     [userId],
     (error, data) => {
       if (error) {
@@ -154,7 +169,6 @@ app.get("/:user_id/dashboard", (req, res) => {
           const user = data;
           res.status(200).json({ success: true, user });
         } else {
-          // Modify the response to include a specific message when there are no folders
           res.status(200).json({
             success: true,
             message: "User has no folders yet",
@@ -177,18 +191,13 @@ app.post("/:user_id/dashboard/addFolder", (req, res) => {
     (error, data) => {
       if (error) {
         console.error(error);
-        res
-          .status(500)
-          .json({ error: "unexpected_error", message: error.message });
+        res.status(500).json({ error: "unexpected_error", message: error.message });
       } else {
-        res
-          .status(201)
-          .json({ success: true, message: "Folder added successfully" });
+        res.status(201).json({ success: true, message: "Folder added successfully" });
       }
     }
   );
 });
-
 app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res) => {
   const userId = req.params.user_id;
   const folderId = req.params.folder_id;
@@ -243,7 +252,7 @@ app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
           (deleteFolderError, deleteFolderData)=>
           {
             if (deleteFolderError) {
-              console.error(folderDeleteError);
+              console.error(deleteFolderError);
               res.status(500).json({
                 error: "unexpected_error",
                 message: deleteFolderError.message,

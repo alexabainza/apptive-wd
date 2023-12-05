@@ -1,5 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
+
+
 const UserNavbar = ({ username, user_id }) => {
     const navigate = useNavigate();
   
@@ -18,7 +21,7 @@ const UserNavbar = ({ username, user_id }) => {
             className="navbar-app-name navbar-brand text-white fs-3"
             to="/home"
           >
-            APPTIVE
+          <img className="imageLogo" src={apptiveLogo} />
           </Link>
         </div>
         <div className="navbar-right d-flex align-items-center">

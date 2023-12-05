@@ -12,23 +12,29 @@ function Dashboard() {
   const [noFoldersMessage, setNoFoldersMessage] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/${user_id}/dashboard`)
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/${user_id}/dashboard`);
+        const data = await response.json();
+  
         if (data.success) {
           if (data.user.length === 0) {
             setNoFoldersMessage('You have no folders.');
           } else {
+            console.log(data)
+
             setFolders(data.user);
           }
         } else {
           console.error('Error fetching folders:', data.message);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching folders:', error);
-      });
-  }, [user_id]);
+      }
+    };
+    fetchData(); 
+    }, [user_id]);
+  
 
   const handleEditFolder = (folderId, newFolderName) => {
     fetch(`http://localhost:3000/${user_id}/dashboard/updateFolder/${folderId}`, {
@@ -62,7 +68,6 @@ function Dashboard() {
       return;
     }
   
-    // Add the folder to the database
     fetch(`http://localhost:3000/${user_id}/dashboard/addFolder`, {
       method: 'POST',
       headers: {

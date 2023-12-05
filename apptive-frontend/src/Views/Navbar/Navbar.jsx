@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 
 const Navbar = () => {
   return (
@@ -7,7 +8,7 @@ const Navbar = () => {
       <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-* px-4">
         <div className="navbar-left">
           <Link className="navbar-app-name navbar-brand text-white fs-3" to="/home">
-            APPTIVE
+          <img className="imageLogo" src={apptiveLogo} />
           </Link>
         </div>
         <div className="d-flex align-items-center">
