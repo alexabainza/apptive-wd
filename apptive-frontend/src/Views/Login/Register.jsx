@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 
 const Register = () => {
   const [firstname, setFirstname] = useState("");
@@ -71,14 +72,17 @@ const Register = () => {
       <div className="reigster-right-side w-50 mb-2 px-4 pt-5 d-flex flex-row justify-content-center align-items-start">
         <div className="register-right-contents w-75 d-flex flex-column justify-content-center">
           <div className="register-header text-center mb-2">
-            <div
-              className="login-header-app fs-3 mt-0 mb-4"
+          <div
+              className="login-header-app fs-3 mt-5 mb-4"
               style={{ fontColor: "d74242" }}
-              to="/home"
             >
-              APPTIVE
+              <Link className="navbar-app-name" to="/">
+                <img className="imageLogo" src={apptiveLogo} />
+              </Link>
             </div>
-            <h2 className="text-white">Welcome back</h2>
+            <h2 className="text-white">
+              <strong>Welcome back</strong>
+              </h2>
             <p className="fs-5 text-white">Sign in to continue</p>
           </div>
           <form onSubmit={handleForm}>
@@ -148,7 +152,7 @@ const Register = () => {
               />
             </div>
             <button type="submit" class="register-submit-button my-3">
-              Submit
+              <strong>Submit</strong>
             </button>
           </form>
           {message && <small style={{ color: "red" }}>{message}</small>}
@@ -156,7 +160,7 @@ const Register = () => {
           <small className="text-white text-center">
             Already registered?{" "}
             <Link to="/login" style={{ color: "#D74242" }}>
-              Login
+              <strong>Login</strong>
             </Link>
           </small>
         </div>

@@ -106,7 +106,7 @@ app.get("/:user_id/dashboard", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-
+  
   conn.query(
     "SELECT user_id FROM user_credentials WHERE user_name = ? AND password = ?",
     [username, password],

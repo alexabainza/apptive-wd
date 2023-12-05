@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -22,7 +23,6 @@ const Login = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-
         if (data.success) {
           // Redirect to the dashboard after successful login
           const userId = data.user_id;
@@ -52,11 +52,12 @@ const Login = () => {
             <div
               className="login-header-app fs-3 mt-5 mb-4"
               style={{ fontColor: "d74242" }}
-              to="/home"
             >
-              APPTIVE
+              <Link className="navbar-app-name" to="/">
+                <img className="imageLogo" src={apptiveLogo} />
+              </Link>
             </div>
-            <h2 className="text-white">Welcome back</h2>
+            <h2 className="text-white"><strong>Welcome back</strong></h2>
             <p className="fs-5 text-white mb-0">Sign in to continue</p>
           </div>
           <form onSubmit={handleForm}>
@@ -93,7 +94,7 @@ const Login = () => {
               />
             </div>
             <button type="submit" className="login-submit-button">
-              Submit
+              <strong>Submit</strong>
             </button>
           </form>
           ;{message && <p style={{ color: "red" }}>{message}</p>}
@@ -103,7 +104,7 @@ const Login = () => {
               to="/register"
               style={{ color: "#D74242" }}
             >
-              Sign up
+              <strong>Sign up</strong>
             </Link>
           </small>
         </div>

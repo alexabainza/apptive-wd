@@ -9,6 +9,7 @@ import Login from "./Views/Login/Login";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Profile from "./Views/Profile/Profile";
+import Select from "./Views/Login/Select";
 import "./app.css";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/:user_id/dashboard" element={<Dashboard />} />
         <Route path="/:user_id" element={<Profile />} />
+        <Route path="/select" element={<Select />} />
 
       </Routes>
     </BrowserRouter>

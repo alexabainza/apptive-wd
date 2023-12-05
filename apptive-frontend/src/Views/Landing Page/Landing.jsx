@@ -7,7 +7,7 @@ export const Landing = () => {
 
   const handleGetStarted = () => {
     // Redirect to another page when the "Get Started" button is clicked
-    navigate("/register"); // Replace "/your-target-route" with the desired route
+    navigate("/select"); // Replace "/your-target-route" with the desired route
   };
 
   return (
@@ -19,15 +19,16 @@ export const Landing = () => {
       >
         <div className="landing-content-container text-center p-4">
           <h1 className="landing-main-title text-white  mb-4 w-75">
-            Making Studying Easier for you
+            Make studying easier for you.
           </h1>
-          <p className="text-white fs-4 mt-2 w-50">
-            An app that lets you take notes while seamlessly integrating a
-            quizzing feature. Take notes like you normally would and in just a
-            few clicks you can format it into a quiz to test your knowledge.
+          <p className="text-white fs-md mt-2 w-50">
+            Compile and collect your notes in one application with a feature
+            that allows you to create flashcards alongside your notes. Take a quiz
+            with your flashcards to test your knowledge.
+
           </p>
           <button className="landing-home-button" onClick={handleGetStarted}>
-            Get Started
+            <strong>Get Started</strong>
           </button>
         </div>
       </div>
