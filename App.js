@@ -33,7 +33,7 @@ app.get("/getUsers", (req, res) => {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
-app.post("/register", async(req, res) => {
+app.post("/register", async (req, res) => {
   const id = req.body.id;
   const username = req.body.username;
   const password = req.body.password;
@@ -41,32 +41,39 @@ app.post("/register", async(req, res) => {
   const lastname = req.body.lastname;
   const email = req.body.email;
 
-    try{
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      conn.query(
-        "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
-        [id, username, firstname, lastname, email, hashedPassword],
-        (error, data) => {
-          if (error) {
-            console.error(error);
-            res
-              .status(500)
-              .json({ message: "Error occurred while registering user" });
-          } else {
-            console.log("User registered successfully");
-            res.status(201).json({ message: "User registered successfully" });
-          }
-        }
-        )
-    }    
-    catch(error){
-      console.error(error);
-          res
-            .status(500)
-            .json({ message: "Error occurred while registering user" });
-        } 
-      }
-  );
+  try {
+    // Check if the username already exists
+    const [existingUser] = await conn.promise().query(
+      "SELECT * FROM user_credentials WHERE user_name = ?",
+      [username]
+    );
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({
+        message: "Username already exists.",
+      });
+    }
+
+    // If username is not taken, proceed with user registration
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await conn.promise().query(
+      "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
+      [id, username, firstname, lastname, email, hashedPassword]
+    );
+
+    console.log("User registered successfully");
+    return res.status(201).json({
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error occurred while registering user",
+    });
+  }
+});
+
+
 
   
 app.post("/login", async (req, res) => {

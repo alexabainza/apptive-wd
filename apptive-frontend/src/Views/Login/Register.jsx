@@ -12,6 +12,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(""); // New state for the message
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ const Register = () => {
       setMessage("All fields must be filled in.");
       return;
     }
+  
     let userData = {
       id: generateId(),
       username: username,
@@ -33,7 +35,7 @@ const Register = () => {
       lastname: lastname,
       email: email,
     };
-
+  
     fetch("http://localhost:3000/register", {
       method: "POST",
       headers: {
@@ -41,25 +43,35 @@ const Register = () => {
       },
       body: JSON.stringify(userData),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const data = await response.json();
+  
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(data.message || "Error during registration");
         }
-        return response.json();
-      })
-      .then((data) => {
+  
         console.log(data);
         // Redirect to the dashboard after successful login
         navigate(`/${userData.id}/dashboard`);
+        // Clear all fields and error message on success
+        setFirstname("");
+        setLastname("");
+        setPassword("");
+        setUsername("");
+        setEmail("");
+        setErrorMessage("");
       })
-      .catch((error) => console.error("Error during registration:", error));
-    // hihelo
-    setFirstname("");
-    setLastname("");
-    setPassword("");
-    setUsername("");
-    setEmail("");
+      .catch((error) => {
+        console.error("Error during registration:", error);
+        // Handle the specific error message
+        setErrorMessage(error.message || "Error during registration");
+        // Clear only the username field on error
+        setUsername("");
+      });
   }
+  
+  
+  
 
   return (
     <div className="register-whole-page d-flex flex-row">
@@ -135,6 +147,7 @@ const Register = () => {
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             <div class="form-group mt-2">
               <label className="text-white">
                 <small>Password</small>
