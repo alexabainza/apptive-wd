@@ -1,11 +1,11 @@
 // AddButton.js
 import React, { useState } from 'react';
 import CreateModal from './CreateModal';
+import { PlusCircleFill } from 'react-bootstrap-icons';
 
 // AddButton.js
 const AddButton = ({ user_id, onFolderAdded }) => {
     const [isModalOpen, setModalOpen] = useState(false);
-  
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
   
@@ -27,7 +27,6 @@ const AddButton = ({ user_id, onFolderAdded }) => {
         const data = await response.json();
   
         if (data.success) {
-          // Call the onFolderAdded callback to update the state in the Dashboard component
           onFolderAdded(folderName);
         } else {
           console.error('Error adding folder:', data.message);
@@ -40,9 +39,7 @@ const AddButton = ({ user_id, onFolderAdded }) => {
   
     return (
       <div className="add-button-container">
-        <button className="add-button rounded" onClick={openModal}>
-          +
-        </button>
+        <PlusCircleFill onClick={openModal} size={50} className='text-white' style={{cursor: 'pointer', color: "#D74242!important"}}></PlusCircleFill>
         <CreateModal isOpen={isModalOpen} onClose={closeModal} onAddFolder={handleAddFolder} />
       </div>
     );
