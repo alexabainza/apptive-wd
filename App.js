@@ -3,6 +3,8 @@ const app = express();
 const port = 3000;
 const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const cors = require("cors");
 
@@ -32,25 +34,82 @@ app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-app.post("/register", (req, res) => {
-  const { id, username, firstname, lastname, email, password } = req.body;
+app.post("/register", async(req, res) => {
+  const id = req.body.id;
+  const username = req.body.username;
+  const password = req.body.password;
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
+  const email = req.body.email;
 
+    try{
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      conn.query(
+        "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
+        [id, username, firstname, lastname, email, hashedPassword],
+        (error, data) => {
+          if (error) {
+            console.error(error);
+            res
+              .status(500)
+              .json({ message: "Error occurred while registering user" });
+          } else {
+            console.log("User registered successfully");
+            res.status(201).json({ message: "User registered successfully" });
+          }
+        }
+        )
+    }    
+    catch(error){
+      console.error(error);
+          res
+            .status(500)
+            .json({ message: "Error occurred while registering user" });
+        } 
+      }
+  );
+
+  
+app.post("/login", async (req, res) => {
+  const username = req.body.username.trim();
+  const password = req.body.password.trim();
   conn.query(
-    "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
-    [id, username, firstname, lastname, email, password],
-    (error, data) => {
+    "SELECT user_id, user_name, password FROM user_credentials WHERE user_name = ?",
+    [username],
+    async (error, data) => {
+      console.log("Query Result:", data);
       if (error) {
         console.error(error);
-        res
-          .status(500)
-          .json({ message: "Error occurred while registering user" });
-      } else {
-        console.log("User registered successfully");
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(500).json({
+          success: false,
+          error: "unexpected_error",
+          message: error.message,
+        });
+      } 
+      if (data.length>0){
+        const isMatch = await bcrypt.compare(password, storedPassword)
+
+        if(isMatch){
+          res.status(200).json({
+            success: true,
+            user_id: data[0].user_id,
+            username: data[0].user_name,
+            message: "Login successful",
+          });
+        }
+        else{
+          console.log("Incorrect Password:", password);
+          res.status(401).json({ success: false, message: "Incorrect password" });
+        }
+      }
+      else{
+        res.status(404).json({ success: false, message: "User not found" });
+
       }
     }
   );
 });
+
 
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
@@ -98,41 +157,6 @@ app.get("/:user_id/dashboard", (req, res) => {
           res.status(200).json({
             success: true,
             message: "User has no folders yet",
-          });
-        }
-      }
-    }
-  );
-});
-
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-
-  conn.query(
-    "SELECT user_id FROM user_credentials WHERE user_name = ? AND password = ?",
-    [username, password],
-    (error, data) => {
-      console.log(data);
-      if (error) {
-        console.error(error);
-        res.status(500).json({
-          success: false,
-          error: "unexpected_error",
-          message: error.message,
-        });
-      } else {
-        if (data.length > 0) {
-          const userId = data[0].user_id;
-          res.status(200).json({
-            success: true,
-            message: "Login successful",
-            user_id: userId, // Include user_id in the response
-          });
-        } else {
-          res.status(401).json({
-            success: false,
-            error: "invalid_credentials",
-            message: "Invalid username or password",
           });
         }
       }
