@@ -228,18 +228,32 @@ app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
   const folderId = req.params.folder_id;
 
   conn.query(
-    "DELETE FROM folders WHERE user_id = ? AND folder_id = ?",
-    [userId, folderId],
-    (error, data) => {
-      if (error) {
-        console.error(error);
+    "DELETE FROM notes where folder_id = ?",
+    [folderId],
+    (deleteNoteError, deleteNoteData) => {
+      if (deleteNoteError) {
+        console.error(deleteNoteError);
         res
           .status(500)
-          .json({ error: "unexpected_error", message: error.message });
+          .json({ error: "unexpected_error", message: deleteNoteError.message });
       } else {
-        res
-          .status(200)
-          .json({ success: true, message: "Folder deleted successfully" });
+        conn.query(
+          "DELETE from folders WHERE user_id = ? AND folder_id = ?",
+          [userId, folderId],
+          (deleteFolderError, deleteFolderData)=>
+          {
+            if (deleteFolderError) {
+              console.error(folderDeleteError);
+              res.status(500).json({
+                error: "unexpected_error",
+                message: deleteFolderError.message,
+              });
+            } else {
+              res.status(200).json({
+                success: true,
+                message: "Folder and associated notes deleted successfully",
+              });
+          }})
       }
     }
   );
