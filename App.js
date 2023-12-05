@@ -33,7 +33,6 @@ app.get("/getUsers", (req, res) => {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
-
 app.post("/register", async(req, res) => {
   const id = req.body.id;
   const username = req.body.username;
@@ -87,6 +86,8 @@ app.post("/login", async (req, res) => {
         });
       } 
       if (data.length>0){
+        const storedPassword = data[0].password;
+
         const isMatch = await bcrypt.compare(password, storedPassword)
 
         if(isMatch){
