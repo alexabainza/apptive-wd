@@ -74,7 +74,7 @@ function Dashboard() {
       .then((data) => {
         if (data.success) {
           setFolders((prevFolders) => {
-            return [...prevFolders, { folder_name: newFolderName }];
+            return [...prevFolders, { folder_name: newFolderName, notesCount: 0 }];
           });
           setNoFoldersMessage(null);
         } else {

@@ -140,7 +140,7 @@ app.get("/:user_id/dashboard", (req, res) => {
   const userId = req.params.user_id;
 
   conn.query(
-    "SELECT * FROM folders f WHERE f.user_id = ? ORDER BY created_at DESC",
+    "SELECT f.*, COUNT(n.notes_id) AS notesCount FROM folders f LEFT JOIN notes n ON f.folder_id = n.folder_id WHERE f.user_id = ? ORDER BY f.created_at DESC",
     [userId],
     (error, data) => {
       if (error) {

@@ -15,7 +15,7 @@ const Folders = ({ folders, onDeleteFolder, username, onEditFolder, user_id }) =
             username={username}
             description={folder.description}
             favorited={folder.favorited}
-            noOfNotes={folder.no_of_notes || 0}
+            noOfNotes={folder.notesCount}
             createdAt={folder.created_at}
             modifiedAt={folder.modified_at}
             onDeleteFolder={onDeleteFolder}
