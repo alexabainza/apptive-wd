@@ -1,11 +1,11 @@
 // CreateModal.js
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const CreateModal = ({ isOpen, onClose, onAddFolder }) => {
-  const [folderName, setFolderName] = useState('');
+  const [folderName, setFolderName] = useState("");
 
   const handleAddFolder = () => {
-    if (folderName.trim() !== '') {
+    if (folderName.trim() !== "") {
       // Call the onAddFolder callback with the folder name
       onAddFolder(folderName);
     }
@@ -13,17 +13,38 @@ const CreateModal = ({ isOpen, onClose, onAddFolder }) => {
   };
 
   return (
-    <div className={`create-modal ${isOpen ? 'open' : ''}`}>
+    <div
+      className={`create-modal ${isOpen ? "open" : ""}`}
+      style={{ backgroundColor: "#37425F", borderRadius: "10px", padding: "20px"}}
+
+    >
       <div className="modal-content">
-        <h2>Add Folder</h2>
-        <label>Folder Name:</label>
+        <h3 className="text-white">Add Folder</h3>
+        <label className="text-white">
+          <small>Folder name</small>
+        </label>
         <input
           type="text"
           value={folderName}
+          className="form-control"
           onChange={(e) => setFolderName(e.target.value)}
         />
-        <button onClick={handleAddFolder}>Save</button>
-        <button onClick={onClose}>Cancel</button>
+        <div className="modal-options d-flex justify-content-between mt-2 ">
+          <button
+            onClick={handleAddFolder}
+            className="w-50 me-1"
+            style={{ backgroundColor: "#D74242" }}
+          >
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="w-50 ms-1"
+            style={{ backgroundColor: "#D74242" }}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

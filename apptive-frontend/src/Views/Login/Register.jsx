@@ -7,6 +7,8 @@ import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 const Register = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +18,6 @@ const Register = () => {
 
   function generateId() {
     return Math.floor(Math.random() * 1000000);
-    
   }
 
   function handleForm(e) {
@@ -50,10 +51,10 @@ const Register = () => {
       .then((data) => {
         console.log(data);
         // Redirect to the dashboard after successful login
-        navigate("/dashboard");
+        navigate(`/${userData.id}/dashboard`);
       })
       .catch((error) => console.error("Error during registration:", error));
-// hihelo
+    // hihelo
     setFirstname("");
     setLastname("");
     setPassword("");
@@ -142,14 +143,26 @@ const Register = () => {
               <label className="text-white">
                 <small>Password</small>
               </label>
-              <input
-                style={{ backgroundColor: "#37425F" }}
-                type="password"
-                name="password"
-                className="form-control text-white"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="input-group">
+                <input
+                  style={{ backgroundColor: "#37425F" }}
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="form-control text-white"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <div className="input-group-append">
+                  <button
+                    type="button"
+                    className="btn btn-link text-white"
+                    style={{ border: "none", background: "transparent" }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <small>{showPassword ? "Hide" : "Show"}</small>
+                  </button>
+                </div>
+              </div>
             </div>
             <button type="submit" class="register-submit-button my-3">
               <strong>Submit</strong>
