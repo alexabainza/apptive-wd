@@ -19,17 +19,20 @@ const Note = ({
 
   return (
     <div>
-      <div className="note-list-item align-items-center justify-content-between text-white d-flex">
+      <div className="note-list-item pb-0align-items-center justify-content-between text-white d-flex">
         <Link
           to={`/${user_id}/${folder_name}/${notes_id}`}
           className="note-item text-white d-flex align-items-center jusify-content-between"
         >
-          <h5>{title}</h5>
-          <small className="my-3"> {last_modified}</small>
-
+          <h5 className="note-title">{title}</h5>
         </Link>
         <div>
-          <button onClick={handleDeleteNote}>
+        <small className="note-date-modified my-3">
+          {new Date(last_modified).toLocaleString()}
+
+          </small>
+
+          <button className="note-delete-icon" onClick={handleDeleteNote}>
             <Trash size={15}></Trash>
           </button>
         </div>

@@ -1,7 +1,8 @@
 import React from "react";
 import UserNavbar from "../Dashboard/UserNavbar";
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 const AddNotesPage = ({ folder }) => {
   const [noteTitle, setNoteTitle] = useState("");
@@ -20,15 +21,9 @@ const AddNotesPage = ({ folder }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ noteTitle, contents }), // Corrected here
+          body: JSON.stringify({ noteTitle, contents }),
         }
       );
-  
-      // if (!response.ok) {
-      //   throw new Error("Failed to save note");
-      // }
-  
-      // Redirect to the NotesPage after successfully saving the note
       navigate(`/${user_id}/${folder_name}`);
     } catch (error) {
       console.error("Error saving note:", error.message);
@@ -39,8 +34,13 @@ const AddNotesPage = ({ folder }) => {
   return (
     <div className="add-notes-page">
       <UserNavbar />
+      <div className="form-group mx-5 mb-4">
+
+      <Link to = {`../${user_id}/${folder_name}`} className="mb-5" >{"<"}   Back</Link>
+</div>
       <form onSubmit={handleAddNote}>
-        <div className="form-group mx-5 my-5">
+        <div className="form-group mx-5 my-1">
+
           <input
             className="form-control mb-3"
             type="text"

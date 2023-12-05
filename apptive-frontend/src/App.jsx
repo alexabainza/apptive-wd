@@ -1,5 +1,3 @@
-// App.jsx
-
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Register from "./Views/Login/Register";
@@ -13,21 +11,26 @@ import "./app.css";
 import NotesPage from "./Views/Notes/NotesPage";
 import IndivNote from "./Views/Notes/IndivNote";
 import AddNotesPage from "./Views/Notes/AddNotesPage";
+import ChooseUser from "./Views/ChooseUser/ChooseUser";
 
 function App() {
   return (
     <BrowserRouter>
-<Routes>
-  <Route path="/" element={<Landing />} />
-  <Route path="/register" element={<Register />} />
-  <Route path="/login" element={<Login />} />
-  <Route path="/:user_id/dashboard" element={<Dashboard />} />
-  <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
-  <Route path="/:user_id/:folder_name" element={<NotesPage />} />
-  <Route path="/:user_id" element={<Profile />} />
-  <Route path="/:user_id/:folder_name/addNote" element={<AddNotesPage/>}/>
-</Routes>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/:user_id/dashboard" element={<Dashboard />} />
+        <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
+        <Route path="/:user_id/:folder_name" element={<NotesPage />} />
+        <Route path="/:user_id" element={<Profile />} />
+        <Route path="/chooseUser" element={<ChooseUser/>} />
 
+        <Route
+          path="/:user_id/:folder_name/addNote"
+          element={<AddNotesPage />}
+        />
+      </Routes>
     </BrowserRouter>
   );
 }

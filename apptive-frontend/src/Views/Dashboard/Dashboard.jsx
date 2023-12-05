@@ -7,18 +7,16 @@ import AddButton from './AddButton';
 function Dashboard() {
   const location = useLocation();
   const { user_id } = useParams();
-  // const { username } = location.state;
+  const username = location.state && location.state.username;
   const [folders, setFolders] = useState([]); // Initialize with an empty array
   const [noFoldersMessage, setNoFoldersMessage] = useState(null);
 
-  // Inside the useEffect block where you fetch folders
   useEffect(() => {
     fetch(`http://localhost:3000/${user_id}/dashboard`)
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
           if (data.user.length === 0) {
-            // Display the message when there are no folders
             setNoFoldersMessage('You have no folders.');
           } else {
             setFolders(data.user);
@@ -75,7 +73,6 @@ function Dashboard() {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // Update the state using a functional update to ensure the latest state
           setFolders((prevFolders) => {
             return [...prevFolders, { folder_name: newFolderName }];
           });
@@ -112,13 +109,13 @@ function Dashboard() {
 
   return (
     <div className="user-dashboard mt-0">
-      <UserNavbar user_id={user_id} />
+      <UserNavbar user_id={user_id} username={username} />
       <div className="user-dashboard-bottom mx-4">
         <h2 className="text-white">Your folders</h2>
         {noFoldersMessage ? (
-          <p>{noFoldersMessage}</p>
+          <p className="text-white">{noFoldersMessage}</p>
         ) : (
-          folders ? <Folders user_id = {user_id} folders={folders} onDeleteFolder={handleFolderDeleted} onEditFolder={handleEditFolder}/> : <p>Loading folders...</p>
+          folders ? <Folders user_id = {user_id} username={username} folders={folders} onDeleteFolder={handleFolderDeleted} onEditFolder={handleEditFolder}/> : <p>Loading folders...</p>
         )}
       </div>
       <AddButton user_id={user_id} onFolderAdded={handleFolderAdded} />

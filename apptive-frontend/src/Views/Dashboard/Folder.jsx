@@ -5,6 +5,7 @@ const Folder = ({
   user_id,
     folderId,
     folderName,
+    username,
   description,
   favorited,
   noOfNotes,
@@ -59,7 +60,7 @@ setIsEditing(true);
         <div className="dashboard-body-left d-flex flex-column">
               <Link to={`/${user_id}/${folderName}`} className="text-white">
 
-          <h4 className="mt-3 mb-0">{folderName}</h4>
+          <h4 className="folder-name mt-3 mb-0">{folderName}</h4>
         <p className="text-white">{`${noOfNotes} notes`}</p>
         </Link>
 
@@ -74,9 +75,10 @@ setIsEditing(true);
       </div>
 
       {isMenuOpen && !isEditing && (
-        <div className="popup" style={{ position: "fixed", bottom: 0, right: 0 }}>
-          <button onClick={handleDeleteClick}>Delete</button>
-          <button onClick={handleEditClick}>Edit</button>
+        <div>
+        {/* <div className="folder-popup d-flex justify-content-between align-items-center" > */}
+          <button onClick={handleDeleteClick} className="folder-options btn btn-primary"><h4 style={{fontSize: "15px"}}>Delete</h4></button>
+          <button onClick={handleEditClick} className="folder-options btn btn-primary"><h4 style={{fontSize: "15px"}}>Edit</h4></button>
         </div>
       )}
     </div>

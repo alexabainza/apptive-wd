@@ -1,11 +1,10 @@
-// Login.jsx
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState(""); // New state for the message
   const navigate = useNavigate();
 
@@ -82,15 +81,27 @@ const Login = () => {
                   <strong>PASSWORD</strong>
                 </small>
               </label>
-              <input
-                type="password"
-                className="form-control text-white"
-                style={{ backgroundColor: "#37425F" }}
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-              />
+              <div className="input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-control text-white"
+                  style={{ backgroundColor: "#37425F" }}
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                />
+                <div className="input-group-append">
+                <button
+                  type="button"
+                  className="btn btn-link text-white"
+                  style={{border: "none", background: "transparent"}}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <small>{showPassword ? "Hide" : "Show"}</small>
+                </button>
+                </div>
+              </div>
             </div>
             <button type="submit" className="login-submit-button">
               Submit
@@ -99,10 +110,7 @@ const Login = () => {
           ;{message && <p style={{ color: "red" }}>{message}</p>}
           <small className="text-white text-center">
             Haven't registered yet?{" "}
-            <Link
-              to="/register"
-              style={{ color: "#D74242" }}
-            >
+            <Link to="/register" style={{ color: "#D74242" }}>
               Sign up
             </Link>
           </small>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 
 const IndivNote = () => {
@@ -60,9 +60,11 @@ const IndivNote = () => {
   return (
     <div className="individual-note">
       <UserNavbar />
+      <div className="individual-note-content mx-5">
+      <Link to = {`../${user_id}/${folder_name}`} className="mb-5" >{"<"}   Back</Link>
       {note.notes_id && (
         <>
-          <h1 className="text-white">
+          <h1 className="text-white mt-2 mb-3">
             {isEditing ? (
               <input
                 type="text"
@@ -75,7 +77,6 @@ const IndivNote = () => {
               note.note_title
             )}
           </h1>
-          <p>Last Modified: {new Date(note.modified_at).toLocaleString()}</p>
           <textarea
             className="form-control"
             name="contents"
@@ -93,6 +94,7 @@ const IndivNote = () => {
           )}
         </>
       )}
+      </div>
     </div>
   );
 };
