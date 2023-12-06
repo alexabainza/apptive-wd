@@ -51,10 +51,24 @@ app.post("/register", async (req, res) => {
     if (existingUser.length > 0) {
       return res.status(400).json({
         message: "Username already exists.",
+        field: "username"
       });
     }
 
-    // If username is not taken, proceed with user registration
+    // Check if the email is already in use
+    const [existingEmail] = await conn.promise().query(
+      "SELECT * FROM user_credentials WHERE email = ?",
+      [email]
+    );
+
+    if (existingEmail.length > 0) {
+      return res.status(400).json({
+        message: "Email already linked to another account.",
+        field: "email"
+      });
+    }
+
+    // If username and email are not taken, proceed with user registration
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     await conn.promise().query(
       "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
@@ -72,6 +86,7 @@ app.post("/register", async (req, res) => {
     });
   }
 });
+
 
 
 

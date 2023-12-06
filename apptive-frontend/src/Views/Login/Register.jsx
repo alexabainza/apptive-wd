@@ -1,5 +1,3 @@
-// UserLogin.jsx
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -11,8 +9,11 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(""); // New state for the message
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState(""); // New state for email error
+  const [combinedError, setCombinedError] = useState("");
+
 
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ const Register = () => {
     return Math.floor(Math.random() * 1000000);
   }
 
-  function handleForm(e) {
+  const handleForm = async (e) => {
     e.preventDefault();
     if (!firstname || !lastname || !username || !email || !password) {
       setMessage("All fields must be filled in.");
@@ -36,40 +37,50 @@ const Register = () => {
       email: email,
     };
   
-    fetch("http://localhost:3000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    })
-      .then(async (response) => {
-        const data = await response.json();
-  
-        if (!response.ok) {
-          throw new Error(data.message || "Error during registration");
-        }
-  
-        console.log(data);
-        // Redirect to the dashboard after successful login
-        navigate(`/${userData.id}/dashboard`);
-        // Clear all fields and error message on success
-        setFirstname("");
-        setLastname("");
-        setPassword("");
-        setUsername("");
-        setEmail("");
-        setErrorMessage("");
-      })
-      .catch((error) => {
-        console.error("Error during registration:", error);
-        // Handle the specific error message
-        setErrorMessage(error.message || "Error during registration");
-        // Clear only the username field on error
-        setUsername("");
+    try {
+      const response = await fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
       });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error during registration");
+      }
+  
+      console.log(data);
+      navigate(`/${userData.id}/dashboard`);
+      setFirstname("");
+      setLastname("");
+      setPassword("");
+      setUsername("");
+      setEmail("");
+      setEmailError("");
+      setCombinedError("");
+      setUsernameError("");
+    }
+   catch (error) {
+
+    setUsernameError("");
+    setEmailError("");
+  
+    // Check if the error message contains information about email or username
+    if (error.message.toLowerCase().includes("username")) {
+      setUsernameError(error.message);
+    } else if (error.message.toLowerCase().includes("email")) {
+      setEmailError(error.message);
+    } else {
+      // If the error message doesn't contain specific information, set a generic error
+      setUsernameError("Error during registration");
+    }
   }
   
+  
+  };
   
   
 
@@ -94,8 +105,9 @@ const Register = () => {
             <h2 className="text-white">Welcome back</h2>
             <p className="fs-5 text-white">Sign in to continue</p>
           </div>
+
           <form onSubmit={handleForm}>
-            <div class="form-group mt-0 pt-0">
+            <div className="form-group mt-0 pt-0">
               <label className="text-white">
                 <small>First Name</small>
               </label>
@@ -108,7 +120,7 @@ const Register = () => {
                 onChange={(e) => setFirstname(e.target.value)}
               />
             </div>
-            <div class="form-group mt-2">
+            <div className="form-group mt-2">
               <label className="text-white">
                 <small>Last Name</small>
               </label>
@@ -121,7 +133,7 @@ const Register = () => {
                 onChange={(e) => setLastname(e.target.value)}
               />
             </div>
-            <div class="form-group mt-2">
+            <div className="form-group mt-2">
               <label className="text-white">
                 <small>Enter email</small>
               </label>
@@ -134,7 +146,9 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div class="form-group mt-2">
+            {emailError&& <p style={{ color: "red" }}>{emailError}</p>}
+
+            <div className="form-group mt-2">
               <label className="text-white">
                 <small>Enter username</small>
               </label>
@@ -147,8 +161,8 @@ const Register = () => {
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-            <div class="form-group mt-2">
+            {usernameError && <p style={{ color: "red" }}>{usernameError}</p>}
+            <div className="form-group mt-2">
               <label className="text-white">
                 <small>Password</small>
               </label>
@@ -173,11 +187,11 @@ const Register = () => {
                 </div>
               </div>
             </div>
-            <button type="submit" class="register-submit-button my-3">
+            <button type="submit" className="register-submit-button my-3">
               Submit
             </button>
           </form>
-          {message && <small style={{ color: "red" }}>{message}</small>}
+          {/* {combinedError && <p style={{ color: "red" }}>{combinedError}</p>} */}
 
           <small className="text-white text-center">
             Already registered?{" "}
