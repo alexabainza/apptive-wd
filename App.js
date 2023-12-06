@@ -134,6 +134,32 @@ app.post("/login", async (req, res) => {
 });
 
 
+app.get("/guestDashboard", (req, res) => {
+  console.log("Request received at /guestDashboard");
+
+  conn.query("SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id", (error, data) => {
+
+    if (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Unexpected error",
+      });
+    } else {
+      console.log("Fdsffd")
+
+      console.log(data); // Log the data for debugging
+      if (data.length > 0) {
+        res.status(200).json({ success: true, data });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "No notes yet.",
+        });
+      }
+    }
+  });
+});
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
 
@@ -157,6 +183,9 @@ app.get("/:user_id", (req, res) => {
     }
   );
 });
+
+
+
 app.get("/:user_id/dashboard", (req, res) => {
   const userId = req.params.user_id;
 
