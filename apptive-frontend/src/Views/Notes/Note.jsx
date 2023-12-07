@@ -19,7 +19,7 @@ const Note = ({
 
   return (
     <div>
-      <div className="note-list-item pb-0align-items-center justify-content-between text-white d-flex">
+      <div className="note-list-item pb-0 align-items-center justify-content-between text-white d-flex">
         <Link
           to={`/${user_id}/${folder_name}/${notes_id}`}
           className="note-item text-white d-flex align-items-center jusify-content-between"

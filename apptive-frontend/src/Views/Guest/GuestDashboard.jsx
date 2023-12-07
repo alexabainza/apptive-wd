@@ -39,7 +39,11 @@ const GuestDashboard = () => {
         <div className='guest-dashboard-contents mx-5'>
             
             <h3 className='text-white mb-5'>Community Notes</h3>
-            <div className = "guest-dashboard-header">
+            <div className = "guest-dashboard-table-header border border-white d-flex justify-content-between p-3">
+              <small className='text-white w-25 text-center'>Title</small>
+              <small className='text-white w-25 text-center'>Folder</small>
+              <small className='text-white w-25 text-center'>Creator</small>
+              <small className='text-white w-25 text-center'>Last Modified</small>
 
             </div>
               <div className='guest-dashboard-notes-list'>
