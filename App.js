@@ -185,6 +185,49 @@ app.get("/guestDashboard/:note_id", (req, res) => {
   );
 });
 
+app.get("/viewProfile/:username", (req, res) => {
+  const username = req.params.username;
+  conn.query(
+    "SELECT * FROM user_credentials WHERE user_name = ?",
+    [username],
+    (error, result) => {
+      if (error) {
+        console.error("Error fetching user details:", error);
+        res.status(500).json({
+          success: false,
+          error: "unexpected_error",
+          message: "Error fetching user details",
+        });
+      } else {
+        console.log("Query result:", result); // Log the query result
+
+        if (result.length > 0) {
+          const userDetails = {
+            user_id: result[0].user_id,
+            user_name: result[0].user_name,
+            firstname: result[0].firstname,
+            lastname: result[0].lastname,
+            email: result[0].email,
+            user_type: result[0].user_type,
+          };
+          console.log("User details:", userDetails);
+          res.status(200).json({
+            success: true,
+            user: userDetails,
+          });
+        } else {
+          console.log("User not found for username:", username);
+          res.status(404).json({
+            success: false,
+            error: "user_not_found",
+            message: "User not found",
+          });
+        }
+      }
+    }
+  );
+});
+
 
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
@@ -348,7 +391,6 @@ app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
 app.get("/:user_id/:folder_name", (req, res) => {
   const folder_name = req.params.folder_name;
   const user_id = req.params.user_id;
-  console.log("fldskfdsgsdg");
   conn.query(
     "SELECT f.folder_name, n.* FROM notes n INNER JOIN folders f ON f.folder_id = n.folder_id WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ?",
     [user_id, user_id, folder_name],
