@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const { v4: generateUniqueId } = require("uuid"); // Add this line
 
 const cors = require("cors");
 
@@ -572,4 +573,51 @@ app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
       }
     }
   );
+});
+
+app.post("/createGuest", (req, res) => {
+  const guestId = generateUniqueId(); // Replace with your actual logic for generating IDs
+  conn.query(
+    "INSERT INTO guests (guest_id) VALUES (?)",
+    ['guest_' + guestId],
+    (error, result) => {
+      if (error) {
+        console.error("Error creating guest user:", error);
+        res.status(500).json({
+          success: false,
+          error: "unexpected_error",
+          message: "Error creating guest user",
+        });
+      } else {
+        console.log("Guest user created successfully");
+        res.status(200).json({
+          success: true,
+          message: "Guest user created successfully",
+        });
+      }
+    }
+  );
+});
+
+app.post("/logVisitedDocument", (req, res) => {
+  const { person_id, note_id } = req.body;
+  console.log("Received request:", person_id, note_id);
+
+  if (!person_id || !note_id) {
+    return res.status(400).json({ error: "Bad Request" });
+  }
+
+  // Insert a record into the visited_documents table
+  const sql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
+  const values = [person_id, note_id];
+
+  conn.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting record:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    console.log("Record inserted successfully");
+    return res.status(200).json({ message: "Visited document logged successfully" });
+  });
 });
