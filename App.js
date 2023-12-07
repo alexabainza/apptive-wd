@@ -137,7 +137,7 @@ app.post("/login", async (req, res) => {
 app.get("/guestDashboard", (req, res) => {
   console.log("Request received at /guestDashboard");
 
-  conn.query("SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id", (error, data) => {
+  conn.query("SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1", (error, data) => {
 
     if (error) {
       console.error(error);
@@ -160,6 +160,32 @@ app.get("/guestDashboard", (req, res) => {
     }
   });
 });
+
+app.get("/guestDashboard/:note_id", (req, res) => {
+  const note_id = req.params.note_id;
+  console.log("Received notes_id:", note_id);
+
+  conn.query(
+    "SELECT n.*, uc.user_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id WHERE n.notes_id = ?",
+    [note_id],
+    (error, data) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        if (data.length === 0) {
+          res.status(404).json({ error: "Note not found" });
+        } else {
+          res.setHeader("Content-Type", "application/json");
+          const note = data[0]; // Assuming there is only one matching note
+          res.json(note);
+        }
+      }
+    }
+  );
+});
+
+
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
 

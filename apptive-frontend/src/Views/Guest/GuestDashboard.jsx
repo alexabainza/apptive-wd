@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import Navbar from '../Navbar/Navbar'
 import { useState } from 'react'
+import CommunityNote from './CommunityNote'
 const GuestDashboard = () => {
   const [notes, setNotes] = useState([])
   const [noNotesMessage, setNotesMessage] = useState(null);
@@ -37,7 +38,18 @@ const GuestDashboard = () => {
         <Navbar/>
         <div className='guest-dashboard-contents mx-5'>
             
-            <h3 className='text-white'>Community Notes</h3>
+            <h3 className='text-white mb-5'>Community Notes</h3>
+            <div className = "guest-dashboard-header">
+
+            </div>
+              <div className='guest-dashboard-notes-list'>
+              {notes.map((note)=>(
+                <div key={note.notes_id}>
+                    <CommunityNote note = {note}/>
+                  </div>
+              
+              ))}
+            </div>
             </div>
 
     </div>
