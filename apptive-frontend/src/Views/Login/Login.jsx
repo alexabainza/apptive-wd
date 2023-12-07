@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -35,7 +36,7 @@ const Login = () => {
         console.error("Error during login:", error);
         setMessage(`An unexpected error occurred: ${error.message}`);
       });
-  }
+  }``
 
   return (
     <div className="login-whole-page d-flex flex-row">
@@ -48,15 +49,11 @@ const Login = () => {
       <div className="login-right-side w-50 px-4 pt-5 d-flex flex-row justify-content-center align-items-start">
         <div className="login-right-contents w-75 d-flex flex-column justify-content-center">
           <div className="login-header text-center mb-5">
-            <div
-              className="login-header-app fs-3 mt-5 mb-4"
-              style={{ fontColor: "d74242" }}
-              to="/home"
-            >
-              APPTIVE
-            </div>
-            <h2 className="text-white">Welcome back</h2>
-            <p className="fs-5 text-white mb-0">Sign in to continue</p>
+            <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
+              <img className="imageLogo" src={apptiveLogo} />
+            </Link>
+            <h2 className="text-white mt-4"><strong>Welcome back</strong></h2>
+            <p className="fs-5 text-white mb-0">Login to continue</p>
           </div>
           <form onSubmit={handleForm}>
             <div className="form-group">

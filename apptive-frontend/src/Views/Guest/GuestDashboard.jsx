@@ -33,8 +33,8 @@ const GuestDashboard = () => {
 )
 
   return (
-    <div className='guest-dashboard-page'>
-        <Navbar/>
+    <div className="d-flex flex-column">
+        <Navbar className='guestNavbar'/>
         <div className='guest-dashboard-contents mx-5'>
             
             <h3 className='text-white'>Community Notes</h3>

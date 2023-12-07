@@ -12,6 +12,8 @@ import NotesPage from "./Views/Notes/NotesPage";
 import IndivNote from "./Views/Notes/IndivNote";
 import AddNotesPage from "./Views/Notes/AddNotesPage";
 import Select from "./Views/Login/Select";
+import GuestDashboard from "./Views/Guest/GuestDashboard";
+
 function App() {
   return (
     <BrowserRouter>
@@ -24,6 +26,7 @@ function App() {
         <Route path="/:user_id/:folder_name" element={<NotesPage />} />
         <Route path="/:user_id" element={<Profile />} />
         <Route path="/select" element={<Select />} />
+        <Route path="/guestdashboard" element={<GuestDashboard />} />
 
         <Route
           path="/:user_id/:folder_name/addNote"

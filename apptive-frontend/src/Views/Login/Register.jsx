@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 
 const Register = () => {
   const [firstname, setFirstname] = useState("");
@@ -95,14 +96,10 @@ const Register = () => {
       <div className="reigster-right-side w-50 mb-2 px-4 pt-5 d-flex flex-row justify-content-center align-items-start">
         <div className="register-right-contents w-75 d-flex flex-column justify-content-center">
           <div className="register-header text-center mb-2">
-            <div
-              className="login-header-app fs-3 mt-0 mb-4"
-              style={{ fontColor: "d74242" }}
-              to="/home"
-            >
-              APPTIVE
-            </div>
-            <h2 className="text-white">Welcome back</h2>
+            <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
+              <img className="imageLogo" src={apptiveLogo} />
+            </Link>
+            <h2 className="text-white mt-4"><strong>Welcome back</strong></h2>
             <p className="fs-5 text-white">Sign in to continue</p>
           </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 
@@ -9,6 +9,15 @@ export const Landing = () => {
     // Redirect to another page when the "Get Started" button is clicked
     navigate("/select"); // Replace "/your-target-route" with the desired route
   };
+
+  useEffect(() => {
+    // Disable scrolling when the component mounts
+    document.body.style.overflow = "hidden";
+    // Re-enable scrolling when the component is unmounted
+  return () => {
+  document.body.style.overflow = "visible";
+  };
+  }, []);
 
   return (
     <div className="d-flex flex-column">
@@ -27,7 +36,7 @@ export const Landing = () => {
             with your flashcards to test your knowledge.
           </p>
           <button className="landing-home-button" onClick={handleGetStarted}>
-            Get Started
+            <strong>Get Started</strong>
           </button>
         </div>
       </div>
