@@ -26,15 +26,14 @@ const CommunityIndivNote = () => {
   
 
   return (
-    <div className="community-indiv-note">
-        <Navbar/>
- <div className="text-white">
-      <p className="w-25 text-center fs-5 mb-0">{note.note_title}</p>
+    <div className="community-indiv-note d-flex flex-column justify-content-center align-items-center">
+      <Navbar/>
+      <div className="notecont mt-5 text-white d-flex flex-column justify-content-center align-items-center">
+        <h2 className="w-75 text-center mt-3"><strong>{note.note_title}</strong></h2>
 
-      <p className="w-25 text-center fs-5 mb-0">{note.user_name}</p>
-      <p className="w-25 text-center fs-5 mb-0">{note.contents}</p>
-
-    </div>
+        <p className="w-75 text-center fs-6 mb-0">@{note.user_name}</p>
+        <p className="w-75 text-center fs-5 mt-5">{note.contents}</p>
+      </div>
     </div>
    
   );

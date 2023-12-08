@@ -19,7 +19,6 @@ export const Landing = () => {
   };
   }, []);
 
-
   return (
     <div className="d-flex flex-column">
       <Navbar />

@@ -50,25 +50,27 @@ const Select = () => {
 
   return (
     <div className="d-flex flex-column">
-    <Navbar />
-      <div className="centercontent">
+      <Navbar />
+      <div className="centercontainer">
         <h2 className="signin">
           <strong>Sign in as</strong>
         </h2>
         <div>
-          <button onClick={handleGuestButtonClick}>
+          
+          <button className="selectButtons" onClick={handleGuestButtonClick}>
             <BoxCard icon={guesticon} text="Guest" />
           </button>
 
           <Link to="/login">
-            <button>
+            <button className="selectButtons">
               <BoxCard icon={membericon} text="Member" />
             </button>
           </Link>
-          <button onClick={handleClearLocalStorageClick}>
-            Clear Local Storage
-          </button>
+
         </div>
+          <button className="clearlocal mt-3" onClick={handleClearLocalStorageClick}>
+            <strong>Clear Local Storage</strong>
+          </button>
       </div>
     </div>
   );

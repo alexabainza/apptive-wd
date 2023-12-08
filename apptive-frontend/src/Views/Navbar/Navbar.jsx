@@ -5,7 +5,7 @@ import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
 const Navbar = () => {
   return (
     <>
-      <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-* px-4">
+      <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-* px-4">
         <div className="navbar-left">
         <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
           <img className="imageLogo" src={apptiveLogo} />
@@ -14,22 +14,16 @@ const Navbar = () => {
         <div className="d-flex align-items-center ml-auto">
           <ul className="navbar-nav">
           <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
+              <Link className="navbar-feat nav-link text-white" to="/features" >
                 Features
               </Link>
             </li>
-            <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
-                Contact Us
-              </Link>
-            </li>
-            <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
+            {/* <li className="textnav nav-item ml-5">
+              <Link className="navbar-feat nav-link text-white" to="/aboutus">
                 About Us
               </Link>
-            </li>
-            {/* <p className="text-white fs-3">|</p> */}
-            <li className="textnav nav-item ml-5">
+            </li> */}
+            <li className="nav-item ml-5">
               <Link className="nav-link text-white" to="/login">
                 <button className="navbar-login btn btn-transparent text-white" >Log In</button>
               </Link>

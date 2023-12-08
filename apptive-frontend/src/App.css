@@ -12,8 +12,8 @@ body {
 /* NAVBAR */
 .textnav {
   margin-top: 8px;
+  margin-right: 16px;
 }
-
 
 .imageLogo{
   width: 230px;
@@ -44,10 +44,12 @@ body {
 }
 
 .navbar{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
   margin-top: 8px;
-
-    width: 100%;
-
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: last baseline;
@@ -83,7 +85,6 @@ body {
   border-radius: 10em;
   background-color: #d74242;
 }
-
 
 .login-right-contents {
   margin-top: 90px;
@@ -153,15 +154,29 @@ body {
   object-fit: cover;
   width: 100%;
 }
+
 /* SELECT */
 .cardButton {
   padding: 0px;
   color: transparent;
   margin: 16px;
   border-radius: 32px;
-  border: 2px solid #ffffff;
+  border: 2px solid #ffebeb;
   background-color: transparent;
   transition: color 0.3s ease;
+}
+
+.selectButtons {
+  background-color: transparent;
+}
+
+.clearlocal {
+  background-color: #d74242;
+}
+
+.clearlocal:hover {
+  background-color: #ffebeb;
+  color: #d74242;
 }
 
 .cardcont {
@@ -208,16 +223,12 @@ body {
 
 .centercontainer { 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  max-height: 100vh;
   width: 100vw;
-}
-
-.centercontent {
-  display: grid;
-  place-items: center;
-  align-items: flex-start;
+  overflow: hidden;
 }
 
 /* GUEST DASHBOARD */
@@ -302,8 +313,8 @@ body {
 }
 
 .user-dashboard{
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100%;
+  width: 100%;
 }
 
 .user-navbar-dropdown:hover{
@@ -518,17 +529,37 @@ padding: 0px 20px;
 
 /* GUEST DASHBOARD */
 .guest-dashboard-page{
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100%;
+  width: 100%;
 }
 
 .guest-dashboard-contents{
-  margin-top: 5vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Adjust if needed */
+  width: 100vw;
+  overflow: hidden;
+  margin: auto; /* This will horizontally center the div */
+}
 
+.guest-dashboard-table-header {
+  width: 150vh;
+}
+
+.guest-dashboard-notes-list {
+  width: 150vh;
 }
 
 .community-indiv-note{
-  min-height: 100vh;
+  min-height: 100%;
+  width: 100%;
+}
+
+.notecont {
+  background-color: rgba(134, 134, 134, 0.226);
+  height: 80vh;
   width: 100vw;
 }
 
@@ -549,7 +580,7 @@ padding: 0px 20px;
   border-radius: 50px;
   cursor: pointer;
 }
-/*PROFILE*/
+
 /* PROFILE */
 .tagBox {
   background-color: transparent;
@@ -638,4 +669,34 @@ padding: 0px 20px;
 .signoutLink:hover {
   color: inherit; /* Inherit color from parent */
   text-decoration: none; /* Remove underline */
+}
+
+/* LANDING NAVTEXTS */
+.ftContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  width: 1000px;
+  height: 500px;
+  margin: 0 auto;
+  /* background-color: black; */
+  margin-left: 28%;
+}
+
+.folderPic {
+  width: 200px;
+  height: auto;
+}
+
+.backback {
+  background-color: #d74242;
+  border: none;
+}
+
+.backback:hover {
+  background-color: #d74242;
+  background-color: #ffebeb;
+  color: #d74242;
+  border: none;
 }
