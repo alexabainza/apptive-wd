@@ -51,8 +51,8 @@ const Folder = ({
             onChange={(e) => setNewFolderName(e.target.value)}
           />
           <div>
-            <button onClick={handleSaveChanges}>Save</button>
-            <button onClick={handleCancelEdit}>Cancel</button>
+          <button className="folder-options btn btn-primary" onClick={handleSaveChanges} style={{ fontSize: "15px" }}>Save</button>
+            <button className="folder-options btn btn-primary" onClick={handleCancelEdit} style={{ fontSize: "15px" }}>Cancel</button>
           </div>
         </div>
       ) : (

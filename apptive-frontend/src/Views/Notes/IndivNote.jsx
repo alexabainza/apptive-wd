@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
+import FlashcardPage from "./Flashcards";
 
 const IndivNote = () => {
   const { user_id, folder_name, note_id } = useParams();
   const [note, setNote] = useState({});
   const [editedNote, setEditedNote] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
 
   useEffect(() => {
     fetch(`http://localhost:3000/${user_id}/${folder_name}/${note_id}`)
@@ -24,6 +26,10 @@ const IndivNote = () => {
         console.error("Error fetching note:", error);
       });
   }, [note_id]);
+  const handleToggleFlashcardPage = () => {
+    setShowFlashcardPage((prevShowFlashcardPage) => !prevShowFlashcardPage);
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,6 +62,7 @@ const IndivNote = () => {
       console.error("Error saving changes:", error.message);
     }
   };
+
 
   return (
     <div className="individual-note">
@@ -94,8 +101,17 @@ const IndivNote = () => {
             {!isEditing && (
               <button onClick={() => setIsEditing(true)}>Edit</button>
             )}
+            {!isEditing && (
+              <>
+                <button onClick={handleToggleFlashcardPage}>
+                  {showFlashcardPage ? "Back to Note" : "Open Flashcard Page"}
+                </button>
+              </>
+            )}
           </>
         )}
+                {showFlashcardPage && <FlashcardPage/>}
+
       </div>
     </div>
   );

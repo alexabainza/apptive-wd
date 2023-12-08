@@ -12,6 +12,8 @@ body {
 /* NAVBAR */
 .textnav {
   margin-top: 8px;
+  margin-right: 16px;
+
 }
 
 
@@ -42,9 +44,17 @@ body {
   color: #d74242 !important;
 
 }
+.dog{
+  width: 100vw;
+  min-height: 100vh;
+}
 
 .navbar{
-  margin-top: 8px;
+  /* position: fixed; */
+  /* top: 0; */
+  /* width: 100%; */
+  /* z-index: 1000; */
+  /* margin-top: 8px; */
 
     width: 100%;
 
@@ -163,9 +173,21 @@ body {
   color: transparent;
   margin: 16px;
   border-radius: 32px;
-  border: 2px solid #ffffff;
+  border: 2px solid #ffebeb;
   background-color: transparent;
   transition: color 0.3s ease;
+}
+.selectButtons {
+  background-color: transparent;
+}
+
+.clearlocal {
+  background-color: #d74242;
+}
+
+.clearlocal:hover {
+  background-color: #ffebeb;
+  color: #d74242;
 }
 
 .cardcont {
@@ -216,6 +238,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 
 .centercontent {
@@ -551,6 +574,12 @@ padding: 0px 20px;
   width: 100vw;
 }
 
+.notecont {
+  background-color: rgba(134, 134, 134, 0.226);
+  height: 80vh;
+  width: 100vw;
+}
+
 /* USER DASHBOARD */
 .user-dashboard-bottom {
   margin-top: 48px
@@ -657,4 +686,78 @@ padding: 0px 20px;
 .signoutLink:hover {
   color: inherit; /* Inherit color from parent */
   text-decoration: none; /* Remove underline */
+}
+
+.ftContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  width: 1000px;
+  height: 500px;
+  margin: 0 auto;
+  /* background-color: black; */
+  margin-left: 28%;
+}
+
+.folderPic {
+  width: 200px;
+  height: auto;
+}
+
+.backback {
+  background-color: #d74242;
+  border: none;
+}
+
+.backback:hover {
+  background-color: #d74242;
+  background-color: #ffebeb;
+  color: #d74242;
+  border: none;
+}
+
+
+/*Flashcards*/
+/* FlashcardPage.css */
+.flashcard-container {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.flashcard {
+  width: 80%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.flashcard-content {
+  width: 100%;
+  height: 80vh;
+  border: 1px solid #ccc;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+
+.card-index {
+  font-size: 18px;
+  font-weight: bold;
 }

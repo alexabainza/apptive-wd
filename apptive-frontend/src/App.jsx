@@ -15,6 +15,9 @@ import Select from "./Views/Login/Select";
 import GuestDashboard from "./Views/Guest/GuestDashboard";
 import CommunityIndivNote from "./Views/Guest/CommunityIndivNote";
 import ViewProfile from "./Views/Profile/ViewProfile";
+import Features from "./Views/Landing Page/Features";
+import AboutUs from "./Views/Landing Page/AboutUs"
+
 function App() {
   return (
     <BrowserRouter>
@@ -39,6 +42,8 @@ function App() {
 
         <Route path="/:person_id/community-notes" element={<GuestDashboard />} />
         <Route path="/viewProfile/:username" element={<ViewProfile />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/aboutus" element={<AboutUs />} />
       </Routes>
     </BrowserRouter>
   );

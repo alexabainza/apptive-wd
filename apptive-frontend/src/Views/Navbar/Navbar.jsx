@@ -14,7 +14,7 @@ const Navbar = () => {
         <div className="d-flex align-items-center ml-auto">
           <ul className="navbar-nav">
           <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
+              <Link className="navbar-feat nav-link text-white" to="/features">
                 Features
               </Link>
             </li>
@@ -24,7 +24,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
+              <Link className="navbar-feat nav-link text-white" to="/aboutus">
                 About Us
               </Link>
             </li>

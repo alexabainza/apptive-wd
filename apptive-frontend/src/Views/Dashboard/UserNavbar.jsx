@@ -39,7 +39,10 @@ const UserNavbar = ({ username, user_id }) => {
               </button>
             </li>
             <li className="nav-item me-4">
-              <Link className="navbar-feat nav-link text-white" to={`/:user_id/community-notes`}>
+              <Link
+                className="navbar-feat nav-link text-white"
+                to={`/:user_id/community-notes`}
+              >
                 Community
               </Link>
             </li>
@@ -47,8 +50,8 @@ const UserNavbar = ({ username, user_id }) => {
               <div className="collapse navbar-collapse ms-5 me-3">
                 <ul className="navbar-nav">
                   <li className="nav-item">
-                    <a
-                      className="user-navbar-dropdown nav-link fw-bold px-3 rounded"
+                    <button
+                      className="user-navbar-dropdown btn btn-primary nav-link fw-bold px-3 rounded"
                       href="#"
                       id="navbarDropdown"
                       role="button"
@@ -56,8 +59,8 @@ const UserNavbar = ({ username, user_id }) => {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      {username}
-                    </a>
+                      {username ? username : "username"}
+                    </button>
                     <ul
                       className="dropdown-menu dropdown-menu-end"
                       style={{ width: "5vw", backgroundColor: "#37425F" }}
