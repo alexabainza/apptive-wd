@@ -87,12 +87,12 @@ const GuestDashboard = () => {
               >
                 Title
               </button>
-              <button
+              {/* <button
                 className="dropdown-item"
                 onClick={() => handleSort("byUser")}
               >
                 Folder
-              </button>
+              </button> */}
               <button
                 className="dropdown-item"
                 onClick={() => handleSort("modifiedDate")}
@@ -120,7 +120,7 @@ const GuestDashboard = () => {
           <small className="w-25 text-white text-center">Title</small>
           <small className="w-25 text-white text-center">Folder</small>
           <small className="w-25 text-white text-center">Creator</small>
-          <small className="w-25 text-white text-center">Date created</small>
+          <small className="w-25 text-white text-center">Date modified</small>
 
         </div>
         <div className="guest-dashboard-notes-list">

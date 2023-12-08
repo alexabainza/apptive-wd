@@ -761,3 +761,46 @@ padding: 0px 20px;
   font-size: 18px;
   font-weight: bold;
 }
+
+/*PLS REGISTER MODAL*/
+/* Add this CSS to your stylesheet */
+/* Add this CSS to your stylesheet */
+
+.registration-modal .modal-content {
+  background-color: #f8f9fa; /* Set your desired background color */
+  color: #212529; /* Set your desired text color */
+  width: 100vw; /* Make the modal cover the full width of the viewport */
+  max-width: none; /* Remove max-width restriction */
+  margin: 0; /* Remove default margin */
+}
+
+.registration-modal .modal-dialog {
+  margin: 0; /* Remove default margin */
+}
+
+.registration-modal .modal-body {
+  padding: 1rem; /* Add some padding to the modal body */
+}
+
+.registration-modal .modal-header {
+  background-color: #007bff; /* Set your desired header background color */
+  color: #fff; /* Set your desired header text color */
+  padding: 1rem; /* Add some padding to the header */
+}
+
+.registration-modal .modal-footer {
+  background-color: #007bff; /* Set your desired footer background color */
+  color: #fff; /* Set your desired footer text color */
+  padding: 1rem; /* Add some padding to the footer */
+}
+
+/* Style the close button */
+.registration-modal .modal-header .close {
+  color: #fff;
+  font-size: 1.5rem; /* Adjust the close button font size */
+}
+
+/* Override the default Bootstrap modal backdrop */
+.registration-modal .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Set your desired backdrop color and opacity */
+}

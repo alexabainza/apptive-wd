@@ -69,7 +69,7 @@ const CommunityNote = ({ note }) => {
             // Continue with navigation
             navigate(`/${person_id}/community-notes/${note.notes_id}`);
           } else {
-            console.error("Failed to log visited document");
+            console.error("You have used up your free document visits. Please register to continue");
           }
         } catch (error) {
           console.error("Error logging document view", error);
@@ -101,19 +101,21 @@ const CommunityNote = ({ note }) => {
       <p className="w-25 text-end mb-0" style={{ fontSize: "16px" }}>
         {new Date(note.modified_at).toLocaleString()}
       </p>
-      <Modal show={showPopup} onHide={handleClosePopup}>
-        <Modal.Header closeButton>
-          <Modal.Title>Registration Required</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Please register to view more documents.</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleClosePopup}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+
+<Modal show={showPopup} onHide={handleClosePopup} centered className="registration-modal">
+  <Modal.Header closeButton className="modal-header">
+    <Modal.Title>Registration Required</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <p>Please register to view more documents.</p>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="primary" onClick={handleClosePopup}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 };

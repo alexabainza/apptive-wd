@@ -711,6 +711,7 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
     );
 
     const viewed = viewedDocument.length > 0;
+    console.log(viewed)
 
     return res.status(200).json({ viewed });
   } catch (err) {
