@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import BoxCard from "./BoxCard.jsx";
 
 const Select = () => {
-  const handleGuestButtonClick = async() =>{
+  const handleGuestButtonClick = async () => {
     try {
       // Send a POST request to create a guest user
       const response = await fetch("http://localhost:3000/createGuest", {
@@ -11,10 +11,16 @@ const Select = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}), // You can include additional data if needed
+        body: JSON.stringify({}),
       });
 
       if (response.ok) {
+        // Parse the response JSON
+        const data = await response.json();
+
+        // Store the user ID in local storage
+        localStorage.setItem("guestId", data.guestId);
+
         // Handle success, e.g., redirect to the guest dashboard
         console.log("Guest user created successfully");
       } else {
@@ -24,7 +30,8 @@ const Select = () => {
     } catch (error) {
       console.error("Error creating guest user", error);
     }
-  }
+  };
+
   return (
     <div className="centercontainer">
       <div className="centercontent">
@@ -38,7 +45,7 @@ const Select = () => {
               <BoxCard icon="../../assets/guestIcon.svg" text="Guest" />
             </button>
           </Link>
-          
+
           <Link to="/login">
             <button>
               <BoxCard icon="../../assets/memberIcon.svg" text="Member" />

@@ -31,23 +31,25 @@ const CommunityNote = ({ note, guestId }) => {
   return (
     <div className="note-list-item d-flex align-items-center justify-content-between align-items-center text-white d-flex w-100 mb-0 p-2">
       {guestId ? (
-        <Link to={`/guestDashboard/${guestId}`}>
+        <Link to={`/guestDashboard/${note.notes_id}`}>
           <p
             className="w-25 text-center mb-0"
             style={{ fontSize: "15px" }}
-            onClick={handleNoteClick} // Add the click handler to the note title
+            // onClick={handleNoteClick} // Add the click handler to the note title
           >
             {note.note_title}
           </p>
         </Link>
       ) : (
+        <Link to={`/guestDashboard/${note.notes_id}`}>
         <p
           className="w-25 text-center mb-0"
           style={{ fontSize: "15px" }}
-          onClick={handleNoteClick} // Add the click handler to the note title
+          // onClick={handleNoteClick} // Add the click handler to the note title
         >
           {note.note_title}
         </p>
+        </Link>
       )}
       <p className="w-25 text-center mb-0" style={{ fontSize: "15px" }}>
         {note.folder_name}
