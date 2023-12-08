@@ -58,10 +58,9 @@ const GuestDashboard = () => {
   };
 
   return (
-    <div className="guest-dashboard-page">
-      {/* Navbar component */}
-      <Navbar />
-
+    <div className="d-flex flex-column">
+        <Navbar className='guestNavbar'/>
+        
       <div className="guest-dashboard-contents mx-5">
         <h3 className="text-white mb-5">Community Notes</h3>
 

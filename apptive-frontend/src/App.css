@@ -10,6 +10,11 @@ body {
 }
 
 /* NAVBAR */
+.textnav {
+  margin-top: 8px;
+}
+
+
 .imageLogo{
   width: 230px;
   height: auto;
@@ -39,6 +44,10 @@ body {
 }
 
 .navbar{
+  margin-top: 8px;
+
+    width: 100%;
+
   display: flex;
   justify-content: space-between;
   align-items: last baseline;
@@ -75,6 +84,11 @@ body {
   background-color: #d74242;
 }
 
+
+.login-right-contents {
+  margin-top: 90px;
+  margin-bottom: auto;
+}
 
 .landing-home-button:hover{
   width: 15em;
@@ -139,6 +153,39 @@ body {
   width: 100%;
 }
 /* SELECT */
+.cardButton {
+  padding: 0px;
+  color: transparent;
+  margin: 16px;
+  border-radius: 32px;
+  border: 2px solid #ffffff;
+  background-color: transparent;
+  transition: color 0.3s ease;
+}
+
+.cardcont {
+  border-radius: 30px;
+  border: 8px solid #E3E3E3;
+  background: #37425F;
+}
+
+.cardbody {
+  padding-left: 32px;
+  padding-right: 25px;
+  padding-bottom: 32px;
+}
+
+.icon {
+  margin: 32px;
+  height: 100px;
+}
+
+.card-title {
+  color: #E3E3E3;
+}
+
+
+
 .line {
   width: 648px;
   height: 0px;
@@ -163,14 +210,22 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  min-width: 100vw;
+  width: 100vw;
 }
 
 .centercontent {
   display: grid;
   place-items: center;
-  align-items: column;
+  align-items: flex-start;
 }
+
+/* GUEST DASHBOARD */
+.guestNavbar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+}
+
 /* REGISTER */
 
 .register-whole-page{
@@ -192,6 +247,8 @@ body {
 }
 
 .register-header{
+  margin-top: 30px;
+  margin-bottom: auto;
   line-height: 15px;
 }
 
@@ -471,4 +528,96 @@ padding: 0px 20px;}
 .community-indiv-note{
   min-height: 100vh;
   width: 100vw;
+}
+
+
+/*PROFILE*/
+/* PROFILE */
+.tagBox {
+  background-color: transparent;
+  display: flex;
+  position: absolute;
+  /* top: 186px;             directly under navbar */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width:auto;
+  height: auto;
+  margin: auto;
+  align-items: center;
+  flex-direction: column;     /*for text*/
+  justify-content: center;
+  text-align: justify;
+}
+
+.tagBox div {
+  text-align: justify;
+}
+
+.profile-page {
+  height: 100vh;
+  width: 100vw;
+  /* display: flex; */
+}
+
+.profileFullname {
+  padding-bottom: 0px;
+  margin-top: 10px;
+}
+
+.profileIcon {
+  margin-top: 25px;
+  width: 130px;
+  height: auto;
+  background-color: white;
+  border-radius: 100%;
+  /* border: 1px solid */
+}
+
+.profileUsername {
+  margin-bottom: 50px;
+}
+
+.profileEmail {
+  margin-top: -20px;
+  padding-top: 0;
+}
+
+.profileUserID {
+  margin-top: 20px;
+}
+
+.profileCont {
+  background-color: #37425F;
+  color: #E3E3E3;
+  margin: auto;
+  width:400px;
+  height: 400px;
+  align-items: center;
+  flex-direction: column;     /*for text*/
+  justify-content: center;
+  text-align: justify;
+  border-radius: 24px;
+}
+
+.signoutProfile {
+  background-color: #d74242;
+  margin-top: 40px;
+  border: none;
+}
+
+.signoutProfile:hover {
+  background-color: #ffebeb;
+  color: #d74242;
+  border: none;
+}
+
+.signoutLink {
+  color: inherit; /* Inherit color from parent */
+  text-decoration: none; /* Remove underline */
+}
+
+.signoutLink:hover {
+  color: inherit; /* Inherit color from parent */
+  text-decoration: none; /* Remove underline */
 }
