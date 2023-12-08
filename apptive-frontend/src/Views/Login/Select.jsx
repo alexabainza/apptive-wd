@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BoxCard from "./BoxCard.jsx";
-import guesticon from "../../assets/guestIcon.svg"
-import membericon from "../../assets/memberIcon.svg"
+import guesticon from "../../assets/guestIcon.svg";
+import membericon from "../../assets/memberIcon.svg";
 import Navbar from "../Navbar/Navbar.jsx";
 const Select = () => {
   const navigate = useNavigate();
@@ -49,22 +49,25 @@ const Select = () => {
   };
 
   return (
-    <div className="d-flex flex-column">
-    <Navbar />
+    <div className="select-whole-page d-flex flex-column">
+      <Navbar />
       <div className="centercontent">
-        <h2 className="signin">
+        <h2 className="signin mb-3">
           <strong>Sign in as</strong>
         </h2>
-        <div>
-          <button onClick={handleGuestButtonClick}>
-            <BoxCard icon={guesticon} text="Guest" />
-          </button>
-
-          <Link to="/login">
-            <button>
-              <BoxCard icon={membericon} text="Member" />
+        <div className="d-flex flex-column">
+          <div className="d-flex mb-4">
+            <button onClick={handleGuestButtonClick}>
+              <BoxCard icon={guesticon} text="Guest" />
             </button>
-          </Link>
+
+            <Link to="/login">
+              <button>
+                <BoxCard icon={membericon} text="Member" />
+              </button>
+            </Link>
+          </div>
+
           <button onClick={handleClearLocalStorageClick}>
             Clear Local Storage
           </button>

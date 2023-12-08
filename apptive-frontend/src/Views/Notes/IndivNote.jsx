@@ -61,39 +61,41 @@ const IndivNote = () => {
     <div className="individual-note">
       <UserNavbar />
       <div className="individual-note-content mx-5">
-      <Link to = {`../${user_id}/${folder_name}`} className="mb-5" >{"<"}   Back</Link>
-      {note.notes_id && (
-        <>
-          <h1 className="text-white mt-2 mb-3">
-            {isEditing ? (
-              <input
-                type="text"
-                name="note_title"
-                className="form-control"
-                value={editedNote.note_title}
-                onChange={handleInputChange}
-              />
-            ) : (
-              note.note_title
+        <Link to={`../${user_id}/${folder_name}`} className="mb-5">
+          {"<"} Back
+        </Link>
+        {note.notes_id && (
+          <>
+            <h1 className="text-white mt-2 mb-3">
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="note_title"
+                  className="form-control"
+                  value={editedNote.note_title}
+                  onChange={handleInputChange}
+                />
+              ) : (
+                note.note_title
+              )}
+            </h1>
+            <textarea
+              className="form-control"
+              name="contents"
+              value={isEditing ? editedNote.contents : note.contents}
+              onChange={handleInputChange}
+              rows="10"
+              cols="50"
+              readOnly={!isEditing}
+            />
+            {isEditing && (
+              <button onClick={handleSaveChanges}>Save Changes</button>
             )}
-          </h1>
-          <textarea
-            className="form-control"
-            name="contents"
-            value={isEditing ? editedNote.contents : note.contents}
-            onChange={handleInputChange}
-            rows="10"
-            cols="50"
-            readOnly={!isEditing}
-          />
-          {isEditing && (
-            <button onClick={handleSaveChanges}>Save Changes</button>
-          )}
-          {!isEditing && (
-            <button onClick={() => setIsEditing(true)}>Edit</button>
-          )}
-        </>
-      )}
+            {!isEditing && (
+              <button onClick={() => setIsEditing(true)}>Edit</button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

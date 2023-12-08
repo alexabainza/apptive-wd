@@ -31,7 +31,7 @@ const Navbar = () => {
             {/* <p className="text-white fs-3">|</p> */}
             <li className="textnav nav-item ml-5">
               <Link className="nav-link text-white" to="/login">
-                <button className="navbar-login btn btn-transparent text-white" >Log In</button>
+                Log In
               </Link>
             </li>
           </ul>

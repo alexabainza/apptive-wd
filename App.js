@@ -165,6 +165,8 @@ app.get("/:person_id/community-notes", (req, res) => {
   });
 });
 
+
+
 app.get("/:person_id/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
   console.log("Received notes_id:", note_id);
@@ -258,7 +260,47 @@ app.get("/:user_id", (req, res) => {
 });
 
 
+app.get("/:person_id/check-user-type", async (req, res) => {
+  const personId = req.params.person_id;
+  try {
+    conn.query("SELECT * FROM guests WHERE guest_id = ?", [personId], (error, resultGuests) => {
+      if (error) {
+        console.error("Error executing guests query:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+        return;
+      }
 
+      console.log("Guests Query Result:", resultGuests);
+
+      if (resultGuests.length > 0) {
+        // User is a guest
+        res.json({ userType: "guest", data: resultGuests });
+      } else {
+        // User is not a guest, check user_credentials table
+        conn.query("SELECT user_type, user_id FROM user_credentials WHERE user_id = ?", [personId], (error, resultCredentials) => {
+          if (error) {
+            console.error("Error executing user_credentials query:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+            return;
+          }
+
+          console.log("Credentials Query Result:", resultCredentials);
+
+          if (resultCredentials.length > 0) {
+            // User is registered
+            res.json({ userType: "registered", data: resultCredentials });
+          } else {
+            // User is invalid
+            res.json({ userType: "invalid", data: null });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 app.get("/:user_id/dashboard", (req, res) => {
   const userId = req.params.user_id;
 

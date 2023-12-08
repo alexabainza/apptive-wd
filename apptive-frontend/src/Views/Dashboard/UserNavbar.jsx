@@ -39,7 +39,7 @@ const UserNavbar = ({ username, user_id }) => {
               </button>
             </li>
             <li className="nav-item me-4">
-              <Link className="navbar-feat nav-link text-white" to={`/user_id/community-notes`}>
+              <Link className="navbar-feat nav-link text-white" to={`/:user_id/community-notes`}>
                 Community
               </Link>
             </li>

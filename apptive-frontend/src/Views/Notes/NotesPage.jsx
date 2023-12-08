@@ -6,13 +6,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { SortUpAlt, SortDownAlt } from "react-bootstrap-icons";
 
 const NotesPage = () => {
-  // const [sort, set]
   const navigate = useNavigate();
   const location = useLocation();
   const { username } = location.state || {};
   const [notes, setNotes] = useState([]); // Initialize with an empty array
   const [notesMessage, setNoNotesMessage] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
+  const [sortBy, setSortBy] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { user_id, folder_name } = useParams();
 
@@ -38,16 +39,32 @@ const NotesPage = () => {
       });
   }, [user_id, folder_name]);
 
-  const handleSort = () => {
-    const sortedNotes = [...notes].sort((a, b) => {
-      const dateA = new Date(a.modified_at).getTime();
-      const dateB = new Date(b.modified_at).getTime();
+ 
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
-      return isAscending ? dateA - dateB : dateB - dateA;
-    });
+  const handleSort = (criteria) => {
+    let sortedNotes = [...notes];
+
+    switch (criteria) {
+      case "modifiedDate":
+        sortedNotes.sort(
+          (a, b) => new Date(b.modified_at) - new Date(a.modified_at)
+        );
+        break;
+      case "alphabeticalOrder":
+        sortedNotes.sort((a, b) => a.note_title.localeCompare(b.note_title));
+        break;
+      case "byUser":
+        sortedNotes.sort((a, b) => a.user_name.localeCompare(b.user_name));
+        break;
+      default:
+        break;
+    }
 
     setNotes(sortedNotes);
-    setIsAscending(!isAscending);
+    setSortBy(criteria);
   };
 
   const deleteNote = async (noteId) => {
@@ -101,7 +118,8 @@ const NotesPage = () => {
       <div className="notes-main-page">
         <UserNavbar user_id={user_id} />
         <div className="notes-main-page-content">
-          <div className="notes-main-page-header mb-5 d-flex justify-content-between">
+          
+          <div className="notes-main-page-header mb-2 d-flex justify-content-between">
             <div className="d-flex align-items-center">
               <Link
                 to={`../${user_id}/dashboard`}
@@ -126,6 +144,42 @@ const NotesPage = () => {
               +
             </Link>
           </div>
+          <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3">
+          <div className="dropdown">
+            <button
+              className="btn btn-primary text-white dropdown-toggle ms-0"
+              type="button"
+              id="sortDropdown"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Sort By: {sortBy || "Select"}
+            </button>
+            <div className="dropdown-menu" aria-labelledby="sortDropdown">
+              <button
+                className="dropdown-item"
+                onClick={() => handleSort("alphabeticalOrder")}
+              >
+                Title
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => handleSort("modifiedDate")}
+              >
+                Last Modified
+              </button>
+            </div>
+          </div>
+
+          <input
+            className="form-control w-25"
+            type="text"
+            placeholder="Search notes"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
           <div className="notes-page-header d-flex text-white justify-content-between">
             <small className="align-items-center">Title</small>
             <div className="notes-page-header-right">
@@ -138,7 +192,13 @@ const NotesPage = () => {
             </div>
           </div>
           <div className="notes-list">
-            {notes.map((note) => (
+            {notes.filter((note)=>
+            note.note_title
+            .toLowerCase()
+            .startsWith(searchQuery.toLowerCase())
+      
+            )
+            .map((note) => (
               <div key={note.notes_id}>
                 <Note
                   folder_name={note.folder_name}

@@ -154,6 +154,10 @@ body {
   width: 100%;
 }
 /* SELECT */
+.select-whole-page{
+  width: 100vw;
+  min-height: 100vh;
+}
 .cardButton {
   padding: 0px;
   color: transparent;
@@ -221,12 +225,20 @@ body {
 }
 
 /* GUEST DASHBOARD */
+.guest-dashboard{
+  width: 100vw;
+  min-height: 100vh;
+}
 .guestNavbar {
   width: 100%;
   position: fixed;
   top: 0;
 }
 
+.guest-dashboard-table-header{
+ border-bottom: #8ea2ea78 0.1px solid;
+  ;
+}
 /* REGISTER */
 
 .register-whole-page{
@@ -397,7 +409,7 @@ padding: 0px 20px;
 }
 
 .note-list-item{
-  width: 50vw;
+  width: 25vw;
   border-bottom: #8ea2ea78 0.1px solid;
 
 }
@@ -493,6 +505,13 @@ padding: 0px 20px;
   margin-left: 4px;
   /* background-color: #d74242!important; */
 
+}
+.note-list-title-entry{
+  cursor: pointer;
+}
+
+.note-list-title-entry:hover{
+  color: #d74242;
 }
 
 .note-title{
