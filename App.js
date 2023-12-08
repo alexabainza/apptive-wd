@@ -605,51 +605,74 @@ app.post("/createGuest", (req, res) => {
   );
 });
 
-// Import necessary modules...
 app.post("/logVisitedDocument", async (req, res) => {
   const { person_id, note_id } = req.body;
-  console.log("Received request:", person_id, note_id);
+
+  try {
+    // Check if the document has already been viewed
+    const [viewedDocument] = await conn.promise().query(
+      "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
+      [person_id, note_id]
+    );
+
+    if (viewedDocument.length > 0) {
+      console.log("Document has already been viewed. Skipping logging.");
+      return res.status(200).json({ message: "Document already viewed" });
+    }
+
+    // Check the current count of logged documents
+    const [documentCount] = await conn.promise().query(
+      "SELECT COUNT(*) AS document_count FROM visited_documents WHERE person_id = ?",
+      [person_id]
+    );
+
+    const { document_count } = documentCount[0];
+    console.log(`Current document count: ${document_count}`);
+
+    if (document_count >= 3) {
+      console.error("User has three logged entries in visited_documents.");
+      return res.status(403).json({
+        error: "document_limit_exceeded",
+        documentCount: document_count,
+        message: "User has three logged entries in visited_documents.",
+      });
+    }
+
+    // Insert a record into the visited_documents table
+    const insertSql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
+    const insertValues = [person_id, note_id];
+    await conn.promise().query(insertSql, insertValues);
+
+    console.log("Record inserted successfully");
+
+    return res.status(200).json({ message: "Visited document logged successfully" });
+  } catch (err) {
+    console.error("Error logging visited document:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.post("/checkIfDocumentViewed", async (req, res) => {
+  const { person_id, note_id } = req.body;
+  console.log("Received request to check if document viewed:", person_id, note_id);
 
   if (!person_id || !note_id) {
     return res.status(400).json({ error: "Bad Request" });
   }
 
   try {
-    // Insert a record into the visited_documents table
-    const sql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
-    const values = [person_id, note_id];
-
-    const result = await conn.promise().query(sql, values);
-
-    console.log("Record inserted successfully");
-
-    // Check if the user type is guest
-    const [userType] = await conn.promise().query(
-      "SELECT user_type FROM guests WHERE guest_id = ?",
-      [person_id]
+    // Check if the document has been viewed by the user
+    const [viewedDocument] = await conn.promise().query(
+      "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
+      [person_id, note_id]
     );
 
-    if (userType.length > 0 && userType[0].user_type === "guest") {
-      // Check if the guest has logged in three times
-      const [visitCount] = await conn.promise().query(
-        "SELECT COUNT(*) AS visit_count FROM visited_documents WHERE person_id = ?",
-        [person_id]
-      );
+    const viewed = viewedDocument.length > 0;
 
-      const { visit_count } = visitCount[0];
-
-      if (visit_count >= 3) {
-        console.error("Guest user has logged in three times. Please register to continue.");
-        return res.status(403).json({
-          error: "guest_limit_exceeded",
-          message: "Guest user has logged in three times. Please register to continue.",
-        });
-      }
-    }
-
-    return res.status(200).json({ message: "Visited document logged successfully" });
+    return res.status(200).json({ viewed });
   } catch (err) {
-    console.error("Error inserting record:", err);
+    console.error("Error checking if document viewed:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
