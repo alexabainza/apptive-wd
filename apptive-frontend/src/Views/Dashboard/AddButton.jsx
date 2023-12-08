@@ -39,7 +39,7 @@ const AddButton = ({ user_id, onFolderAdded }) => {
   
     return (
       <div className="add-button-container">
-        <PlusCircleFill onClick={openModal} size={50} className='text-white' style={{cursor: 'pointer', color: "#D74242!important"}}></PlusCircleFill>
+        <PlusCircleFill onClick={openModal} size={68} className="addButtonCircle"></PlusCircleFill>
         <CreateModal isOpen={isModalOpen} onClose={closeModal} onAddFolder={handleAddFolder} />
       </div>
     );

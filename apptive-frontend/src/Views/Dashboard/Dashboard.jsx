@@ -115,8 +115,10 @@ function Dashboard() {
   return (
     <div className="user-dashboard mt-0">
       <UserNavbar user_id={user_id} username={username} />
-      <div className="user-dashboard-bottom mx-4">
-        <h2 className="text-white">Your folders</h2>
+      <div className="user-dashboard-bottom ">
+        <h2 className="folderDirect text-white">
+          <strong>Folders</strong>
+        </h2>
         {noFoldersMessage ? (
           <p className="text-white">{noFoldersMessage}</p>
         ) : (

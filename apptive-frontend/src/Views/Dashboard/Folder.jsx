@@ -1,22 +1,22 @@
 // Inside Folder.jsx
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 const Folder = ({
   user_id,
-    folderId,
-    folderName,
-    username,
+  folderId,
+  folderName,
+  username,
   description,
   favorited,
   noOfNotes,
   createdAt,
   modifiedAt,
   onDeleteFolder,
-  onEditFolder
+  onEditFolder,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("folderName")
+  const [newFolderName, setNewFolderName] = useState("folderName");
 
   const handleMenuClick = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -28,20 +28,19 @@ const Folder = ({
   };
 
   const handleEditClick = () => {
-    // Handle edit logic for the specific folder
-setIsEditing(true);
+    setIsEditing(true);
     setIsMenuOpen(false);
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-  }
+  };
 
-  const handleSaveChanges=()=>{
+  const handleSaveChanges = () => {
     onEditFolder(folderId, newFolderName);
     setIsEditing(false);
     setIsMenuOpen(false);
-  }
+  };
   return (
     <div className="dashboard-body-folders px-4 py-2 mb-2 d-flex flex-column justify-content-between align-items-start text-left">
       {isEditing ? (
@@ -58,12 +57,10 @@ setIsEditing(true);
         </div>
       ) : (
         <div className="dashboard-body-left d-flex flex-column">
-              <Link to={`/${user_id}/${folderName}`} className="text-white">
-
-          <h4 className="folder-name mt-3 mb-0">{folderName}</h4>
-        <p className="text-white">{`${noOfNotes} notes`}</p>
-        </Link>
-
+          <Link to={`/${user_id}/${folderName}`} className="text-white">
+          <h4 className="folder-name mt-3 mb-0"><strong>{folderName}</strong></h4>
+            <p className="text-white">{`${noOfNotes} notes`}</p>
+          </Link>
         </div>
       )}
       <div
@@ -76,13 +73,22 @@ setIsEditing(true);
 
       {isMenuOpen && !isEditing && (
         <div>
-        {/* <div className="folder-popup d-flex justify-content-between align-items-center" > */}
-          <button onClick={handleDeleteClick} className="folder-options btn btn-primary"><h4 style={{fontSize: "15px"}}>Delete</h4></button>
-          <button onClick={handleEditClick} className="folder-options btn btn-primary"><h4 style={{fontSize: "15px"}}>Edit</h4></button>
+          <button
+            onClick={handleDeleteClick}
+            className="folder-options btn btn-primary"
+          >
+            <h4 style={{ fontSize: "15px" }}>Delete</h4>
+          </button>
+          <button
+            onClick={handleEditClick}
+            className="folder-options btn btn-primary"
+          >
+            <h4 style={{ fontSize: "15px" }}>Edit</h4>
+          </button>
         </div>
       )}
     </div>
-
-  );}
+  );
+};
 
 export default Folder;

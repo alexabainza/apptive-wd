@@ -99,7 +99,7 @@ const Register = () => {
           <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
               <img className="imageLogo" src={apptiveLogo} />
             </Link>
-            <h2 className="text-white mt-4"><strong>Welcome back</strong></h2>
+            <h2 className="text-white"><strong>Welcome back</strong></h2>
             <p className="fs-5 text-white">Sign in to continue</p>
           </div>
 
@@ -185,7 +185,7 @@ const Register = () => {
               </div>
             </div>
             <button type="submit" className="register-submit-button my-3">
-              Submit
+            <strong>Submit</strong>
             </button>
           </form>
           {/* {combinedError && <p style={{ color: "red" }}>{combinedError}</p>} */}
@@ -193,7 +193,7 @@ const Register = () => {
           <small className="text-white text-center">
             Already registered?{" "}
             <Link to="/login" style={{ color: "#D74242" }}>
-              Login
+            <strong>Login</strong>
             </Link>
           </small>
         </div>

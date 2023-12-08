@@ -72,7 +72,8 @@ const Login = () => {
                 placeholder="Enter username"
               />
             </div>
-            <div className="form-group my-4">
+            <div className="form-group my-4 mt-0">
+
               <label htmlFor="exampleInputPassword1" className="text-white">
                 <small>
                   <strong>PASSWORD</strong>
@@ -101,14 +102,14 @@ const Login = () => {
               </div>
             </div>
             <button type="submit" className="login-submit-button">
-              Submit
+            <strong>Submit</strong>
             </button>
           </form>
           ;{message && <p style={{ color: "red" }}>{message}</p>}
           <small className="text-white text-center">
             Haven't registered yet?{" "}
             <Link to="/register" style={{ color: "#D74242" }}>
-              Sign up
+              <strong>Sign up</strong>
             </Link>
           </small>
         </div>

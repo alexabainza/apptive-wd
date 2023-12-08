@@ -118,6 +118,7 @@ body {
 
 .login-right-side{
   background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
+  margin-top: 35px;
 
   align-items: start;
 
@@ -242,8 +243,8 @@ body {
 .register-right-side{
   align-items: start;
   background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
-
-
+    margin-top: 35px;
+  
 }
 
 .register-header{
@@ -301,7 +302,7 @@ body {
 }
 
 .user-dashboard{
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
 }
 
@@ -323,7 +324,7 @@ body {
 
 .dashboard-body-folders {
   width: 35vh;
-  height: 25vh;
+  height: 24vh;
   background-color: #37425F;
   /* border: #ddd 1px solid; */
   border-radius: 10px;
@@ -366,7 +367,8 @@ body {
 }
 .create-modal {
   display: none;
-padding: 0px 20px;}
+padding: 0px 20px;
+}
 
 .create-modal.open {
   display: flex;
@@ -530,7 +532,23 @@ padding: 0px 20px;}
   width: 100vw;
 }
 
+/* USER DASHBOARD */
+.user-dashboard-bottom {
+  margin-top: 48px
+}
 
+.folderDirect {
+  margin-bottom: 42px;
+}
+
+.addButtonCircle {
+  color: #d74242;
+  background-color: white;
+  /* margin-bottom: 24px;
+  margin-right: 24px; */
+  border-radius: 50px;
+  cursor: pointer;
+}
 /*PROFILE*/
 /* PROFILE */
 .tagBox {
