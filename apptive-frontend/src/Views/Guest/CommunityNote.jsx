@@ -6,7 +6,7 @@ const CommunityNote = ({ note }) => {
   const { person_id } = useParams();
   const navigate = useNavigate();
   const [documentCount, setDocumentCount] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
+  // const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     if (person_id) {
@@ -16,9 +16,10 @@ const CommunityNote = ({ note }) => {
     }
   }, [person_id]);
 
-  const handleClosePopup = () => {
-    setShowPopup(false);
-  };
+  // const handleClosePopup = () => {
+  //   setShowPopup(false);
+  // };
+
   const handleNoteClick = async () => {
     try {
       // Check if the document has already been viewed
@@ -111,7 +112,7 @@ const CommunityNote = ({ note }) => {
       <p className="w-25 text-center mb-0" style={{ fontSize: "15px" }}>
         {new Date(note.modified_at).toLocaleString()}
         </p>
-      <Modal show={showPopup} onHide={handleClosePopup}>
+      {/* <Modal show={showPopup} onHide={handleClosePopup}>
         <Modal.Header closeButton>
           <Modal.Title>Registration Required</Modal.Title>
         </Modal.Header>
@@ -123,7 +124,7 @@ const CommunityNote = ({ note }) => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

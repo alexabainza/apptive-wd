@@ -9,6 +9,7 @@ const GuestDashboard = () => {
   const [noNotesMessage, setNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,12 +58,18 @@ const GuestDashboard = () => {
     setSortBy(criteria);
   };
 
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
   return (
-    <div className="d-flex flex-column">
+    <div className="guest-dashboard-page">    
         <Navbar className='guestNavbar'/>
         
-      <div className="guest-dashboard-contents mx-5">
-        <h3 className="text-white mb-5">Community Notes</h3>
+      <div className=" guest-dashboard-contents mt-0">
+        <h2 className="commNote text-white mb-5">
+          <strong>Community Notes</strong>
+        </h2>
 
         <div className="guest-dashboard-table-header border border-white d-flex justify-content-between p-3">
           <div className="dropdown">
