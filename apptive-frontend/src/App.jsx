@@ -31,9 +31,14 @@ function App() {
           path="/:user_id/:folder_name/addNote"
           element={<AddNotesPage />}
         />
-                <Route path="/guestDashboard" element={<GuestDashboard />} />
-                <Route path="/guestDashboard/:note_id" element={<CommunityIndivNote/>}/>
-        <Route path="/viewProfile/:username" element={<ViewProfile/>}/>
+        <Route
+          path="/community-note/:note_id"
+          element={<CommunityIndivNote />}
+        />
+        <Route path="/:person_id/community-notes/:note_id" element={<CommunityIndivNote/>} />
+
+        <Route path="/:person_id/community-notes" element={<GuestDashboard />} />
+        <Route path="/viewProfile/:username" element={<ViewProfile />} />
       </Routes>
     </BrowserRouter>
   );

@@ -3,13 +3,13 @@ import { useParams } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 
 const CommunityIndivNote = () => {
-  const { note_id } = useParams();
+  const { person_id, note_id } = useParams();
   const [note, setNote] = useState({});
   useEffect(() => {
     // Check if note_id is defined before making the fetch request
     if (note_id) {
-      fetch(`http://localhost:3000/guestDashboard/${note_id}`)
-        .then((response) => response.json())
+      fetch(`http://localhost:3000/${person_id}/community-notes/${note_id}`)
+      .then((response) => response.json())
         .then((data) => {
           if (data.error) {
             console.error("Error fetching note:", data.error);

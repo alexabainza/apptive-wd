@@ -135,9 +135,10 @@ app.post("/login", async (req, res) => {
 });
 
 
-app.get("/guestDashboard", (req, res) => {
+app.get("/:person_id/community-notes", (req, res) => {
   console.log("Request received at /guestDashboard");
-
+  const person_id = req.params.person_id;
+  console.log(`INSIDE COMMUNITY NOTES FOR ${person_id}`)
   conn.query("SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1", (error, data) => {
 
     if (error) {
@@ -155,6 +156,8 @@ app.get("/guestDashboard", (req, res) => {
       } else {
         res.status(200).json({
           success: true,
+          person_id: person_id, // Include the person_id in the response
+
           message: "No notes yet.",
         });
       }
@@ -162,7 +165,7 @@ app.get("/guestDashboard", (req, res) => {
   });
 });
 
-app.get("/guestDashboard/:note_id", (req, res) => {
+app.get("/:person_id/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
   console.log("Received notes_id:", note_id);
 
@@ -577,6 +580,8 @@ app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
 
 app.post("/createGuest", (req, res) => {
   const guestId = generateUniqueId(); // Replace with your actual logic for generating IDs
+  console.log("Create guest path called");
+  
   conn.query(
     "INSERT INTO guests (guest_id) VALUES (?)",
     ['guest_' + guestId],
@@ -589,17 +594,19 @@ app.post("/createGuest", (req, res) => {
           message: "Error creating guest user",
         });
       } else {
-        console.log("Guest user created successfully");
+        console.log(`Guest user created successfully: ${guestId}`);
         res.status(200).json({
           success: true,
           message: "Guest user created successfully",
+          guestId: guestId, // Include the guestId in the response
         });
       }
     }
   );
 });
 
-app.post("/logVisitedDocument", (req, res) => {
+// Import necessary modules...
+app.post("/logVisitedDocument", async (req, res) => {
   const { person_id, note_id } = req.body;
   console.log("Received request:", person_id, note_id);
 
@@ -607,17 +614,42 @@ app.post("/logVisitedDocument", (req, res) => {
     return res.status(400).json({ error: "Bad Request" });
   }
 
-  // Insert a record into the visited_documents table
-  const sql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
-  const values = [person_id, note_id];
+  try {
+    // Insert a record into the visited_documents table
+    const sql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
+    const values = [person_id, note_id];
 
-  conn.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Error inserting record:", err);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
+    const result = await conn.promise().query(sql, values);
 
     console.log("Record inserted successfully");
+
+    // Check if the user type is guest
+    const [userType] = await conn.promise().query(
+      "SELECT user_type FROM guests WHERE guest_id = ?",
+      [person_id]
+    );
+
+    if (userType.length > 0 && userType[0].user_type === "guest") {
+      // Check if the guest has logged in three times
+      const [visitCount] = await conn.promise().query(
+        "SELECT COUNT(*) AS visit_count FROM visited_documents WHERE person_id = ?",
+        [person_id]
+      );
+
+      const { visit_count } = visitCount[0];
+
+      if (visit_count >= 3) {
+        console.error("Guest user has logged in three times. Please register to continue.");
+        return res.status(403).json({
+          error: "guest_limit_exceeded",
+          message: "Guest user has logged in three times. Please register to continue.",
+        });
+      }
+    }
+
     return res.status(200).json({ message: "Visited document logged successfully" });
-  });
+  } catch (err) {
+    console.error("Error inserting record:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 });
