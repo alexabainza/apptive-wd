@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import FlashcardPage from "./Flashcards";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const IndivNote = () => {
   const { user_id, folder_name, note_id } = useParams();
@@ -9,6 +11,7 @@ const IndivNote = () => {
   const [editedNote, setEditedNote] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
+  const quillRef = useRef(null);
 
   useEffect(() => {
     fetch(`http://localhost:3000/${user_id}/${folder_name}/${note_id}`)
@@ -30,14 +33,16 @@ const IndivNote = () => {
     setShowFlashcardPage((prevShowFlashcardPage) => !prevShowFlashcardPage);
   };
 
-
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedNote((prevNote) => ({
-      ...prevNote,
-      [name]: value,
-    }));
+    if (e.target) {
+      const { name, value } = e.target;
+      setEditedNote((prevNote) => ({
+        ...prevNote,
+        [name]: value,
+      }));
+    }
   };
+  
 
   const handleSaveChanges = async () => {
     try {
@@ -62,7 +67,18 @@ const IndivNote = () => {
       console.error("Error saving changes:", error.message);
     }
   };
+  const handleHighlight = (color) => {
+    const quill = quillRef.current.getEditor();
+    const range = quill.getSelection();
 
+    if (range) {
+      const isHighlighted =
+        quill.getFormat(range.index, range.length).background === color;
+      quill.formatText(range.index, range.length, {
+        background: isHighlighted ? null : color,
+      });
+    }
+  };
 
   return (
     <div className="individual-note">
@@ -86,17 +102,39 @@ const IndivNote = () => {
                 note.note_title
               )}
             </h1>
-            <textarea
-              className="form-control"
-              name="contents"
-              value={isEditing ? editedNote.contents : note.contents}
-              onChange={handleInputChange}
-              rows="10"
-              cols="50"
-              readOnly={!isEditing}
-            />
+            {isEditing ? (
+              <ReactQuill
+                style={{ resize: "none", height: "80vh", overflowY: "scroll" }}
+                className="form-control"
+                ref={quillRef}
+                theme="snow"
+                value={editedNote.contents}
+                onChange={(value) =>
+                  handleInputChange({ target: { name: "contents", value } })
+                }
+                placeholder="Enter your notes here..."
+              />
+            ) : (
+              <ReactQuill
+                className="form-control"
+                name="contents"
+                value={editedNote.contents}
+                onChange={handleInputChange}
+                rows="10"
+                cols="50"
+                readOnly
+              />
+            )}
             {isEditing && (
-              <button onClick={handleSaveChanges}>Save Changes</button>
+              <>
+                <button onClick={() => handleHighlight("green")}>
+                  Flashcard Question (Green)
+                </button>
+                <button onClick={() => handleHighlight("yellow")}>
+                  Flashcard Answer (Yellow)
+                </button>
+                <button onClick={handleSaveChanges}>Save Changes</button>
+              </>
             )}
             {!isEditing && (
               <button onClick={() => setIsEditing(true)}>Edit</button>
@@ -110,8 +148,7 @@ const IndivNote = () => {
             )}
           </>
         )}
-                {showFlashcardPage && <FlashcardPage/>}
-
+        {showFlashcardPage && <FlashcardPage />}
       </div>
     </div>
   );
