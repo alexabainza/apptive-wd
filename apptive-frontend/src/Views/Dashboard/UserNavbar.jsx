@@ -41,7 +41,7 @@ const UserNavbar = ({ username, user_id }) => {
             <li className="nav-item me-4">
               <Link
                 className="navbar-feat nav-link text-white"
-                to={`/:user_id/community-notes`}
+                to={`/${user_id}/community-notes`}
               >
                 Community
               </Link>

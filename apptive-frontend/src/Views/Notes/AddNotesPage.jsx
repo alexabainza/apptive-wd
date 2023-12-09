@@ -4,12 +4,17 @@ import { useState } from "react";
 
 import { useParams, useNavigate, Link } from "react-router-dom";
 
+import { useRef, useEffect } from "react"; 
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
 const AddNotesPage = ({ folder }) => {
   const [noteTitle, setNoteTitle] = useState("");
   const [contents, setContents] = useState("");
   const { user_id, folder_name } = useParams();
   const navigate = useNavigate();
 
+  const quillRef = useRef(null);
   const handleAddNote = async (e) => {
     e.preventDefault();
   
@@ -30,9 +35,18 @@ const AddNotesPage = ({ folder }) => {
     }
   };
   
+  const handleHighlight = (color) => {
+    const quill = quillRef.current.getEditor();
+    const range = quill.getSelection();
+
+    if (range) {
+      const isHighlighted = quill.getFormat(range.index, range.length).background === color;
+      quill.formatText(range.index, range.length, { background: isHighlighted ? null : color });
+    }
+  };
 
   return (
-    <div className="add-notes-page">
+    <div className="add-notes-page" >
       <UserNavbar />
       <div className="form-group mx-5 mb-4">
 
@@ -48,13 +62,31 @@ const AddNotesPage = ({ folder }) => {
             value={noteTitle}
             onChange={(e) => setNoteTitle(e.target.value)}
           />
-          <textarea
-            style={{ resize: "none" }}
+          <ReactQuill
+            theme="snow"
+            style={{ resize: "none", height: '80vh', overflowY: 'scroll' }}
             className="form-control"
+            
+            ref={quillRef}
             value={contents}
+            onChange={(value) => setContents(value)}
             placeholder="Enter your notes here..."
-            onChange={(e) => setContents(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
           />
+          <div className="my-2">
+          <button type="button" onClick={() => handleHighlight("green")}>
+              Flashcard Question (Green)
+            </button>
+            <button
+              type="button" onClick={() => handleHighlight("yellow")}>
+            
+              Flashcard Answer (yellow)
+            </button>
+          </div>
           <input type="submit" value="Submit" />
         </div>
       </form>

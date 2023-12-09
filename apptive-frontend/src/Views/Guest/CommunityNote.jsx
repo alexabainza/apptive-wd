@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Alert } from "react-bootstrap";
 
 const CommunityNote = ({ note }) => {
   const { person_id } = useParams();
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [userType, setUserType] = useState("");
   const [visitCount, setVisitCount] = useState(0);
-
 
   useEffect(() => {
     const fetchUserType = async () => {
@@ -31,7 +31,10 @@ const CommunityNote = ({ note }) => {
     fetchUserType();
   }, [person_id]);
 
-  const handleClosePopup = () => setShowPopup(false);
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setShowAlert(false);
+  };
 
   const handleNoteClick = async () => {
     try {
@@ -39,45 +42,48 @@ const CommunityNote = ({ note }) => {
   
       const logDocumentView = async () => {
         try {
-          const response = await fetch("http://localhost:3000/logVisitedDocument", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              person_id: person_id,
-              note_id: note.notes_id,
-            }),
-          });
+          const response = await fetch(
+            "http://localhost:3000/logVisitedDocument",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                person_id: person_id,
+                note_id: note.notes_id,
+              }),
+            }
+          );
   
           if (response.ok) {
             console.log("Visited document logged successfully");
   
-            // Fetch the document count directly here
             const documentCount = await fetchDocumentCount(person_id);
             setVisitCount(documentCount);
   
             if (userType === "guest" && documentCount >= 3) {
-              setShowPopup(true);
+              setShowAlert(true);
               return;
-            }
-  
-            if (userType === "registered") {
-              setShowPopup(false);
             }
   
             // Continue with navigation
             navigate(`/${person_id}/community-notes/${note.notes_id}`);
           } else {
-            console.error("You have used up your free document visits. Please register to continue");
+            alert(
+              "You have used up your free document visits. Please register to continue"
+            );
           }
         } catch (error) {
           console.error("Error logging document view", error);
         }
       };
   
-      if (!hasViewed || userType === "registered" ) {
+      if (!hasViewed || userType === "registered") {
         await logDocumentView();
+      } else if (userType === "guest" && visitCount >= 3) {
+        // Handle the case when a guest attempts to open more than the allowed number of documents
+        alert("Guests are limited to viewing 3 documents. Please register to view more.");
       }
     } catch (error) {
       console.error("Error handling note click", error);
@@ -87,7 +93,11 @@ const CommunityNote = ({ note }) => {
 
   return (
     <div className="note-list-item d-flex text-white w-100 py-1">
-      <p className="note-list-title-entry w-25 text-center mb-0" style={{ fontSize: "16px" }} onClick={handleNoteClick}>
+      <p
+        className="note-list-title-entry w-25 text-center mb-0"
+        style={{ fontSize: "16px" }}
+        onClick={handleNoteClick}
+      >
         {note.note_title}
       </p>
       <p className="w-25 text-center mb-0" style={{ fontSize: "16px" }}>
@@ -102,32 +112,52 @@ const CommunityNote = ({ note }) => {
         {new Date(note.modified_at).toLocaleString()}
       </p>
 
-<Modal show={showPopup} onHide={handleClosePopup} centered className="registration-modal">
-  <Modal.Header closeButton className="modal-header">
-    <Modal.Title>Registration Required</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <p>Please register to view more documents.</p>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="primary" onClick={handleClosePopup}>
-      Close
-    </Button>
-  </Modal.Footer>
-</Modal>
+      <Modal
+        show={showPopup}
+        onHide={handleClosePopup}
+        centered
+        className="registration-modal"
+      >
+        <Modal.Header closeButton className="modal-header">
+          <Modal.Title className="text-white">Registration Required</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-white">Please register to view more documents.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleClosePopup}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
+      <Alert show={showAlert} variant="danger">
+        <Alert.Heading>Registration Required</Alert.Heading>
+        <p>Please register to view more documents.</p>
+        <hr />
+        <div className="d-flex justify-content-end">
+          <Link to="/register">
+            <Button variant="outline-danger" onClick={handleClosePopup}>
+              Register
+            </Button>
+          </Link>
+        </div>
+      </Alert>
     </div>
   );
 };
 
 const fetchDocumentCount = async (person_id) => {
   try {
-    const response = await fetch(`http://localhost:3000/getDocumentCount/${person_id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `http://localhost:3000/getDocumentCount/${person_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -144,16 +174,19 @@ const fetchDocumentCount = async (person_id) => {
 
 const checkIfDocumentViewed = async (personId, noteId) => {
   try {
-    const response = await fetch(`http://localhost:3000/checkIfDocumentViewed`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        person_id: personId,
-        note_id: noteId,
-      }),
-    });
+    const response = await fetch(
+      `http://localhost:3000/checkIfDocumentViewed`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          person_id: personId,
+          note_id: noteId,
+        }),
+      }
+    );
 
     if (response.ok) {
       const result = await response.json();
