@@ -23,7 +23,7 @@ const UserNavbar = ({ username, user_id }) => {
         <div className="navbar-left">
           <Link
             className="navbar-app-name navbar-brand text-white fs-3"
-            to="/home"
+            to="/"
           >
             <img className="imageLogo" src={apptiveLogo} />
           </Link>

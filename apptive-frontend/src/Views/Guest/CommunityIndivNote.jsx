@@ -26,17 +26,23 @@ const CommunityIndivNote = () => {
 
   return (
     <div className="community-indiv-note">
-      <div style={{margin: "0px 50px"}}>
-      <Navbar />
-      <Link to={`/${person_id}/community-notes`} className="text-white">{"<"}Back</Link>
-      <div className="community-indiv-note-contents mt-2 text-white" style={{margin: "0px 50px"}}>
-        <h1 className="mb-4">{note.note_title}</h1>
-        <small className="mb-4">@{note.user_name}</small>
-        <p className="text-justify fs-5 mb-0">{note.contents}</p>
-      </div>
-      </div>
+      <div style={{ margin: "0px 50px" }}>
+        <Navbar />
+        <div
+          className="community-indiv-note-contents mt-2 text-white"
+          style={{ margin: "0px 50px" }}
+        >
+          <Link to={`/${person_id}/community-notes`} className="text-white">
+            {"<"}Back
+          </Link>
 
-
+          <h1 className="mb-2 mt-4">{note.note_title}</h1>
+          <Link to={`../viewProfile/${note.user_name}`}>
+            <small className="mb-1">@{note.user_name}</small>
+          </Link>
+          <p className="text-justify fs-5 mb-0 mt-2">{note.contents}</p>
+        </div>
+      </div>
     </div>
   );
 };

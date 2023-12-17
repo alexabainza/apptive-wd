@@ -128,7 +128,7 @@ const GuestDashboard = () => {
             .filter((note) =>
               note.note_title
                 .toLowerCase()
-                .startsWith(searchQuery.toLowerCase())
+                .includes(searchQuery.toLowerCase())
             )
             .map((note) => (
               <div key={note.notes_id}>

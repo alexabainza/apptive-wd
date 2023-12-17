@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Navbar from "../Navbar/Navbar";
 import { Button } from "react-bootstrap";
 import profile from "../../assets/profile-user.svg";
 
+
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [userType, setUserType] = useState(null);
   const { user_id } = useParams();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +41,7 @@ const Profile = () => {
   }, [user_id]);
 
   const handleLogout = () => {
+    navigate("/login")
     // Handle logout logic here
   };
 

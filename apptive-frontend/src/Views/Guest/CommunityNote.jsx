@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { Modal, Button, Alert } from "react-bootstrap";
+import { Button, Alert } from "react-bootstrap";
 
 const CommunityNote = ({ note }) => {
   const { person_id } = useParams();
   const navigate = useNavigate();
-  const [showPopup, setShowPopup] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [userType, setUserType] = useState("");
   const [visitCount, setVisitCount] = useState(0);
@@ -31,15 +30,10 @@ const CommunityNote = ({ note }) => {
     fetchUserType();
   }, [person_id]);
 
-  const handleClosePopup = () => {
-    setShowPopup(false);
-    setShowAlert(false);
-  };
-
   const handleNoteClick = async () => {
     try {
       const hasViewed = await checkIfDocumentViewed(person_id, note.notes_id);
-  
+
       const logDocumentView = async () => {
         try {
           const response = await fetch(
@@ -55,18 +49,18 @@ const CommunityNote = ({ note }) => {
               }),
             }
           );
-  
+
           if (response.ok) {
             console.log("Visited document logged successfully");
-  
+
             const documentCount = await fetchDocumentCount(person_id);
             setVisitCount(documentCount);
-  
+
             if (userType === "guest" && documentCount >= 3) {
               setShowAlert(true);
               return;
             }
-  
+
             // Continue with navigation
             navigate(`/${person_id}/community-notes/${note.notes_id}`);
           } else {
@@ -78,7 +72,7 @@ const CommunityNote = ({ note }) => {
           console.error("Error logging document view", error);
         }
       };
-  
+
       if (!hasViewed || userType === "registered") {
         await logDocumentView();
       } else if (userType === "guest" && visitCount >= 3) {
@@ -89,7 +83,6 @@ const CommunityNote = ({ note }) => {
       console.error("Error handling note click", error);
     }
   };
-  
 
   return (
     <div className="note-list-item d-flex text-white w-100 py-1">
@@ -108,28 +101,9 @@ const CommunityNote = ({ note }) => {
           {note.user_name}
         </p>
       </Link>
-      <p className="w-25 text-end mb-0" style={{ fontSize: "16px" }}>
+      <p className="w-25 text-center mb-0" style={{ fontSize: "16px" }}>
         {new Date(note.modified_at).toLocaleString()}
       </p>
-
-      <Modal
-        show={showPopup}
-        onHide={handleClosePopup}
-        centered
-        className="registration-modal"
-      >
-        <Modal.Header closeButton className="modal-header">
-          <Modal.Title className="text-white">Registration Required</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="text-white">Please register to view more documents.</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleClosePopup}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
 
       <Alert show={showAlert} variant="danger">
         <Alert.Heading>Registration Required</Alert.Heading>
@@ -137,7 +111,7 @@ const CommunityNote = ({ note }) => {
         <hr />
         <div className="d-flex justify-content-end">
           <Link to="/register">
-            <Button variant="outline-danger" onClick={handleClosePopup}>
+            <Button variant="outline-danger" onClick={() => setShowAlert(false)}>
               Register
             </Button>
           </Link>
