@@ -16,7 +16,7 @@ const Folder = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("folderName");
+  const [newFolderName, setNewFolderName] = useState(folderName);
 
   const handleMenuClick = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -46,11 +46,12 @@ const Folder = ({
       {isEditing ? (
         <div className="dashboard-body-left d-flex flex-column">
           <input
+            className="form-control"
             type="text"
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
           />
-          <div>
+          <div className="d-flex ">
           <button className="folder-options btn btn-primary" onClick={handleSaveChanges} style={{ fontSize: "15px" }}>Save</button>
             <button className="folder-options btn btn-primary" onClick={handleCancelEdit} style={{ fontSize: "15px" }}>Cancel</button>
           </div>

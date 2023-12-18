@@ -10,16 +10,20 @@ const AddButton = ({ user_id, onFolderAdded }) => {
     const closeModal = () => setModalOpen(false);
   
     const handleAddFolder = async (folderName) => {
+      
       try {
         if (!folderName || folderName.trim() === '') {
           console.error('Folder name is empty or whitespace.');
           return;
         }
-  
-        const response = await fetch(`http://localhost:3000/${user_id}/dashboard/addFolder`, {
+        const storedToken = localStorage.getItem('token');
+
+        const response = await fetch(`http://localhost:3000/dashboard/addFolder`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `${storedToken}`,
+
           },
           body: JSON.stringify({ folderName }),
         });

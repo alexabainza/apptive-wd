@@ -42,31 +42,6 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-// const verifyJWT = (req, res, next) => {
-//   //authorize if user is allowed
-//   const token = req.headers["authorization"];
-//   if (!token) 
-//     return res.status(400).json({error: "User not authenticated"})
-//   try{
-//     const validToken = jwt.verify(token, "jwtSecret")
-//     if (validToken && !validToken.valid) {
-//       return res.status(401).json({ error: "Token invalid" });
-//     }
-
-//     if(validToken){
-//       req.authenticated = true
-//       req.user = validToken;  // Set the decoded token in req.user
-
-//       return next()
-//     }
-//   }
-//   catch(err){
-//     return res.status(400).json({error: err})
-//   }
-// };
-
-
-
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
@@ -312,32 +287,6 @@ app.get("/profile", verifyJWT, (req, res) => {
   );
 });
 
-
-
-// app.get("/profile", verifyJWT, (req, res) => {
-//   res.json("profile")
-  // const userId = req.params.user_id;
-
-  // conn.query(
-  //   "SELECT * FROM user_credentials WHERE user_id = ?",
-  //   [userId],
-  //   (error, data) => {
-  //     if (error) {
-  //       console.error(error);
-  //       res
-  //         .status(500)
-  //         .json({ error: "unexpected_error", message: error.message });
-  //     } else {
-  //       if (data.length > 0) {
-  //         const user = data[0];
-  //         res.status(200).json({ success: true, user });
-  //       } else {
-  //         res.status(404).json({ success: false, message: "User not found" });
-  //       }
-  //     }
-  //   }
-  // );
-// });
 app.get("/check-user-type", verifyJWT, (req, res) => {
   const { user_id } = req.user;
 
@@ -357,7 +306,6 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
         // User is a guest
         res.json({ success: true, userType: "guest", data: resultGuests });
       } else {
-        // User is not a guest, check user_credentials table
         conn.query(
           "SELECT user_type FROM user_credentials WHERE user_id = ?",
           [user_id],
@@ -434,8 +382,8 @@ app.post("/logout", (req, res) => {
   res.json({ success: true, message: "Logout successful" });
 });
 
-app.post("/:user_id/dashboard/addFolder", (req, res) => {
-  const userId = req.params.user_id;
+app.post("/dashboard/addFolder", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
   const { folderName } = req.body;
 
   const folderId = `${userId}_${uuidv4()}`;
@@ -457,8 +405,8 @@ app.post("/:user_id/dashboard/addFolder", (req, res) => {
     }
   );
 });
-app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res) => {
-  const userId = req.params.user_id;
+app.patch("/dashboard/updateFolder/:folder_id", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
   const folderId = req.params.folder_id;
 
   const { newFolderName } = req.body;
@@ -491,9 +439,9 @@ app.patch("/:user_id/dashboard/updateFolder/:folder_id", (req, res) => {
   );
 });
 
-app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
-  const userId = req.params.user_id;
+app.delete("/dashboard/deleteFolder/:folder_id", verifyJWT, (req, res) => {
   const folderId = req.params.folder_id;
+  const userId = req.user.user_id;
 
   conn.query(
     "DELETE FROM notes where folder_id = ?",

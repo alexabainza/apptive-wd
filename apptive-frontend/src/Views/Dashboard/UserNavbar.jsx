@@ -4,13 +4,27 @@ import apptiveLogo from "../../assets/APPTIVE_LOGO.png";
 
 const UserNavbar = ({username, token}) => {
   const navigate = useNavigate();
+  // const [username, setUsername] = useState(null);
+// 
+  // useEffect(() => {
+  //   // Decode the token and extract user information
+  //   if (token) {
+  //     const decodedToken = jwt.decode(token);
+  //     if (decodedToken) {
+  //       setUsername(decodedToken.username);
+  //     }
+  //   }
+  // }, [token]);
+
   // const token = localStorage.getItem("token");
+  console.log('Received Token:', token);
 
   const handleProfile = () => {
     navigate(`/${user_id}`);
   };
 
   const handleDashboard = () => {
+    console.log("username is + " + username)
     navigate(`/dashboard`, { state: { username } });
   };
   const handleLogout = async () => {
@@ -19,7 +33,7 @@ const UserNavbar = ({username, token}) => {
       const logoutResponse = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // Include "Bearer" before the token
+          Authorization: `${token}`, // Include "Bearer" before the token
         },
       });
 
