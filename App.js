@@ -3,11 +3,28 @@ const app = express();
 const port = 3000;
 const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const { v4: generateUniqueId } = require("uuid"); // Add this line
-
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
+
+const verifyJWT = (req, res, next) => {
+  //authorize if user is allowed
+  const token = req.headers["x-access-token"]; //grab token
+  if (!token) {
+    res.send("we need a token.");
+  } else {
+    jwt.verify(token, "jwtSecret", (err, decoded) => {
+      if (err) {
+        res.json({ auth: false, message: "Authentication failed" });
+      } else {
+        req.user_id = decoded.id;
+        next();
+      }
+    });
+  }
+};
 
 app.use(cors());
 app.use(express.json());
@@ -44,37 +61,37 @@ app.post("/register", async (req, res) => {
 
   try {
     // Check if the username already exists
-    const [existingUser] = await conn.promise().query(
-      "SELECT * FROM user_credentials WHERE user_name = ?",
-      [username]
-    );
+    const [existingUser] = await conn
+      .promise()
+      .query("SELECT * FROM user_credentials WHERE user_name = ?", [username]);
 
     if (existingUser.length > 0) {
       return res.status(400).json({
         message: "Username already exists.",
-        field: "username"
+        field: "username",
       });
     }
 
     // Check if the email is already in use
-    const [existingEmail] = await conn.promise().query(
-      "SELECT * FROM user_credentials WHERE email = ?",
-      [email]
-    );
+    const [existingEmail] = await conn
+      .promise()
+      .query("SELECT * FROM user_credentials WHERE email = ?", [email]);
 
     if (existingEmail.length > 0) {
       return res.status(400).json({
         message: "Email already linked to another account.",
-        field: "email"
+        field: "email",
       });
     }
 
     // If username and email are not taken, proceed with user registration
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    await conn.promise().query(
-      "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
-      [id, username, firstname, lastname, email, hashedPassword]
-    );
+    await conn
+      .promise()
+      .query(
+        "INSERT INTO user_credentials (`user_id`, `user_name`, `firstname`, `lastname`, `email`, `password`) VALUES (?, ?, ?, ?, ?, ?)",
+        [id, username, firstname, lastname, email, hashedPassword]
+      );
 
     console.log("User registered successfully");
     return res.status(201).json({
@@ -88,10 +105,6 @@ app.post("/register", async (req, res) => {
   }
 });
 
-
-
-
-  
 app.post("/login", async (req, res) => {
   const username = req.body.username.trim();
   const password = req.body.password.trim();
@@ -107,65 +120,80 @@ app.post("/login", async (req, res) => {
           error: "unexpected_error",
           message: error.message,
         });
-      } 
-      if (data.length>0){
+      }
+      if (data.length > 0) {
         const storedPassword = data[0].password;
 
-        const isMatch = await bcrypt.compare(password, storedPassword)
+        const isMatch = await bcrypt.compare(password, storedPassword);
 
-        if(isMatch){
-          res.status(200).json({
-            success: true,
-            user_id: data[0].user_id,
-            username: data[0].user_name,
-            message: "Login successful",
+        if (isMatch) {
+          const user_id = data[0].user_id;
+          const token = jwt.sign({ user_id }, "jwtSecret", {
+            expiresIn: 300, //5 minutes
           });
-        }
-        else{
-          console.log("Incorrect Password:", password);
-          res.status(401).json({ success: false, message: "Incorrect password" });
-        }
-      }
-      else{
-        res.status(404).json({ success: false, message: "User not found" });
+          res.json({
+            auth: true,
+            token: token,
+            result: {
+              user_id: data[0].user_id,
+              username: data[0].user_name,
+            },
+          });
 
+          // res.status(200).json({
+          //   success: true,
+          //   user_id: data[0].user_id,
+
+          //   username: data[0].user_name,
+          //   message: "Login successful",
+          // });
+        } else {
+          console.log("Incorrect Password:", password);
+          res.json({ auth: false, message: "wrong username/password" });
+        }
+      } else {
+        res.json({ auth: false, message: "no user exists" });
+        // res.status(404).json({ success: false, message: "User not found" });
       }
     }
   );
 });
 
+app.get("/isUserAuthenticated", (req, res) => {
+  res.send({message: "you are valid"});
+});
 
 app.get("/:person_id/community-notes", (req, res) => {
   console.log("Request received at /guestDashboard");
   const person_id = req.params.person_id;
-  console.log(`INSIDE COMMUNITY NOTES FOR ${person_id}`)
-  conn.query("SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1", (error, data) => {
-
-    if (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Unexpected error",
-      });
-    } else {
-      console.log("Fdsffd")
-
-      console.log(data); // Log the data for debugging
-      if (data.length > 0) {
-        res.status(200).json({ success: true, data });
-      } else {
-        res.status(200).json({
-          success: true,
-          person_id: person_id, // Include the person_id in the response
-
-          message: "No notes yet.",
+  console.log(`INSIDE COMMUNITY NOTES FOR ${person_id}`);
+  conn.query(
+    "SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1",
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          success: false,
+          message: "Unexpected error",
         });
+      } else {
+        console.log("Fdsffd");
+
+        console.log(data); // Log the data for debugging
+        if (data.length > 0) {
+          res.status(200).json({ success: true, data });
+        } else {
+          res.status(200).json({
+            success: true,
+            person_id: person_id, // Include the person_id in the response
+
+            message: "No notes yet.",
+          });
+        }
       }
     }
-  });
+  );
 });
-
-
 
 app.get("/:person_id/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
@@ -234,7 +262,6 @@ app.get("/viewProfile/:username", (req, res) => {
   );
 });
 
-
 app.get("/:user_id", (req, res) => {
   const userId = req.params.user_id;
 
@@ -259,43 +286,50 @@ app.get("/:user_id", (req, res) => {
   );
 });
 
-
 app.get("/:person_id/check-user-type", async (req, res) => {
   const personId = req.params.person_id;
   try {
-    conn.query("SELECT * FROM guests WHERE guest_id = ?", [personId], (error, resultGuests) => {
-      if (error) {
-        console.error("Error executing guests query:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-        return;
+    conn.query(
+      "SELECT * FROM guests WHERE guest_id = ?",
+      [personId],
+      (error, resultGuests) => {
+        if (error) {
+          console.error("Error executing guests query:", error);
+          res.status(500).json({ error: "Internal Server Error" });
+          return;
+        }
+
+        console.log("Guests Query Result:", resultGuests);
+
+        if (resultGuests.length > 0) {
+          // User is a guest
+          res.json({ userType: "guest", data: resultGuests });
+        } else {
+          // User is not a guest, check user_credentials table
+          conn.query(
+            "SELECT user_type, user_id FROM user_credentials WHERE user_id = ?",
+            [personId],
+            (error, resultCredentials) => {
+              if (error) {
+                console.error("Error executing user_credentials query:", error);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+              }
+
+              console.log("Credentials Query Result:", resultCredentials);
+
+              if (resultCredentials.length > 0) {
+                // User is registered
+                res.json({ userType: "registered", data: resultCredentials });
+              } else {
+                // User is invalid
+                res.json({ userType: "invalid", data: null });
+              }
+            }
+          );
+        }
       }
-
-      console.log("Guests Query Result:", resultGuests);
-
-      if (resultGuests.length > 0) {
-        // User is a guest
-        res.json({ userType: "guest", data: resultGuests });
-      } else {
-        // User is not a guest, check user_credentials table
-        conn.query("SELECT user_type, user_id FROM user_credentials WHERE user_id = ?", [personId], (error, resultCredentials) => {
-          if (error) {
-            console.error("Error executing user_credentials query:", error);
-            res.status(500).json({ error: "Internal Server Error" });
-            return;
-          }
-
-          console.log("Credentials Query Result:", resultCredentials);
-
-          if (resultCredentials.length > 0) {
-            // User is registered
-            res.json({ userType: "registered", data: resultCredentials });
-          } else {
-            // User is invalid
-            res.json({ userType: "invalid", data: null });
-          }
-        });
-      }
-    });
+    );
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -357,9 +391,13 @@ app.post("/:user_id/dashboard/addFolder", (req, res) => {
     (error, data) => {
       if (error) {
         console.error(error);
-        res.status(500).json({ error: "unexpected_error", message: error.message });
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
       } else {
-        res.status(201).json({ success: true, message: "Folder added successfully" });
+        res
+          .status(201)
+          .json({ success: true, message: "Folder added successfully" });
       }
     }
   );
@@ -410,13 +448,15 @@ app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
         console.error(deleteNoteError);
         res
           .status(500)
-          .json({ error: "unexpected_error", message: deleteNoteError.message });
+          .json({
+            error: "unexpected_error",
+            message: deleteNoteError.message,
+          });
       } else {
         conn.query(
           "DELETE from folders WHERE user_id = ? AND folder_id = ?",
           [userId, folderId],
-          (deleteFolderError, deleteFolderData)=>
-          {
+          (deleteFolderError, deleteFolderData) => {
             if (deleteFolderError) {
               console.error(deleteFolderError);
               res.status(500).json({
@@ -428,7 +468,9 @@ app.delete("/:user_id/dashboard/deleteFolder/:folder_id", (req, res) => {
                 success: true,
                 message: "Folder and associated notes deleted successfully",
               });
-          }})
+            }
+          }
+        );
       }
     }
   );
@@ -550,12 +592,10 @@ app.delete("/:user_id/:folder_name/delete/:note_id", (req, res) => {
                   .status(500)
                   .json({ error: "unexpected_error", message: error.message });
               } else {
-                res
-                  .status(201)
-                  .json({
-                    success: true,
-                    message: "Note deleted successfully",
-                  });
+                res.status(201).json({
+                  success: true,
+                  message: "Note deleted successfully",
+                });
               }
             }
           );
@@ -593,7 +633,10 @@ app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
                 console.error(updateError);
                 res
                   .status(500)
-                  .json({ error: "unexpected_error", message: updateError.message });
+                  .json({
+                    error: "unexpected_error",
+                    message: updateError.message,
+                  });
               } else {
                 if (data.affectedRows > 0) {
                   res.status(200).json({
@@ -623,10 +666,10 @@ app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
 app.post("/createGuest", (req, res) => {
   const guestId = generateUniqueId(); // Replace with your actual logic for generating IDs
   console.log("Create guest path called");
-  
+
   conn.query(
     "INSERT INTO guests (guest_id) VALUES (?)",
-    ['guest_' + guestId],
+    ["guest_" + guestId],
     (error, result) => {
       if (error) {
         console.error("Error creating guest user:", error);
@@ -652,10 +695,12 @@ app.post("/logVisitedDocument", async (req, res) => {
 
   try {
     // Check if the document has already been viewed
-    const [viewedDocument] = await conn.promise().query(
-      "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
-      [person_id, note_id]
-    );
+    const [viewedDocument] = await conn
+      .promise()
+      .query(
+        "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
+        [person_id, note_id]
+      );
 
     if (viewedDocument.length > 0) {
       console.log("Document has already been viewed. Skipping logging.");
@@ -663,10 +708,12 @@ app.post("/logVisitedDocument", async (req, res) => {
     }
 
     // Check the current count of logged documents
-    const [documentCount] = await conn.promise().query(
-      "SELECT COUNT(*) AS document_count FROM visited_documents WHERE person_id = ?",
-      [person_id]
-    );
+    const [documentCount] = await conn
+      .promise()
+      .query(
+        "SELECT COUNT(*) AS document_count FROM visited_documents WHERE person_id = ?",
+        [person_id]
+      );
 
     const { document_count } = documentCount[0];
     console.log(`Current document count: ${document_count}`);
@@ -681,23 +728,29 @@ app.post("/logVisitedDocument", async (req, res) => {
     }
 
     // Insert a record into the visited_documents table
-    const insertSql = "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
+    const insertSql =
+      "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
     const insertValues = [person_id, note_id];
     await conn.promise().query(insertSql, insertValues);
 
     console.log("Record inserted successfully");
 
-    return res.status(200).json({ message: "Visited document logged successfully" });
+    return res
+      .status(200)
+      .json({ message: "Visited document logged successfully" });
   } catch (err) {
     console.error("Error logging visited document:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
 app.post("/checkIfDocumentViewed", async (req, res) => {
   const { person_id, note_id } = req.body;
-  console.log("Received request to check if document viewed:", person_id, note_id);
+  console.log(
+    "Received request to check if document viewed:",
+    person_id,
+    note_id
+  );
 
   if (!person_id || !note_id) {
     return res.status(400).json({ error: "Bad Request" });
@@ -705,13 +758,15 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
 
   try {
     // Check if the document has been viewed by the user
-    const [viewedDocument] = await conn.promise().query(
-      "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
-      [person_id, note_id]
-    );
+    const [viewedDocument] = await conn
+      .promise()
+      .query(
+        "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
+        [person_id, note_id]
+      );
 
     const viewed = viewedDocument.length > 0;
-    console.log(viewed)
+    console.log(viewed);
 
     return res.status(200).json({ viewed });
   } catch (err) {

@@ -7,7 +7,31 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState(""); // New state for the message
+  const [loginStatus, setLoginStatus] = useState(false);
   const navigate = useNavigate();
+
+  const userAuthenticated = () => {
+    fetch("http://localhost:3000/isUserAuthenticated", {
+      headers: {
+        "x-access-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // Check if the response indicates authentication
+        if (data.message === "you are valid") {
+          console.log("User is authenticated");
+        } else {
+          console.log("User is not authenticated");
+        }
+      })
+      .catch((error) => {
+        console.error("Error during authentication:", error);
+      });
+  };
+  
+
 
   function handleForm(e) {
     e.preventDefault();
@@ -23,11 +47,16 @@ const Login = () => {
       .then((data) => {
         console.log(data);
 
-        if (data.success) {
+        if(data.auth){
+        // if (data.success) {
           // Redirect to the dashboard after successful login
           const userId = data.user_id;
-          navigate(`/${data.user_id}/dashboard`, { state: { username } });
+          localStorage.setItem("token", data.token)
+          setLoginStatus(true)
+          // navigate(`/${data.user_id}/dashboard`, { state: { username } });
         } else {
+          setLoginStatus(false)
+
           // Handle unsuccessful login
           setMessage(`Login failed: ${data.message}`);
         }
@@ -113,7 +142,11 @@ const Login = () => {
             </Link>
           </small>
         </div>
+        {loginStatus && (
+        <button onClick={userAuthenticated}>Check if authenticated</button>
+      )}
       </div>
+
     </div>
   );
 };
