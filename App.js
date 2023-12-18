@@ -331,51 +331,43 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
     }
   );
 });
-app.get("/dashboard", verifyJWT, (req, res) => {
+app.get('/dashboard', verifyJWT, async (req, res) => {
   const userId = req.user.user_id;
 
-  conn.query(
-    `SELECT
-      u.user_name,
-      f.folder_id,
-      f.user_id,
-      f.folder_name,
-      f.description,
-      f.favorited,
-      COUNT(n.notes_id) AS notesCount,
-      f.created_at,
-      f.modified_at
-    FROM
-      folders f
-    LEFT JOIN
-      notes n ON f.folder_id = n.folder_id
-    INNER JOIN
-      user_credentials u ON f.user_id = u.user_id
-    WHERE
-      f.user_id = ?
-    GROUP BY
-      f.folder_id`,
-    [userId],
-    (error, data) => {
-      if (error) {
-        console.error(error);
-        res.status(500).json({
-          error: "unexpected_error",
-          message: error.message,
-        });
-      } else {
-        if (data.length > 0) {
-          const user = data;
-          res.status(200).json({ success: true, user });
-        } else {
-          res.status(200).json({
-            success: true,
-            message: "User has no folders yet",
-          });
-        }
-      }
+  try {
+    const [userData] = await db.query(
+      `SELECT
+        u.user_name,
+        f.folder_id,
+        f.user_id,
+        f.folder_name,
+        f.description,
+        f.favorited,
+        COUNT(n.notes_id) AS notesCount,
+        f.created_at,
+        f.modified_at
+      FROM
+        user_credentials u
+      LEFT JOIN
+        folders f ON u.user_id = f.user_id
+      LEFT JOIN
+        notes n ON f.folder_id = n.folder_id
+      WHERE
+        u.user_id = ?
+      GROUP BY
+        f.folder_id`,
+      [userId]
+    );
+
+    if (!userData) {
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
-  );
+
+    return res.status(200).json({ success: true, user: userData });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, error: 'unexpected_error', message: error.message });
+  }
 });
 app.post("/logout", (req, res) => {
   // You may want to do additional cleanup or logging here

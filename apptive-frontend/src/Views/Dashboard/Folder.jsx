@@ -52,14 +52,28 @@ const Folder = ({
             onChange={(e) => setNewFolderName(e.target.value)}
           />
           <div className="d-flex ">
-          <button className="folder-options btn btn-primary" onClick={handleSaveChanges} style={{ fontSize: "15px" }}>Save</button>
-            <button className="folder-options btn btn-primary" onClick={handleCancelEdit} style={{ fontSize: "15px" }}>Cancel</button>
+            <button
+              className="folder-options btn btn-primary"
+              onClick={handleSaveChanges}
+              style={{ fontSize: "15px" }}
+            >
+              Save
+            </button>
+            <button
+              className="folder-options btn btn-primary"
+              onClick={handleCancelEdit}
+              style={{ fontSize: "15px" }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       ) : (
         <div className="dashboard-body-left d-flex flex-column">
           <Link to={`/${user_id}/${folderName}`} className="text-white">
-          <h4 className="folder-name mt-3 mb-0"><strong>{folderName}</strong></h4>
+            <h4 className="folder-name mt-3 mb-0">
+              <strong>{folderName}</strong>
+            </h4>
             <p className="text-white">{`${noOfNotes} notes`}</p>
           </Link>
         </div>
