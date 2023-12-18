@@ -46,6 +46,7 @@ const Login = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
+        console.log("sdgfdsgsloginpage")
 
         if(data.auth){
         // if (data.success) {
@@ -53,7 +54,7 @@ const Login = () => {
           const userId = data.user_id;
           localStorage.setItem("token", data.token)
           setLoginStatus(true)
-          // navigate(`/${data.user_id}/dashboard`, { state: { username } });
+          navigate(`/dashboard`);
         } else {
           setLoginStatus(false)
 
@@ -142,9 +143,6 @@ const Login = () => {
             </Link>
           </small>
         </div>
-        {loginStatus && (
-        <button onClick={userAuthenticated}>Check if authenticated</button>
-      )}
       </div>
 
     </div>

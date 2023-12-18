@@ -8,23 +8,9 @@ const saltRounds = 10;
 const { v4: generateUniqueId } = require("uuid"); // Add this line
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-
-const verifyJWT = (req, res, next) => {
-  //authorize if user is allowed
-  const token = req.headers["x-access-token"]; //grab token
-  if (!token) {
-    res.send("we need a token.");
-  } else {
-    jwt.verify(token, "jwtSecret", (err, decoded) => {
-      if (err) {
-        res.json({ auth: false, message: "Authentication failed" });
-      } else {
-        req.user_id = decoded.id;
-        next();
-      }
-    });
-  }
-};
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+const { verify, sign } = require("jsonwebtoken");
 
 app.use(cors());
 app.use(express.json());
@@ -36,6 +22,50 @@ const conn = mysql.createConnection({
   password: "",
   database: "apptive",
 });
+
+const verifyJWT = (req, res, next) => {
+  //authorize if the user is allowed
+  const token = req.headers['authorization'];
+  if (!token) 
+    return res.status(400).json({ error: 'User not authenticated' });
+
+  try {
+    const validToken = jwt.verify(token, 'jwtSecret');
+    req.authenticated = true;
+    req.user = validToken;  // Set the decoded token in req.user
+    return next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    return res.status(401).json({ error: 'Token invalid' });
+  }
+};
+
+// const verifyJWT = (req, res, next) => {
+//   //authorize if user is allowed
+//   const token = req.headers["authorization"];
+//   if (!token) 
+//     return res.status(400).json({error: "User not authenticated"})
+//   try{
+//     const validToken = jwt.verify(token, "jwtSecret")
+//     if (validToken && !validToken.valid) {
+//       return res.status(401).json({ error: "Token invalid" });
+//     }
+
+//     if(validToken){
+//       req.authenticated = true
+//       req.user = validToken;  // Set the decoded token in req.user
+
+//       return next()
+//     }
+//   }
+//   catch(err){
+//     return res.status(400).json({error: err})
+//   }
+// };
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello world");
@@ -129,7 +159,7 @@ app.post("/login", async (req, res) => {
         if (isMatch) {
           const user_id = data[0].user_id;
           const token = jwt.sign({ user_id }, "jwtSecret", {
-            expiresIn: 300, //5 minutes
+            expiresIn: 60*60*24*30*1000, //5 minutes
           });
           res.json({
             auth: true,
@@ -139,14 +169,6 @@ app.post("/login", async (req, res) => {
               username: data[0].user_name,
             },
           });
-
-          // res.status(200).json({
-          //   success: true,
-          //   user_id: data[0].user_id,
-
-          //   username: data[0].user_name,
-          //   message: "Login successful",
-          // });
         } else {
           console.log("Incorrect Password:", password);
           res.json({ auth: false, message: "wrong username/password" });
@@ -261,22 +283,26 @@ app.get("/viewProfile/:username", (req, res) => {
     }
   );
 });
-
-app.get("/:user_id", (req, res) => {
-  const userId = req.params.user_id;
+app.get("/profile", verifyJWT, (req, res) => {
+  // The user information is available in req.user after the verifyJWT middleware
+  const { user_id } = req.user;
 
   conn.query(
     "SELECT * FROM user_credentials WHERE user_id = ?",
-    [userId],
+    [user_id],
     (error, data) => {
       if (error) {
         console.error(error);
-        res
-          .status(500)
-          .json({ error: "unexpected_error", message: error.message });
+        res.status(500).json({ error: "unexpected_error", message: error.message });
       } else {
         if (data.length > 0) {
-          const user = data[0];
+          const user = {
+            user_id: data[0].user_id,
+            username: data[0].user_name,
+            firstname: data[0].firstname,
+            lastname: data[0].lastname,
+            email: data[0].email,
+          };
           res.status(200).json({ success: true, user });
         } else {
           res.status(404).json({ success: false, message: "User not found" });
@@ -286,60 +312,83 @@ app.get("/:user_id", (req, res) => {
   );
 });
 
-app.get("/:person_id/check-user-type", async (req, res) => {
-  const personId = req.params.person_id;
-  try {
-    conn.query(
-      "SELECT * FROM guests WHERE guest_id = ?",
-      [personId],
-      (error, resultGuests) => {
-        if (error) {
-          console.error("Error executing guests query:", error);
-          res.status(500).json({ error: "Internal Server Error" });
-          return;
-        }
 
-        console.log("Guests Query Result:", resultGuests);
 
-        if (resultGuests.length > 0) {
-          // User is a guest
-          res.json({ userType: "guest", data: resultGuests });
-        } else {
-          // User is not a guest, check user_credentials table
-          conn.query(
-            "SELECT user_type, user_id FROM user_credentials WHERE user_id = ?",
-            [personId],
-            (error, resultCredentials) => {
-              if (error) {
-                console.error("Error executing user_credentials query:", error);
-                res.status(500).json({ error: "Internal Server Error" });
-                return;
-              }
+// app.get("/profile", verifyJWT, (req, res) => {
+//   res.json("profile")
+  // const userId = req.params.user_id;
 
-              console.log("Credentials Query Result:", resultCredentials);
+  // conn.query(
+  //   "SELECT * FROM user_credentials WHERE user_id = ?",
+  //   [userId],
+  //   (error, data) => {
+  //     if (error) {
+  //       console.error(error);
+  //       res
+  //         .status(500)
+  //         .json({ error: "unexpected_error", message: error.message });
+  //     } else {
+  //       if (data.length > 0) {
+  //         const user = data[0];
+  //         res.status(200).json({ success: true, user });
+  //       } else {
+  //         res.status(404).json({ success: false, message: "User not found" });
+  //       }
+  //     }
+  //   }
+  // );
+// });
+app.get("/check-user-type", verifyJWT, (req, res) => {
+  const { user_id } = req.user;
 
-              if (resultCredentials.length > 0) {
-                // User is registered
-                res.json({ userType: "registered", data: resultCredentials });
-              } else {
-                // User is invalid
-                res.json({ userType: "invalid", data: null });
-              }
-            }
-          );
-        }
+  conn.query(
+    "SELECT * FROM guests WHERE guest_id = ?",
+    [user_id],
+    (error, resultGuests) => {
+      if (error) {
+        console.error("Error executing guests query:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+        return;
       }
-    );
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+
+      console.log("Guests Query Result:", resultGuests);
+
+      if (resultGuests.length > 0) {
+        // User is a guest
+        res.json({ success: true, userType: "guest", data: resultGuests });
+      } else {
+        // User is not a guest, check user_credentials table
+        conn.query(
+          "SELECT user_type FROM user_credentials WHERE user_id = ?",
+          [user_id],
+          (error, resultCredentials) => {
+            if (error) {
+              console.error("Error executing user_credentials query:", error);
+              res.status(500).json({ error: "Internal Server Error" });
+              return;
+            }
+
+            console.log("Credentials Query Result:", resultCredentials);
+
+            if (resultCredentials.length > 0) {
+              // User is registered
+              res.json({ success: true, userType: "registered", data: resultCredentials });
+            } else {
+              // User is invalid
+              res.json({ success: true, userType: "invalid", data: null });
+            }
+          }
+        );
+      }
+    }
+  );
 });
-app.get("/:user_id/dashboard", (req, res) => {
-  const userId = req.params.user_id;
+app.get("/dashboard", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
 
   conn.query(
     `SELECT
+      u.user_name,
       f.folder_id,
       f.user_id,
       f.folder_name,
@@ -352,6 +401,8 @@ app.get("/:user_id/dashboard", (req, res) => {
       folders f
     LEFT JOIN
       notes n ON f.folder_id = n.folder_id
+    INNER JOIN
+      user_credentials u ON f.user_id = u.user_id
     WHERE
       f.user_id = ?
     GROUP BY
@@ -377,6 +428,10 @@ app.get("/:user_id/dashboard", (req, res) => {
       }
     }
   );
+});
+app.post("/logout", (req, res) => {
+  // You may want to do additional cleanup or logging here
+  res.json({ success: true, message: "Logout successful" });
 });
 
 app.post("/:user_id/dashboard/addFolder", (req, res) => {

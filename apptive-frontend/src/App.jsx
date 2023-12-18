@@ -17,15 +17,24 @@ import CommunityIndivNote from "./Views/Guest/CommunityIndivNote";
 import ViewProfile from "./Views/Profile/ViewProfile";
 import Features from "./Views/Landing Page/Features";
 import AboutUs from "./Views/Landing Page/AboutUs"
-
+import UserNavbar from "./Views/Dashboard/UserNavbar";
 function App() {
+  // const token = localStorage.getItem("token");
+  // let username = "";
+  // if (token) {
+  //   // Decode the JWT token to get user information
+  //   const decodedToken = jwt_decode(token);
+  //   username = decodedToken.username;
+  // }
   return (
     <BrowserRouter>
+      {/* {token && <UserNavbar username={username} token={token} />} Pass the token as a prop */}
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/:user_id/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
         <Route path="/:user_id/:folder_name" element={<NotesPage />} />
         <Route path="/:user_id" element={<Profile />} />
