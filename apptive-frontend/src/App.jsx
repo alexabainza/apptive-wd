@@ -37,7 +37,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
         <Route path="/:folder_name" element={<NotesPage />} />
-        <Route path="/:user_id" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/select" element={<Select />} />
         <Route
           path="/:user_id/:folder_name/addNote"
