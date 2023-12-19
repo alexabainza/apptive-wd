@@ -7,18 +7,30 @@ import { SortUpAlt, SortDownAlt } from "react-bootstrap-icons";
 
 const NotesPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { username } = location.state || {};
   const [notes, setNotes] = useState([]); // Initialize with an empty array
   const [notesMessage, setNoNotesMessage] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [token, setToken] = useState(null);
   const { user_id, folder_name } = useParams();
+  const [username, setUsername ]= useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:3000/${folder_name}`)
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+    console.log("Received Token inside notes page:", storedToken); // Add this line to log the token
+
+    if (!storedToken) {
+      navigate("/login");
+      return;
+    }
+
+    fetch(`http://localhost:3000/${folder_name}`, {
+      headers: {
+        Authorization: storedToken,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log("Received data:", data);
@@ -28,6 +40,8 @@ const NotesPage = () => {
             setNoNotesMessage("You have no notes.");
           } else {
             console.log(data);
+            setUsername(data[0].user_name);
+
             setNotes(data);
           }
         } else {
@@ -39,7 +53,6 @@ const NotesPage = () => {
       });
   }, [user_id, folder_name]);
 
- 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -116,13 +129,12 @@ const NotesPage = () => {
   return (
     <>
       <div className="notes-main-page">
-        <UserNavbar user_id={user_id} />
+        <UserNavbar username={username} token={token} />
         <div className="notes-main-page-content">
-          
           <div className="notes-main-page-header mb-2 d-flex justify-content-between">
             <div className="d-flex align-items-center">
               <Link
-                to={`../${user_id}/dashboard`}
+                to={`../dashboard`}
                 className="notes-main-page-folder-text text-white"
               >
                 <h2>Folders</h2>
@@ -145,41 +157,41 @@ const NotesPage = () => {
             </Link>
           </div>
           <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3">
-          <div className="dropdown">
-            <button
-              className="btn btn-primary text-white dropdown-toggle ms-0"
-              type="button"
-              id="sortDropdown"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Sort By: {sortBy || "Select"}
-            </button>
-            <div className="dropdown-menu" aria-labelledby="sortDropdown">
+            <div className="dropdown">
               <button
-                className="dropdown-item"
-                onClick={() => handleSort("alphabeticalOrder")}
+                className="btn btn-primary text-white dropdown-toggle ms-0"
+                type="button"
+                id="sortDropdown"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
               >
-                Title
+                Sort By: {sortBy || "Select"}
               </button>
-              <button
-                className="dropdown-item"
-                onClick={() => handleSort("modifiedDate")}
-              >
-                Last Modified
-              </button>
+              <div className="dropdown-menu" aria-labelledby="sortDropdown">
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleSort("alphabeticalOrder")}
+                >
+                  Title
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleSort("modifiedDate")}
+                >
+                  Last Modified
+                </button>
+              </div>
             </div>
-          </div>
 
-          <input
-            className="form-control w-25"
-            type="text"
-            placeholder="Search notes"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-        </div>
+            <input
+              className="form-control w-25"
+              type="text"
+              placeholder="Search notes"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </div>
           <div className="notes-page-header d-flex text-white justify-content-between">
             <small className="align-items-center">Title</small>
             <div className="notes-page-header-right">
@@ -192,27 +204,26 @@ const NotesPage = () => {
             </div>
           </div>
           <div className="notes-list">
-            {notes.filter((note)=>
-            note.note_title
-            .toLowerCase()
-            .startsWith(searchQuery.toLowerCase())
-      
-            )
-            .map((note) => (
-              <div key={note.notes_id}>
-                <Note
-                  folder_name={note.folder_name}
-                  user_id={note.user_id}
-                  folder_id={note.folder_id}
-                  notes_id={note.notes_id}
-                  title={note.note_title}
-                  last_modified={note.modified_at}
-                  created_at={note.created_at}
-                  content={note.contents}
-                  onDeleteNote={deleteNote}
-                />
-              </div>
-            ))}
+            {notes
+              .filter((note) =>
+              (note.note_title?.toLowerCase() || '').startsWith(searchQuery.toLowerCase())
+
+              )
+              .map((note) => (
+                <div key={note.notes_id}>
+                  <Note
+                    folder_name={note.folder_name}
+                    user_id={note.user_id}
+                    folder_id={note.folder_id}
+                    notes_id={note.notes_id}
+                    title={note.note_title}
+                    last_modified={note.modified_at}
+                    created_at={note.created_at}
+                    content={note.contents}
+                    onDeleteNote={deleteNote}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </div>

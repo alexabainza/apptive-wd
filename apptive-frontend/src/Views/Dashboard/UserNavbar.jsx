@@ -4,21 +4,6 @@ import apptiveLogo from "../../assets/APPTIVE_LOGO.png";
 
 const UserNavbar = ({username, token}) => {
   const navigate = useNavigate();
-  // const [username, setUsername] = useState(null);
-// 
-  // useEffect(() => {
-  //   // Decode the token and extract user information
-  //   if (token) {
-  //     const decodedToken = jwt.decode(token);
-  //     if (decodedToken) {
-  //       setUsername(decodedToken.username);
-  //     }
-  //   }
-  // }, [token]);
-
-  // const token = localStorage.getItem("token");
-  console.log('Received Token:', token);
-
   const handleProfile = () => {
     navigate(`/${user_id}`);
   };

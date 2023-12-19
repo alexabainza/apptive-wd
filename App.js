@@ -485,13 +485,17 @@ app.delete("/dashboard/deleteFolder/:folder_id", verifyJWT, (req, res) => {
     }
   );
 });
-
-app.get("/:user_id/:folder_name", (req, res) => {
+app.get("/:folder_name", verifyJWT, (req, res) => {
   const folder_name = req.params.folder_name;
-  const user_id = req.params.user_id;
+  const user_id = req.user.user_id;
+
+  // Use LEFT JOIN to include users with no notes
   conn.query(
-    "SELECT f.folder_name, n.* FROM notes n INNER JOIN folders f ON f.folder_id = n.folder_id WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ?",
-    [user_id, user_id, folder_name],
+    "SELECT f.folder_name, n.*, u.user_name FROM folders f " +
+    "LEFT JOIN notes n ON f.folder_id = n.folder_id AND n.user_id = ? " +
+    "LEFT JOIN user_credentials u ON u.user_id = ? " +
+    "WHERE f.user_id = ? AND f.folder_name = ?",
+    [user_id, user_id, user_id, folder_name],
     (error, data) => {
       if (error) {
         console.error("Error executing query:", error);
@@ -503,6 +507,7 @@ app.get("/:user_id/:folder_name", (req, res) => {
     }
   );
 });
+
 
 app.get("/:user_id/:folder_name/:notes_id", (req, res) => {
   const folder_name = req.params.folder_name;
