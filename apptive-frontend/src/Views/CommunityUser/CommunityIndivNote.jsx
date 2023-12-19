@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import Navbar from "../Navbar/Navbar";
-
+import UserNavbar from "../Dashboard/UserNavbar";
 const CommunityIndivNote = () => {
   const { person_id, note_id } = useParams();
   const [note, setNote] = useState({});
+  const storedToken = localStorage.getItem("token");
+
   useEffect(() => {
     // Check if note_id is defined before making the fetch request
     if (note_id) {
-      fetch(`http://localhost:3000/${person_id}/community-notes/${note_id}`)
+      fetch(`http://localhost:3000/community-notes/${note_id}`,{
+        headers: {
+          Authorization: storedToken,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -26,23 +31,21 @@ const CommunityIndivNote = () => {
 
   return (
     <div className="community-indiv-note">
-      <div style={{ margin: "0px 50px" }}>
-        <Navbar />
+        <UserNavbar/>
         <div
           className="community-indiv-note-contents mt-2 text-white"
           style={{ margin: "0px 50px" }}
         >
-          <Link to={`/${person_id}/community-notes`} className="text-white">
-            {"<"}Back
+          <Link to={`/community-notes`} className="back-btn text-white">
+            {"<"}  Back
           </Link>
 
           <h1 className="mb-2 mt-4">{note.note_title}</h1>
           <Link to={`../viewProfile/${note.user_name}`}>
             <small className="mb-1">@{note.user_name}</small>
           </Link>
-          <p className="text-justify fs-5 mb-0 mt-2">{note.contents}</p>
+          <p className="community-indiv-note-notecontents text-justify mb-0 mt-2">{note.contents}</p>
         </div>
-      </div>
     </div>
   );
 };

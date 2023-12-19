@@ -50,6 +50,9 @@ body {
 }
 
 .navbar{
+    background-image: linear-gradient(78deg, #38102b, #151724, #0f233e);
+    width: 100%;
+
   /* position: fixed; */
   /* top: 0; */
   /* width: 100%; */
@@ -352,7 +355,16 @@ body {
 }
 
 .dropdown-item:hover{
-  background-color: #0f233e;
+  background-color:#d74242
+}
+
+.dropdown-menu{
+  font-size: 12px;
+}
+
+.search-notes{
+  font-size: 12px;
+
 }
 
 
@@ -566,12 +578,26 @@ padding: 0px 20px;
 
 .guest-dashboard-contents{
   margin-top: 5vh;
+  padding: 0px 200px;
+
 
 }
 
 .community-indiv-note{
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
+}
+
+
+.community-indiv-note-contents{
+  padding: 0px 100px;
+
+}
+.community-indiv-note-notecontents{
+  font-size: 15px;
+}
+.back-btn:hover{
+  color: #d74242!important;
 }
 
 .notecont {
@@ -803,4 +829,15 @@ padding: 0px 20px;
 /* Override the default Bootstrap modal backdrop */
 .registration-modal .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5); /* Set your desired backdrop color and opacity */
+}
+
+.table-header {
+  background-color: #3b85cf!important; /* Choose your desired background color */
+  color: rgb(93, 54, 54)!important;
+}
+
+/* SORT BY BUTTON */
+.sort-by-button{
+  /* background-color: red; */
+  font-size: 12px;
 }

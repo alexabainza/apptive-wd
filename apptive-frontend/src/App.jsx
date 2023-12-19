@@ -12,8 +12,8 @@ import NotesPage from "./Views/Notes/NotesPage";
 import IndivNote from "./Views/Notes/IndivNote";
 import AddNotesPage from "./Views/Notes/AddNotesPage";
 import Select from "./Views/Login/Select";
-import GuestDashboard from "./Views/Guest/GuestDashboard";
-import CommunityIndivNote from "./Views/Guest/CommunityIndivNote";
+import CommunityDashboard from "./Views/CommunityUser/CommunityDashboard";
+import CommunityIndivNote from "./Views/CommunityUser/CommunityIndivNote";
 import ViewProfile from "./Views/Profile/ViewProfile";
 import Features from "./Views/Landing Page/Features";
 import AboutUs from "./Views/Landing Page/AboutUs"
@@ -44,12 +44,12 @@ function App() {
           element={<AddNotesPage />}
         />
         <Route
-          path="/community-note/:note_id"
+          path="/community-notes/:note_id"
           element={<CommunityIndivNote />}
         />
         <Route path="/:person_id/community-notes/:note_id" element={<CommunityIndivNote/>} />
-
-        <Route path="/:person_id/community-notes" element={<GuestDashboard />} />
+        <Route path="/:community-notes" element = {<CommunityDashboard/>}/>
+        {/* <Route path="/:person_id/community-notes" element={<GuestDashboard />} /> */}
         <Route path="/viewProfile/:username" element={<ViewProfile />} />
         <Route path="/features" element={<Features />} />
         <Route path="/aboutus" element={<AboutUs />} />

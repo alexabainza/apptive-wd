@@ -174,10 +174,8 @@ app.get("/isUserAuthenticated", (req, res) => {
   res.send({message: "you are valid"});
 });
 
-app.get("/:person_id/community-notes", (req, res) => {
-  console.log("Request received at /guestDashboard");
-  const person_id = req.params.person_id;
-  console.log(`INSIDE COMMUNITY NOTES FOR ${person_id}`);
+app.get("/community-notes", verifyJWT, (req, res) => {
+  const person_id = req.user.user_id;
   conn.query(
     "SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1",
     (error, data) => {
@@ -188,9 +186,7 @@ app.get("/:person_id/community-notes", (req, res) => {
           message: "Unexpected error",
         });
       } else {
-        console.log("Fdsffd");
 
-        console.log(data); // Log the data for debugging
         if (data.length > 0) {
           res.status(200).json({ success: true, data });
         } else {
@@ -206,7 +202,7 @@ app.get("/:person_id/community-notes", (req, res) => {
   );
 });
 
-app.get("/:person_id/community-notes/:note_id", (req, res) => {
+app.get("/community-notes/:note_id", verifyJWT, (req, res) => {
   const note_id = req.params.note_id;
   console.log("Received notes_id:", note_id);
 
