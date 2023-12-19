@@ -509,12 +509,15 @@ app.get("/:folder_name", verifyJWT, (req, res) => {
 });
 
 
-app.get("/:user_id/:folder_name/:notes_id", (req, res) => {
+app.get("/:folder_name/:notes_id",verifyJWT, (req, res) => {
   const folder_name = req.params.folder_name;
-  const user_id = req.params.user_id;
+  const user_id = req.user.user_id;
   const note_id = req.params.notes_id;
   conn.query(
-    "SELECT n.* FROM notes n INNER JOIN folders f ON f.folder_id = n.folder_id WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ? AND n.notes_id = ?",
+    "SELECT n.*, u.user_name FROM notes n " +
+    "INNER JOIN folders f ON f.folder_id = n.folder_id " +
+    "LEFT JOIN user_credentials u ON u.user_id = n.user_id " +
+    "WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ? AND n.notes_id = ?",
     [user_id, user_id, folder_name, note_id],
 
     (error, data) => {
@@ -534,16 +537,43 @@ app.get("/:user_id/:folder_name/:notes_id", (req, res) => {
     }
   );
 });
+app.get("/user/:userId", verifyJWT, (req, res) => {
+  const userId = req.params.userId;
 
-app.post("/:user_id/:folder_name/addNote", (req, res) => {
-  const userId = req.params.user_id;
+  conn.query(
+    "SELECT user_name FROM user_credentials WHERE user_id = ?",
+    [userId],
+    (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({
+          error: "unexpected_error",
+          message: "Internal Server Error",
+        });
+      }
+
+      if (result.length > 0) {
+        const user = result[0];
+        res.json({ user_id: userId, user_name: user.user_name });
+      } else {
+        res.status(404).json({
+          error: "user_not_found",
+          message: "User not found",
+        });
+      }
+    }
+  );
+});
+
+app.post("/:folder_name/addNote", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
   const folderName = req.params.folder_name;
-  console.log(req.body); // Log the request body to check if it's received correctly
 
   const note_id = `${userId}_${uuidv4()}_${uuidv4()}`;
   conn.query(
-    "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
-    [userId, folderName],
+    "SELECT f.folder_id, u.user_name FROM folders f " +
+    "LEFT JOIN user_credentials u ON u.user_id = f.user_id " +
+    "WHERE f.user_id = ? AND f.folder_name = ?",    [userId, folderName],
     (error, result) => {
       if (error) {
         console.error(error);
@@ -579,8 +609,8 @@ app.post("/:user_id/:folder_name/addNote", (req, res) => {
   );
 });
 
-app.delete("/:user_id/:folder_name/delete/:note_id", (req, res) => {
-  const userId = req.params.user_id;
+app.delete("/:folder_name/delete/:note_id", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
   const folderName = req.params.folder_name;
   const note_id = req.params.note_id;
 
@@ -623,8 +653,8 @@ app.delete("/:user_id/:folder_name/delete/:note_id", (req, res) => {
     }
   );
 });
-app.patch("/:user_id/:folder_name/:note_id/updateNote", (req, res) => {
-  const userId = req.params.user_id;
+app.patch("/:folder_name/:note_id/updateNote", verifyJWT, (req, res) => {
+  const userId = req.user.user_id;
   const folderName = req.params.folder_name;
   const noteId = req.params.note_id;
 

@@ -21,7 +21,7 @@ const Note = ({
     <div>
       <div className="note-list-item pb-0 align-items-center justify-content-between text-white d-flex w-100">
         <Link
-          to={`/${user_id}/${folder_name}/${notes_id}`}
+          to={`/${folder_name}/${notes_id}`}
           className="note-item text-white d-flex align-items-center jusify-content-between"
         >
           <h5 className="note-title">{title}</h5>

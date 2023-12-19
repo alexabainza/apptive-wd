@@ -35,12 +35,12 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
+        <Route path="/:folder_name/:note_id" element={<IndivNote />} />
         <Route path="/:folder_name" element={<NotesPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/select" element={<Select />} />
         <Route
-          path="/:user_id/:folder_name/addNote"
+          path="/:folder_name/addNote"
           element={<AddNotesPage />}
         />
         <Route

@@ -11,15 +11,25 @@ const IndivNote = () => {
   const [editedNote, setEditedNote] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
+  const [username, setUsername] = useState("");
+
+  const storedToken = localStorage.getItem("token");
+
   const quillRef = useRef(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/${user_id}/${folder_name}/${note_id}`)
+    fetch(`http://localhost:3000/${folder_name}/${note_id}`,{
+      headers: {
+        Authorization: storedToken,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         if (data != null) {
           setNote(data);
+          setUsername(data.username); // Set the username in the state
+          console.log("username from indiv note : " + username)
           setEditedNote(data); // Initialize editedNote with the current note data
         } else {
           console.error("Error fetching note:", data.message);
@@ -47,11 +57,13 @@ const IndivNote = () => {
   const handleSaveChanges = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/${user_id}/${folder_name}/${note_id}/updateNote`,
+        `http://localhost:3000/${folder_name}/${note_id}/updateNote`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: storedToken,
+
           },
           body: JSON.stringify(editedNote),
         }
@@ -82,9 +94,9 @@ const IndivNote = () => {
 
   return (
     <div className="individual-note">
-      <UserNavbar />
+      <UserNavbar username={username} />
       <div className="individual-note-content mx-5">
-        <Link to={`../${user_id}/${folder_name}`} className="mb-5">
+        <Link to={`../${folder_name}`} className="mb-5">
           {"<"} Back
         </Link>
         {note.notes_id && (

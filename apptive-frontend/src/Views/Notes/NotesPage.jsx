@@ -14,12 +14,11 @@ const NotesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [token, setToken] = useState(null);
   const { user_id, folder_name } = useParams();
-  const [username, setUsername ]= useState("");
+  const [username, setUsername] = useState("");
+  const storedToken = localStorage.getItem("token");
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
     setToken(storedToken);
-    console.log("Received Token inside notes page:", storedToken); // Add this line to log the token
 
     if (!storedToken) {
       navigate("/login");
@@ -84,9 +83,12 @@ const NotesPage = () => {
     try {
       console.log("Delete button has been clicked");
       const response = await fetch(
-        `http://localhost:3000/${user_id}/${folder_name}/delete/${noteId}`,
+        `http://localhost:3000/${folder_name}/delete/${noteId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: token,
+          },
         }
       );
 
@@ -110,6 +112,8 @@ const NotesPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: token,
+
           },
           body: JSON.stringify(noteDetails),
         }
@@ -149,7 +153,7 @@ const NotesPage = () => {
             </div>
 
             <Link
-              to={`/${user_id}/${folder_name}/addNote`}
+              to={`/${folder_name}/addNote`}
               className="notes-main-page-add text-white"
               style={{ fontSize: "35px" }}
             >
@@ -206,8 +210,9 @@ const NotesPage = () => {
           <div className="notes-list">
             {notes
               .filter((note) =>
-              (note.note_title?.toLowerCase() || '').startsWith(searchQuery.toLowerCase())
-
+                (note.note_title?.toLowerCase() || "").startsWith(
+                  searchQuery.toLowerCase()
+                )
               )
               .map((note) => (
                 <div key={note.notes_id}>
