@@ -1,10 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import UserNavbar from "../Dashboard/UserNavbar";
-import { useState } from "react";
-
 import { useParams, useNavigate, Link } from "react-router-dom";
-
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -19,22 +16,34 @@ const AddNotesPage = ({ folder }) => {
 
   const quillRef = useRef(null);
 
-  
+  useEffect(() => {
+    if (username) {
+      // Log the username after it has been updated
+      console.log("Updated username:", username);
+    }
+  }, [username]); // Run this effect whenever the username changes
+
   const handleAddNote = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/${folder_name}/addNote`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: storedToken,
-          },
-          body: JSON.stringify({ noteTitle, contents }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/${folder_name}/addNote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: storedToken,
+        },
+        body: JSON.stringify({ noteTitle, contents }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsername(data.username); // Extract username from the response
+        console.log("username from add notes page: " + data.username);
+      } else {
+        console.error("Error saving note:", response.statusText);
+      }
+
       navigate(`/${folder_name}`);
     } catch (error) {
       console.error("Error saving note:", error.message);
@@ -46,8 +55,7 @@ const AddNotesPage = ({ folder }) => {
     const range = quill.getSelection();
 
     if (range) {
-      const isHighlighted =
-        quill.getFormat(range.index, range.length).background === color;
+      const isHighlighted = quill.getFormat(range.index, range.length).background === color;
       quill.formatText(range.index, range.length, {
         background: isHighlighted ? null : color,
       });
@@ -56,7 +64,7 @@ const AddNotesPage = ({ folder }) => {
 
   return (
     <div className="add-notes-page">
-      <UserNavbar />
+      <UserNavbar username={username} />
       <div className="form-group mx-5 mb-4">
         <Link to={`../${folder_name}`} className="mb-5">
           {"<"} Back

@@ -160,7 +160,7 @@ const NotesPage = () => {
               +
             </Link>
           </div>
-          <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3">
+          <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3 px-0">
             <div className="dropdown">
               <button
                 className="btn btn-primary text-white dropdown-toggle ms-0"
@@ -195,17 +195,6 @@ const NotesPage = () => {
               value={searchQuery}
               onChange={handleSearch}
             />
-          </div>
-          <div className="notes-page-header d-flex text-white justify-content-between">
-            <small className="align-items-center">Title</small>
-            <div className="notes-page-header-right">
-              <small className="text-white me-3">Sort by</small>
-              {isAscending ? (
-                <SortUpAlt size={20} className="mb-0s" onClick={handleSort} />
-              ) : (
-                <SortDownAlt size={20} className="mb-0s" onClick={handleSort} />
-              )}{" "}
-            </div>
           </div>
           <div className="notes-list">
             {notes

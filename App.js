@@ -502,7 +502,6 @@ app.get("/:folder_name", verifyJWT, (req, res) => {
         res.status(500).send("Internal Server Error");
       } else {
         res.json(data);
-        console.log(data);
       }
     }
   );
@@ -564,49 +563,65 @@ app.get("/user/:userId", verifyJWT, (req, res) => {
     }
   );
 });
+app.post("/:folder_name/addNote", verifyJWT, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const folderName = req.params.folder_name;
 
-app.post("/:folder_name/addNote", verifyJWT, (req, res) => {
-  const userId = req.user.user_id;
-  const folderName = req.params.folder_name;
+    const note_id = `${userId}_${uuidv4()}_${uuidv4()}`;
 
-  const note_id = `${userId}_${uuidv4()}_${uuidv4()}`;
-  conn.query(
-    "SELECT f.folder_id, u.user_name FROM folders f " +
-    "LEFT JOIN user_credentials u ON u.user_id = f.user_id " +
-    "WHERE f.user_id = ? AND f.folder_name = ?",    [userId, folderName],
-    (error, result) => {
-      if (error) {
-        console.error(error);
-        res
-          .status(500)
-          .json({ error: "unexpected_error", message: error.message });
-      } else {
-        if (result.length > 0) {
-          const folderId = result[0].folder_id;
-          conn.query(
-            "INSERT INTO notes(user_id, folder_id, notes_id, note_title, contents) VALUES (?, ?, ?, ?, ?)",
-            [userId, folderId, note_id, req.body.noteTitle, req.body.contents],
-            (error, data) => {
-              if (error) {
-                console.error(error);
-                res
-                  .status(500)
-                  .json({ error: "unexpected_error", message: error.message });
-              } else {
-                res
-                  .status(201)
-                  .json({ success: true, message: "Note added successfully" });
-              }
-            }
-          );
-        } else {
-          res
-            .status(404)
-            .json({ error: "folder_not_found", message: "Folder not found" });
+    const result = await new Promise((resolve, reject) => {
+      conn.query(
+        "SELECT f.folder_id, u.user_name FROM folders f " +
+        "LEFT JOIN user_credentials u ON u.user_id = f.user_id " +
+        "WHERE f.user_id = ? AND f.folder_name = ?",
+        [userId, folderName],
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
         }
-      }
+      );
+    });
+
+    if (result.length > 0) {
+      const folderId = result[0].folder_id;
+      const username = result[0].user_name; // Extract username from the result
+
+      console.log("user name from app js is " + username);
+
+      // Send the username back to the frontend immediately
+      res.status(200).json({
+        success: true,
+        message: "Username retrieved successfully",
+        username: username,
+      });
+
+      // Insert the note in the background
+      conn.query(
+        "INSERT INTO notes(user_id, folder_id, notes_id, note_title, contents) VALUES (?, ?, ?, ?, ?)",
+        [userId, folderId, note_id, req.body.noteTitle, req.body.contents],
+        (error, data) => {
+          if (error) {
+            console.error(error);
+          } else {
+            console.log("Note added successfully");
+          }
+        }
+      );
+    } else {
+      res
+        .status(404)
+        .json({ error: "folder_not_found", message: "Folder not found" });
     }
-  );
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "unexpected_error", message: error.message });
+  }
 });
 
 app.delete("/:folder_name/delete/:note_id", verifyJWT, (req, res) => {

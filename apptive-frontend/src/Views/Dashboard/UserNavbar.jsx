@@ -5,7 +5,7 @@ import apptiveLogo from "../../assets/APPTIVE_LOGO.png";
 const UserNavbar = ({username, token}) => {
   const navigate = useNavigate();
   const handleProfile = () => {
-    navigate(`/${user_id}`);
+    navigate(`/profile`);
   };
 
   const handleDashboard = () => {
@@ -14,26 +14,21 @@ const UserNavbar = ({username, token}) => {
   };
   const handleLogout = async () => {
     try {
-      // Call the logout endpoint on the server
       const logoutResponse = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
-          Authorization: `${token}`, // Include "Bearer" before the token
+          Authorization: `${token}`,
         },
       });
 
       if (logoutResponse.ok) {
-        // Remove the token from local storage
         localStorage.removeItem("token");
-        // Navigate to the login page or perform other logout actions
         navigate("/login");
       } else {
         console.error("Failed to logout:", logoutResponse.status);
-        // Handle logout failure here
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      // Handle logout error here
     }
   };
 

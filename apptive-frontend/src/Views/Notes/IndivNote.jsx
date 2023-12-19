@@ -28,8 +28,6 @@ const IndivNote = () => {
         console.log(data);
         if (data != null) {
           setNote(data);
-          setUsername(data.username); // Set the username in the state
-          console.log("username from indiv note : " + username)
           setEditedNote(data); // Initialize editedNote with the current note data
         } else {
           console.error("Error fetching note:", data.message);
@@ -39,6 +37,12 @@ const IndivNote = () => {
         console.error("Error fetching note:", error);
       });
   }, [note_id]);
+
+  useEffect(() => {
+    setUsername(note.user_name);
+
+  }, [note]);
+
   const handleToggleFlashcardPage = () => {
     setShowFlashcardPage((prevShowFlashcardPage) => !prevShowFlashcardPage);
   };
