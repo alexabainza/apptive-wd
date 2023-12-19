@@ -235,6 +235,31 @@ app.get("/guest/community-notes", (req, res) => {
   );
 });
 
+app.get("/guest/community-notes/:note_id", (req, res) => {
+  const note_id = req.params.note_id;
+  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+
+  console.log("Received notes_id:", note_id);
+
+  conn.query(
+    "SELECT n.*, uc.user_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id WHERE n.notes_id = ?",
+    [note_id],
+    (error, data) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        if (data.length === 0) {
+          res.status(404).json({ error: "Note not found" });
+        } else {
+          res.setHeader("Content-Type", "application/json");
+          const note = data[0]; // Assuming there is only one matching note
+          res.json(note);
+        }
+      }
+    }
+  );
+});
 app.get("/community-notes/:note_id", verifyJWT, (req, res) => {
   const note_id = req.params.note_id;
   console.log("Received notes_id:", note_id);

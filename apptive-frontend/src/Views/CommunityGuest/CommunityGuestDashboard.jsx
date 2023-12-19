@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import CommunityNote from "./CommunityGuestNote";
 import { useParams, useNavigate } from "react-router-dom";
+import { Table } from "react-bootstrap";
 
 
 const CommunityGuestDashboard = () => {
@@ -10,6 +11,8 @@ const CommunityGuestDashboard = () => {
   const [noNotesMessage, setNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
+
   const navigate = useNavigate()
 
   const guestId = localStorage.getItem("guestId");
@@ -54,20 +57,37 @@ const CommunityGuestDashboard = () => {
     setSearchQuery(event.target.value);
   };
 
+  
   const handleSort = (criteria) => {
     let sortedNotes = [...notes];
+    let newSortOrder = "asc";
+
+    // If the same criteria is clicked again, toggle the sort order
+    if (sortBy === criteria) {
+      newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    }
 
     switch (criteria) {
-      case "modifiedDate":
-        sortedNotes.sort(
-          (a, b) => new Date(b.modified_at) - new Date(a.modified_at)
+      case "Last Modified":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? new Date(a.modified_at) - new Date(b.modified_at)
+            : new Date(b.modified_at) - new Date(a.modified_at)
         );
         break;
-      case "alphabeticalOrder":
-        sortedNotes.sort((a, b) => a.note_title.localeCompare(b.note_title));
+      case "Title":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? a.note_title.localeCompare(b.note_title)
+            : b.note_title.localeCompare(a.note_title)
+        );
         break;
-      case "byUser":
-        sortedNotes.sort((a, b) => a.user_name.localeCompare(b.user_name));
+      case "Creator":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? a.user_name.localeCompare(b.user_name)
+            : b.user_name.localeCompare(a.user_name)
+        );
         break;
       default:
         break;
@@ -75,49 +95,44 @@ const CommunityGuestDashboard = () => {
 
     setNotes(sortedNotes);
     setSortBy(criteria);
+    setSortOrder(newSortOrder);
   };
 
   return (
     <div className="guest-dashboard d-flex flex-column">
-      <Navbar className="guestNavbar" />
+      <Navbar />
 
-      <div className="guest-dashboard-contents mx-5">
-        <h3 className="text-white ">Community Notes</h3>
+      <div className="guest-dashboard-contents">
+        <h2 className="text-white "><strong>Community Notes</strong></h2>
 
-        <div className="guest-dashboard-table-header-main pb-4 mb-5 d-flex justify-content-between p-3">
+        <div className="guest-dashboard-table-header-main pb-4  d-flex justify-content-between py-3">
           <div className="dropdown">
             <button
-              className="btn btn-primary text-white dropdown-toggle ms-0"
+              className="sort-by-button btn text-white dropdown-toggle ms-0"
               type="button"
               id="sortDropdown"
               data-bs-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false"
             >
-              Sort By: {sortBy || "Select"}
+              Sort By: {sortBy ? `${sortBy} (${sortOrder === "asc" ? "Ascending" : "Descending"})` : "Select"}
             </button>
             <div className="dropdown-menu" aria-labelledby="sortDropdown">
               <button
                 className="dropdown-item"
-                onClick={() => handleSort("alphabeticalOrder")}
+                onClick={() => handleSort("Title")}
               >
                 Title
               </button>
-              {/* <button
-                className="dropdown-item"
-                onClick={() => handleSort("byUser")}
-              >
-                Folder
-              </button> */}
               <button
                 className="dropdown-item"
-                onClick={() => handleSort("modifiedDate")}
+                onClick={() => handleSort("Creator")}
               >
                 Creator
               </button>
               <button
                 className="dropdown-item"
-                onClick={() => handleSort("modifiedDate")}
+                onClick={() => handleSort("Last Modified")}
               >
                 Last Modified
               </button>
@@ -125,33 +140,34 @@ const CommunityGuestDashboard = () => {
           </div>
 
           <input
-            className="form-control w-25"
+            className="search-notes form-control w-25"
             type="text"
             placeholder="Search notes"
             value={searchQuery}
             onChange={handleSearch}
           />
         </div>
-        <div className="guest-dashboard-table-header d-flex">
-          <small className="w-25 text-white text-center">Title</small>
-          <small className="w-25 text-white text-center">Folder</small>
-          <small className="w-25 text-white text-center">Creator</small>
-          <small className="w-25 text-white text-center">Date modified</small>
-
-        </div>
-        <div className="guest-dashboard-notes-list">
-          {notes
-            .filter((note) =>
-              note.note_title
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-            )
-            .map((note) => (
-              <div key={note.notes_id}>
-                <CommunityNote note={note} />
-              </div>
-            ))}
-        </div>
+        <Table bordered hover responsive variant="dark" className="my-0">
+          <thead className="table-header text-center thead-dark ">
+            <tr>
+              <th>Title</th>
+              <th>Folder</th>
+              <th>Creator</th>
+              <th>Date Modified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {notes
+              .filter((note) =>
+                note.note_title
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())
+              )
+              .map((note) => (
+                <CommunityNote key={note.notes_id} note={note} />
+              ))}
+          </tbody>
+        </Table>
       </div>
     </div>
   );

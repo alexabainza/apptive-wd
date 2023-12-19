@@ -48,7 +48,10 @@ body {
   width: 100vw;
   min-height: 100vh;
 }
-
+.guest-navbar{
+  background-image: linear-gradient(78deg, #38102b, #151724, #0f233e);
+  width: 100%;
+}
 .navbar{
     background-image: linear-gradient(78deg, #38102b, #151724, #0f233e);
     width: 100%;
@@ -585,7 +588,7 @@ padding: 0px 20px;
 
 .community-indiv-note{
   min-height: 100vh;
-  width: 100%;
+  width: 100vw;
 }
 
 
