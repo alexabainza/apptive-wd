@@ -23,6 +23,12 @@ const conn = mysql.createConnection({
   database: "apptive",
 });
 
+const generateToken = (user_id) => {
+  return jwt.sign({ user_id }, "jwtSecret", {
+    expiresIn: 60 * 60 * 24 * 30 * 1000, // Set the expiration time as needed
+  });
+};
+
 const verifyJWT = (req, res, next) => {
   //authorize if the user is allowed
   const token = req.headers['authorization'];
@@ -56,21 +62,30 @@ app.get("/getUsers", (req, res) => {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+const isUsernameTaken = async (username) => {
+  const [existingUser] = await conn
+    .promise()
+    .query("SELECT * FROM user_credentials WHERE user_name = ?", [username]);
+  return existingUser.length > 0;
+};
+
+// Function to check if an email is already in use
+const isEmailTaken = async (email) => {
+  const [existingEmail] = await conn
+    .promise()
+    .query("SELECT * FROM user_credentials WHERE email = ?", [email]);
+  return existingEmail.length > 0;
+};
+
+// Function to generate a JWT token
+
 app.post("/register", async (req, res) => {
-  const id = req.body.id;
-  const username = req.body.username;
-  const password = req.body.password;
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
-  const email = req.body.email;
+  const { id, username, password, firstname, lastname, email } = req.body;
 
   try {
     // Check if the username already exists
-    const [existingUser] = await conn
-      .promise()
-      .query("SELECT * FROM user_credentials WHERE user_name = ?", [username]);
-
-    if (existingUser.length > 0) {
+    const isUsernameExist = await isUsernameTaken(username);
+    if (isUsernameExist) {
       return res.status(400).json({
         message: "Username already exists.",
         field: "username",
@@ -78,11 +93,8 @@ app.post("/register", async (req, res) => {
     }
 
     // Check if the email is already in use
-    const [existingEmail] = await conn
-      .promise()
-      .query("SELECT * FROM user_credentials WHERE email = ?", [email]);
-
-    if (existingEmail.length > 0) {
+    const isEmailExist = await isEmailTaken(email);
+    if (isEmailExist) {
       return res.status(400).json({
         message: "Email already linked to another account.",
         field: "email",
@@ -90,7 +102,7 @@ app.post("/register", async (req, res) => {
     }
 
     // If username and email are not taken, proceed with user registration
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, 10);
     await conn
       .promise()
       .query(
@@ -98,9 +110,12 @@ app.post("/register", async (req, res) => {
         [id, username, firstname, lastname, email, hashedPassword]
       );
 
-    console.log("User registered successfully");
+    // Generate a new token for the registered user
+    const token = generateToken(id);
+
     return res.status(201).json({
       message: "User registered successfully",
+      token: token,
     });
   } catch (error) {
     console.error(error);
@@ -110,6 +125,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
+
 app.post("/login", async (req, res) => {
   const username = req.body.username.trim();
   const password = req.body.password.trim();
@@ -117,7 +133,6 @@ app.post("/login", async (req, res) => {
     "SELECT user_id, user_name, password FROM user_credentials WHERE user_name = ?",
     [username],
     async (error, data) => {
-      console.log("Query Result:", data);
       if (error) {
         console.error(error);
         res.status(500).json({
@@ -133,9 +148,8 @@ app.post("/login", async (req, res) => {
 
         if (isMatch) {
           const user_id = data[0].user_id;
-          const token = jwt.sign({ user_id }, "jwtSecret", {
-            expiresIn: 60*60*24*30*1000, //5 minutes
-          });
+          const token = generateToken(user_id)
+          
           res.json({
             auth: true,
             token: token,
@@ -335,7 +349,7 @@ app.get('/dashboard', verifyJWT, async (req, res) => {
   const userId = req.user.user_id;
 
   try {
-    const [userData] = await db.query(
+    const [userData] = await conn.promise().query(
       `SELECT
         u.user_name,
         f.folder_id,
@@ -359,7 +373,7 @@ app.get('/dashboard', verifyJWT, async (req, res) => {
       [userId]
     );
 
-    if (!userData) {
+    if (!userData || userData.length === 0) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
@@ -369,6 +383,7 @@ app.get('/dashboard', verifyJWT, async (req, res) => {
     return res.status(500).json({ success: false, error: 'unexpected_error', message: error.message });
   }
 });
+
 app.post("/logout", (req, res) => {
   // You may want to do additional cleanup or logging here
   res.json({ success: true, message: "Logout successful" });

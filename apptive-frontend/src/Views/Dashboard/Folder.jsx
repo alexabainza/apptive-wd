@@ -70,7 +70,7 @@ const Folder = ({
         </div>
       ) : (
         <div className="dashboard-body-left d-flex flex-column">
-          <Link to={`/${user_id}/${folderName}`} className="text-white">
+          <Link to={`/${folderName}`} className="text-white">
             <h4 className="folder-name mt-3 mb-0">
               <strong>{folderName}</strong>
             </h4>

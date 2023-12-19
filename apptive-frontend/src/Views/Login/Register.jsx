@@ -53,8 +53,9 @@ const Register = () => {
         throw new Error(data.message || "Error during registration");
       }
   
-      console.log(data);
-      navigate(`/${userData.id}/dashboard`);
+      localStorage.setItem('token', data.token);
+
+      navigate(`/dashboard`);
       setFirstname("");
       setLastname("");
       setPassword("");

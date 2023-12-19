@@ -1,5 +1,3 @@
-// Dashboard.js
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Folders from './Folders';
@@ -16,6 +14,7 @@ function Dashboard() {
 
   useEffect(() => {
     if (!storedToken) {
+      console.error('Authentication failed: Token is missing');
       navigate('/login');
       return;
     }
@@ -37,21 +36,13 @@ function Dashboard() {
         const data = await response.json();
 
         if (data.success) {
-          const user = data.user[0];
+          setUsername(data.user[0].user_name);
+          setUserId(data.user[0].user_id);
 
-          if (user) {
-            setUsername(user.user_name);
-            setUserId(user.user_id);
-
-            if (user.folders.length === 0) {
-              setNoFoldersMessage('You have no folders.');
-            } else {
-              setFolders(user.folders);
-            }
+          if (data.user.length === 0) {
+            setNoFoldersMessage('You have no folders.');
           } else {
-            setUsername(user.user_name);
-
-            setNoFoldersMessage('User not found or has no folders.');
+            setFolders(data.user);
           }
         } else {
           console.error('Error fetching folders:', data.message);
@@ -63,6 +54,15 @@ function Dashboard() {
 
     fetchData();
   }, [navigate, storedToken]);
+
+  useEffect(() => {
+    // Check if there are no folders and set the message
+    if (folders.length === 0) {
+      setNoFoldersMessage('You have no folders.');
+    } else {
+      setNoFoldersMessage(null);
+    }
+  }, [folders]);
 
   const handleEditFolder = (folderId, newFolderName) => {
     fetch(`http://localhost:3000/dashboard/updateFolder/${folderId}`, {
@@ -78,7 +78,9 @@ function Dashboard() {
         if (data.success) {
           setFolders((prevFolders) =>
             prevFolders.map((folder) =>
-              folder.folder_id === folderId ? { ...folder, folder_name: newFolderName } : folder
+              folder.folder_id === folderId
+                ? { ...folder, folder_name: newFolderName }
+                : folder
             )
           );
         } else {
@@ -110,7 +112,6 @@ function Dashboard() {
 
       if (data.success) {
         setFolders((prevFolders) => [...prevFolders, { folder_name: newFolderName, notesCount: 0 }]);
-        setNoFoldersMessage(null);
       } else {
         console.error('Error adding folder:', data.message);
       }
@@ -129,7 +130,9 @@ function Dashboard() {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setFolders((prevFolders) => prevFolders.filter((folder) => folder.folder_id !== folderId));
+          setFolders((prevFolders) =>
+            prevFolders.filter((folder) => folder.folder_id !== folderId)
+          );
         } else {
           console.error('Error deleting folder:', data.message);
         }
@@ -138,16 +141,6 @@ function Dashboard() {
         console.error('Error deleting folder:', error);
       });
   };
-  
-  useEffect(() => {
-    // Check if folders.length is 0 after the state has been updated
-    if (folders.length === 0) {
-      setNoFoldersMessage('You have no folders.');
-    } else {
-      setNoFoldersMessage(null);
-    }
-  }, [folders]); // Run this effect whenever folders state changes
-  
 
   return (
     <div className="user-dashboard mt-0">

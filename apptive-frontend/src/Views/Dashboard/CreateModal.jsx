@@ -1,9 +1,14 @@
 // CreateModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 
 const CreateModal = ({ isOpen, onClose, onAddFolder }) => {
   const [folderName, setFolderName] = useState("");
 
+  useEffect(() => {
+    if (isOpen) {
+      setFolderName("");
+    }
+  }, [isOpen]);
   const handleAddFolder = () => {
     if (folderName.trim() !== "") {
       // Call the onAddFolder callback with the folder name

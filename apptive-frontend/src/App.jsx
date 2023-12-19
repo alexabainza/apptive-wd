@@ -36,7 +36,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/:user_id/:folder_name/:note_id" element={<IndivNote />} />
-        <Route path="/:user_id/:folder_name" element={<NotesPage />} />
+        <Route path="/:folder_name" element={<NotesPage />} />
         <Route path="/:user_id" element={<Profile />} />
         <Route path="/select" element={<Select />} />
         <Route

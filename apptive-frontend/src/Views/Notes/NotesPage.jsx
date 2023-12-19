@@ -18,7 +18,7 @@ const NotesPage = () => {
   const { user_id, folder_name } = useParams();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/${user_id}/${folder_name}`)
+    fetch(`http://localhost:3000/${folder_name}`)
       .then((response) => response.json())
       .then((data) => {
         console.log("Received data:", data);
