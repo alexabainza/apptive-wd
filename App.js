@@ -202,6 +202,39 @@ app.get("/community-notes", verifyJWT, (req, res) => {
   );
 });
 
+
+app.get("/guest/community-notes", (req, res) => {
+  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+  if (!guestId) {
+    return res.status(401).json({
+      success: false,
+      message: 'Guest not authenticated. Please provide guestId.',
+    });
+  }  conn.query(
+    "SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1",
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          success: false,
+          message: "Unexpected error",
+        });
+      } else {
+
+        if (data.length > 0) {
+          res.status(200).json({ success: true, data });
+        } else {
+          res.status(200).json({
+            success: true,
+            guestId: guestId, // Include the guestId in the response
+            message: "No notes yet.",
+          });
+        }
+      }
+    }
+  );
+});
+
 app.get("/community-notes/:note_id", verifyJWT, (req, res) => {
   const note_id = req.params.note_id;
   console.log("Received notes_id:", note_id);

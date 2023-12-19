@@ -17,6 +17,7 @@ import CommunityIndivNote from "./Views/CommunityUser/CommunityIndivNote";
 import ViewProfile from "./Views/Profile/ViewProfile";
 import Features from "./Views/Landing Page/Features";
 import AboutUs from "./Views/Landing Page/AboutUs"
+import CommunityGuestDashboard from "./Views/CommunityGuest/CommunityGuestDashboard";
 import UserNavbar from "./Views/Dashboard/UserNavbar";
 function App() {
   // const token = localStorage.getItem("token");
@@ -48,7 +49,9 @@ function App() {
           element={<CommunityIndivNote />}
         />
         <Route path="/:person_id/community-notes/:note_id" element={<CommunityIndivNote/>} />
-        <Route path="/:community-notes" element = {<CommunityDashboard/>}/>
+        <Route path="/community-notes" element = {<CommunityDashboard/>}/>
+        <Route path="/guest/community-notes" element = {<CommunityGuestDashboard/>}/>
+
         {/* <Route path="/:person_id/community-notes" element={<GuestDashboard />} /> */}
         <Route path="/viewProfile/:username" element={<ViewProfile />} />
         <Route path="/features" element={<Features />} />

@@ -20,6 +20,8 @@ const Select = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Guest-Id": existingGuestId, // This sets the Guest-Id header
+
         },
         body: JSON.stringify({}),
       });
@@ -40,7 +42,7 @@ const Select = () => {
   };
 
   const redirectToGuestDashboard = (guestId) => {
-    navigate(`/${guestId}/community-notes`);
+    navigate(`/guest/community-notes`);
   };
 
   const handleClearLocalStorageClick = () => {
