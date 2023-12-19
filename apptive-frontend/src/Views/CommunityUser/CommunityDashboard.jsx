@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CommunityNote from "./CommunityNote";
 import { Table } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 
 const CommunityDashboard = ({username}) => {
@@ -11,9 +12,16 @@ const CommunityDashboard = ({username}) => {
   const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
 
   const storedToken = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!storedToken) {
+        // Redirect to the login page if there is no stored token
+        navigate("/login");
+        return;
+      }
+
       try {
         const response = await fetch(`http://localhost:3000/community-notes`, {
           headers: {

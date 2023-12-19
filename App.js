@@ -23,8 +23,8 @@ const conn = mysql.createConnection({
   database: "apptive",
 });
 
-const generateToken = (user_id) => {
-  return jwt.sign({ user_id }, "jwtSecret", {
+const generateToken = (user_id, username) => {
+  return jwt.sign({ user_id, username}, "jwtSecret", {
     expiresIn: 60 * 60 * 24 * 30 * 1000, // Set the expiration time as needed
   });
 };
@@ -148,7 +148,7 @@ app.post("/login", async (req, res) => {
 
         if (isMatch) {
           const user_id = data[0].user_id;
-          const token = generateToken(user_id)
+          const token = generateToken(user_id, username)
           
           res.json({
             auth: true,

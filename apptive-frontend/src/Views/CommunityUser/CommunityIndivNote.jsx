@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
+// import jwt_decode from "jwt-decode";
+
 const CommunityIndivNote = () => {
-  const { person_id, note_id } = useParams();
+  const { note_id } = useParams();
   const [note, setNote] = useState({});
+  const [username, setUsername] = useState("");
+
   const storedToken = localStorage.getItem("token");
 
   useEffect(() => {
-    // Check if note_id is defined before making the fetch request
+    
     if (note_id) {
+        // const decodedToken = jwt_decode(storedToken);
+        // const userUsername = decodedToken.username;
+  
+        // setUsername(userUsername);
       fetch(`http://localhost:3000/community-notes/${note_id}`,{
         headers: {
           Authorization: storedToken,
@@ -28,6 +36,7 @@ const CommunityIndivNote = () => {
         });
     }
   }, [note_id]);
+  console.log("Username from commindivnote is "+ username)
 
   return (
     <div className="community-indiv-note">
