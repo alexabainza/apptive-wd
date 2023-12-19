@@ -32,13 +32,10 @@ const NotesPage = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Received data:", data);
-
         if (Array.isArray(data)) {
           if (data.length === 0) {
             setNoNotesMessage("You have no notes.");
           } else {
-            console.log(data);
             setUsername(data[0].user_name);
 
             setNotes(data);
@@ -81,7 +78,6 @@ const NotesPage = () => {
 
   const deleteNote = async (noteId) => {
     try {
-      console.log("Delete button has been clicked");
       const response = await fetch(
         `http://localhost:3000/${folder_name}/delete/${noteId}`,
         {
@@ -113,7 +109,6 @@ const NotesPage = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: token,
-
           },
           body: JSON.stringify(noteDetails),
         }
@@ -124,7 +119,6 @@ const NotesPage = () => {
       }
 
       const data = await response.json();
-      console.log("Note saved successfully:", data);
     } catch (error) {
       console.error("Error saving note:", error.message);
     }
@@ -197,27 +191,31 @@ const NotesPage = () => {
             />
           </div>
           <div className="notes-list">
-            {notes
-              .filter((note) =>
-                (note.note_title?.toLowerCase() || "").startsWith(
-                  searchQuery.toLowerCase()
+            {notes.length === 0 ? (
+              <p className="text-white">You have no notes.</p>
+            ) : (
+              notes
+                .filter((note) =>
+                  (note.note_title?.toLowerCase() || "").startsWith(
+                    searchQuery.toLowerCase()
+                  )
                 )
-              )
-              .map((note) => (
-                <div key={note.notes_id}>
-                  <Note
-                    folder_name={note.folder_name}
-                    user_id={note.user_id}
-                    folder_id={note.folder_id}
-                    notes_id={note.notes_id}
-                    title={note.note_title}
-                    last_modified={note.modified_at}
-                    created_at={note.created_at}
-                    content={note.contents}
-                    onDeleteNote={deleteNote}
-                  />
-                </div>
-              ))}
+                .map((note) => (
+                  <div key={note.notes_id}>
+                    <Note
+                      folder_name={note.folder_name}
+                      user_id={note.user_id}
+                      folder_id={note.folder_id}
+                      notes_id={note.notes_id}
+                      title={note.note_title}
+                      last_modified={note.modified_at}
+                      created_at={note.created_at}
+                      content={note.contents}
+                      onDeleteNote={deleteNote}
+                    />
+                  </div>
+                ))
+            )}
           </div>
         </div>
       </div>
