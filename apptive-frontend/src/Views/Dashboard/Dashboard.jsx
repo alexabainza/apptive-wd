@@ -29,8 +29,9 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
-        setUsername(data.user[0].user_name);
-        setUserId(data.user[0].user_id);
+        const user = data.user[0];
+        setUsername(user.user_name);
+        setUserId(user.user_id);
         setFolders(data.user);
         setNoFoldersMessage(data.user.length === 0 ? 'You have no folders.' : null);
       } else {
@@ -74,7 +75,7 @@ function Dashboard() {
       console.error('Folder name is empty or whitespace.');
       return;
     }
-  
+
     try {
       const response = await fetch(`http://localhost:3000/dashboard/addFolder`, {
         method: 'POST',
@@ -84,11 +85,10 @@ function Dashboard() {
         },
         body: JSON.stringify({ folderName: newFolderName }),
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
-        // Update state immediately after adding the new folder
         setFolders((prevFolders) => [
           ...prevFolders,
           { folder_id: data.folderId, folder_name: newFolderName, notesCount: 0 },
@@ -100,7 +100,7 @@ function Dashboard() {
       console.error('Error adding folder:', error.message);
     }
   };
-  
+
   const handleFolderDeleted = async (folderId) => {
     try {
       const response = await fetch(`http://localhost:3000/dashboard/deleteFolder/${folderId}`, {
@@ -113,9 +113,13 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
-        setFolders((prevFolders) =>
-          prevFolders.filter((folder) => folder.folder_id !== folderId)
-        );
+        setFolders((prevFolders) => {
+          const newFolders = prevFolders.filter((folder) => folder.folder_id !== folderId);
+          if (newFolders.length === 0) {
+            setNoFoldersMessage('You have no folders.');
+          }
+          return newFolders;
+        });
       } else {
         console.error('Error deleting folder:', data.message);
       }
@@ -131,7 +135,7 @@ function Dashboard() {
     } else {
       fetchData();
     }
-  }, [navigate, storedToken, folders.length]); // Include folders.length in the dependency array
+  }, [navigate, storedToken]);
 
   return (
     <div className="user-dashboard mt-0">
