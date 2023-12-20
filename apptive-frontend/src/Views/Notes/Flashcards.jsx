@@ -1,56 +1,82 @@
 // FlashcardPage.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import UserNavbar from "../Dashboard/UserNavbar";
 
 const FlashcardPage = ({ highlightedTextQuestion, highlightedTextAnswer }) => {
-    const { user_id, folder_name, note_id } = useParams();
+  const { folder_name, note_id } = useParams();
   const [isFlipped, setFlipped] = useState(false);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [flashcards, setFlashcards] = useState([]);
+  const storedToken = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/${folder_name}/${note_id}/flashcards`, {
+      headers: {
+        Authorization: storedToken,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data != null) {
+          setFlashcards(data.data);
+        } else {
+          console.error("Error fetching flashcards:", data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching flashcards:", error);
+      });
+  }, [folder_name, note_id, storedToken]);
+
   const handleFlip = () => {
     setFlipped(!isFlipped);
   };
-  const handleNextCard = () => {
-    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % flashcardData.length);
-    setFlipped(false); // Reset flip state when moving to the next card
+
+  const handleGoToNotes = () => {
+    navigate(`../${folder_name}/${note_id}`);
   };
 
-  const handlePrevCard = () => {
-    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + flashcardData.length) % flashcardData.length);
-    setFlipped(false); // Reset flip state when moving to the previous card
-  };
-  // Assuming you have some data for your flashcard
-  const flashcardData = [
-    { front: highlightedTextQuestion, back: highlightedTextAnswer},
-    // { front:  back: 'Yellowstone National Park' },
-    { front: 'Often it is a reserve of natural, semi-natural, or developed land that a government declares or owns in use for conservation of wild nature for posterity and as a symbol of national pride', back: 'national parks' },
-    { front: 'was the first national park in the U.S. and is also widely held to be the first national park in the world', back: 'Yellowstone National Park' },
-    { front: 'this is the only National Park in Switzerland', back: 'Swiss National Park' },
-    { front: 'in Gunung Mulu National Park in Sarawak, Malaysia and famous for its striking limestone karst formations, commonly called "the pinnacles"', back: 'Mount Api' },
-    { front: 'who are to supervise, manage, and/or perform work in the conservation and use of park resources.', back: 'park ranger' },
-];
-
-return (
-    <div>
-
-      <div className="flashcard-container">
-      
-        <div className="flashcard">
-        {/* <Link to = {`../${user_id}/${folder_name}`} className="mb-5" >{"<"}   Go Home </Link> */}
-          <div
-            className="flashcard-content"
-            onClick={handleFlip}
+  return (
+    <div className="flashcard-container">
+      <UserNavbar />
+      <div className="flashcard-main-content">
+        <div className="d-flex justify-content-between align-items-center mx-5">
+          <Link
+            to={`../${folder_name}/${note_id}`}
+            className="back-btn mb-4 mt-4 text-white"
           >
-            {isFlipped ? <div className="back">{flashcardData[currentCardIndex].back}</div> : <div className="front">{flashcardData[currentCardIndex].front}</div>}
-          </div>
-          <div className="button-container">
-            <button onClick={handlePrevCard} className="nav-button">&lt; Prev</button>
-            <div className="card-index">Card {currentCardIndex + 1}</div>
-            <button onClick={handleNextCard} className="nav-button">Next &gt;</button>
+            {"<"} Back
+          </Link>
+          <button onClick={handleGoToNotes}>Go to notes</button>
+        </div>
+        <div>
+          <div className="flashcard mx-5">
+            <div className="flashcard-content" onClick={handleFlip}>
+              {flashcards && flashcards.length > 0 ? (
+                flashcards.map((flashcard, index) => (
+                  <div
+                    key={index}
+                    className={isFlipped ? "back" : "front"}
+                  >
+                    {isFlipped ? flashcard.answer : flashcard.question}
+                  </div>
+                ))
+              ) : (
+                <div className="no-flashcards-message">
+                  You have no flashcards.
+                </div>
+              )}
+            </div>
+            {flashcards && flashcards.length > 0 && (
+              <div className="button-container">
+                {/* You can add your navigation buttons here if needed */}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
-    
   );
 };
 

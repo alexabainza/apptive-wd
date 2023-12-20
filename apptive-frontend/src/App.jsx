@@ -20,6 +20,7 @@ import AboutUs from "./Views/Landing Page/AboutUs"
 import CommunityGuestDashboard from "./Views/CommunityGuest/CommunityGuestDashboard";
 import UserNavbar from "./Views/Dashboard/UserNavbar";
 import CommunityGuestIndivNote from "./Views/CommunityGuest/CommunityGuestIndivNote";
+import FlashcardPage from "./Views/Notes/Flashcards";
 function App() {
   // const token = localStorage.getItem("token");
   // let username = "";
@@ -52,7 +53,7 @@ function App() {
         <Route path="/community-notes" element = {<CommunityDashboard/>}/>
         <Route path="/guest/community-notes" element = {<CommunityGuestDashboard/>}/>
         <Route path="/guest/community-notes/:note_id" element = {<CommunityGuestIndivNote/>}/>
-
+        <Route path = "/:folder_name/:note_id/flashcards" element={<FlashcardPage/>}/>
         {/* <Route path="/:person_id/community-notes" element={<GuestDashboard />} /> */}
         <Route path="/viewProfile/:username" element={<ViewProfile />} />
         <Route path="/features" element={<Features />} />

@@ -61,9 +61,6 @@ body {
   /* width: 100%; */
   /* z-index: 1000; */
   /* margin-top: 8px; */
-
-    width: 100%;
-
   display: flex;
   justify-content: space-between;
   align-items: last baseline;
@@ -750,8 +747,8 @@ padding: 0px 20px;
 /*Flashcards*/
 /* FlashcardPage.css */
 .flashcard-container {
-  /* width: 100vw; */
-  display: flex;
+  width: 100vw;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -777,6 +774,7 @@ padding: 0px 20px;
   justify-content: center;
   cursor: pointer;
 }
+
 
 
 .button-container {
@@ -861,7 +859,7 @@ padding: 0px 20px;
 
 .success-notification {
   position: absolute;
-  top: 500px; /* Adjust as needed */
+  top: 50px; /* Adjust as needed */
   right: 30px; /* Adjust as needed */
   background-color: #4caf50;
   color: #fff;

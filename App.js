@@ -956,3 +956,30 @@ app.post("/:folder_name/:note_id/makeFlashcards", verifyJWT, (req, res)=>{
   }
 
 })
+
+app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res)=>{
+  const {folder_name, note_id} = req.params
+  conn.query(
+    "SELECT * FROM flashcards WHERE flashcard_set_id = ?", [note_id],
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          success: false,
+          message: "Unexpected error",
+        });
+      } else {
+
+        if (data.length > 0) {
+          res.status(200).json({ success: true, data });
+        } else {
+          res.status(200).json({
+            success: true,
+            // person_id: person_id, // Include the person_id in the response
+            message: "No flashcards yet.",
+          });
+        }
+      }
+    }
+  );
+})

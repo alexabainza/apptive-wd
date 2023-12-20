@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import FlashcardPage from "./Flashcards";
 import ReactQuill from "react-quill";
@@ -8,6 +8,7 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 
 const IndivNote = () => {
+  const navigate = useNavigate();
   const { folder_name, note_id } = useParams();
   const [note, setNote] = useState({});
   const [editedNote, setEditedNote] = useState({});
@@ -23,14 +24,12 @@ const IndivNote = () => {
   const storedToken = localStorage.getItem("token");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
-
-
   const quillRef = useRef(null);
   const showSuccessNotificationForDuration = async (duration) => {
     setShowSuccessNotification(true);
 
     // Wait for the specified duration and then hide the notification
-    await new Promise(resolve => setTimeout(resolve, duration));
+    await new Promise((resolve) => setTimeout(resolve, duration));
 
     setShowSuccessNotification(false);
   };
@@ -56,6 +55,11 @@ const IndivNote = () => {
         console.error("Error fetching note:", error);
       });
   }, [note_id]);
+
+  const handleGoToFlashcards = () => {
+    navigate(`/${folder_name}/${note_id}/flashcards`); // Navigate to "/flashcards" when the Flashcards tab is clicked
+  }
+
 
   useEffect(() => {
     setUsername(note.user_name);
@@ -121,21 +125,24 @@ const IndivNote = () => {
   const handleGenerateCard = async () => {
     // Pass highlighted texts to FlashcardPage when "Generate Card" is clicked
     setShowFlashcardPage(true);
-    try{
-      const response = await fetch(`http://localhost:3000/${folder_name}/${note_id}/makeFlashcards`,{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: storedToken,
-        },
-        body: JSON.stringify({
-          folder_id: note.folder_id,
-          flashcard_set_id: note_id, // Assuming note_id is the flashcard_set_id
-          user_id: note.user_id, // Replace userId with the actual user ID
-          question: highlightedTextQuestion,
-          answer: highlightedTextAnswer,
-        }),
-      })
+    try {
+      const response = await fetch(
+        `http://localhost:3000/${folder_name}/${note_id}/makeFlashcards`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: storedToken,
+          },
+          body: JSON.stringify({
+            folder_id: note.folder_id,
+            flashcard_set_id: note_id, // Assuming note_id is the flashcard_set_id
+            user_id: note.user_id, // Replace userId with the actual user ID
+            question: highlightedTextQuestion,
+            answer: highlightedTextAnswer,
+          }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to generate flashcard");
       }
@@ -147,8 +154,7 @@ const IndivNote = () => {
       // Reset highlighted texts after generating the flashcard
       setHighlightedTextQuestion("");
       setHighlightedTextAnswer("");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error generating flashcard:", error.message);
     }
   };
@@ -157,24 +163,19 @@ const IndivNote = () => {
     <div className="individual-note">
       <UserNavbar username={username} />
 
-      <div className="individual-note-content mx-5 position-relative">
+      <div className="individual-note-content mx-5 position-relative align-items-center">
         <div className="d-flex justify-content-between">
-          <Link to={`../${folder_name}`} className="mb-4 text-white back-btn">
+          <Link to={`../${folder_name}`} className="text-white back-btn mt-4">
             {"<"} Back
           </Link>
+          <button onClick={handleGoToFlashcards}>Go to Flashcards</button>
         </div>
         {showSuccessNotification && (
-        <div className="success-notification text-white px-3 py-1">
-          Card created successfully!
-        </div>
-      )}
-        <Tabs
-          id="controlled-tab-example"
-          activeKey={key}
-          onSelect={(k) => setKey(k)}
-          className="indiv-note-tab mb-3 text-white"
-        >
-          <Tab eventKey="notes" title="Notes">
+          <div className="success-notification text-white px-3 py-1">
+            Card created successfully!
+          </div>
+        )}
+        
             {note.notes_id && (
               <>
                 <h1 className="text-white mt-2 mb-3">
@@ -233,32 +234,13 @@ const IndivNote = () => {
                     </button>
                     <button onClick={handleSaveChanges}>Save Changes</button>
                     <button onClick={handleGenerateCard}>Generate Card</button>
-
                   </>
                 )}
                 {!isEditing && (
                   <button onClick={() => setIsEditing(true)}>Edit</button>
                 )}
-                {!isEditing && (
-                  <>
-                    <button onClick={handleToggleFlashcardPage}>
-                      {showFlashcardPage
-                        ? "Back to Note"
-                        : "Open Flashcard Page"}
-                    </button>
-                  </>
-                )}
               </>
             )}
-          </Tab>
-          <Tab eventKey="flashcards" title="Flashcards">
-            <FlashcardPage
-              highlightedTextQuestion={highlightedTextQuestion}
-              highlightedTextAnswer={highlightedTextAnswer}
-            />
-          </Tab>
-        </Tabs>
-       
       </div>
     </div>
   );
