@@ -776,6 +776,20 @@ padding: 0px 20px;
 }
 
 
+.flashcard.edit-mode {
+  background-color: #cfcae0;
+}
+
+
+.edit-mode-indicator{
+  font-weight: 800;
+  font-size: 1em;
+  color: red;
+}
+.editable {
+  min-height: 50px; 
+  padding: 5px; 
+}
 
 .button-container {
   display: flex;
@@ -876,3 +890,4 @@ padding: 0px 20px;
 .success-notification.hide {
   opacity: 0;
 }
+

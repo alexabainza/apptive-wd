@@ -1001,3 +1001,33 @@ app.delete("/:folder_name/:note_id/flashcards/:flashcardId/delete", verifyJWT, (
         });
       }})}
   )
+
+  app.patch('/:folder_name/:note_id/flashcards/:flashcard_id/edit', (req, res) => {
+    const { folder_name, note_id, flashcard_id } = req.params;
+    const { question, answer } = req.body;
+  
+    conn.query("UPDATE flashcards SET question = ?, answer = ?,  modified_at = NOW() WHERE flashcard_id = ?",
+    [question, answer, flashcard_id],
+    
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({
+          error: "unexpected_error",
+          message: error.message,
+        });
+      } else {
+        if (data.affectedRows > 0) {
+          res.status(200).json({
+            success: true,
+            message: "Flashcard updated successfully",
+          });
+        } else {
+          res.status(404).json({
+            success: false,
+            message: "Folder not found",
+          });
+        }
+      }
+    })
+    });

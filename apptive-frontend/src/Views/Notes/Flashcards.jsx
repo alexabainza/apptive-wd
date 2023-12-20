@@ -7,7 +7,11 @@ const FlashcardPage = () => {
   const [isFlipped, setFlipped] = useState(false);
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const storedToken = localStorage.getItem("token");
+  const [storedToken] = useState(localStorage.getItem("token"));
+  const [editMode, setEditMode] = useState(false);
+  const [editedFlashcardId, setEditedFlashcardId] = useState(null);
+  const [editedQuestion, setEditedQuestion] = useState("");
+  const [editedAnswer, setEditedAnswer] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +53,58 @@ const FlashcardPage = () => {
     navigate(`../${folder_name}/${note_id}`);
   };
 
+  const handleEditFlashcard = (flashcardId) => {
+    const flashcardToEdit = flashcards.find(
+      (flashcard) => flashcard.flashcard_id === flashcardId
+    );
+    setEditedFlashcardId(flashcardId);
+    setEditedQuestion(flashcardToEdit.question);
+    setEditedAnswer(flashcardToEdit.answer);
+    setEditMode(true);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/${folder_name}/${note_id}/flashcards/${editedFlashcardId}/edit`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: storedToken,
+          },
+          body: JSON.stringify({
+            question: editedQuestion,
+            answer: editedAnswer,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        // Flashcard edited successfully, update the local state
+        setFlashcards((prevFlashcards) =>
+          prevFlashcards.map((flashcard) =>
+            flashcard.flashcard_id === editedFlashcardId
+              ? { ...flashcard, question: editedQuestion, answer: editedAnswer }
+              : flashcard
+          )
+        );
+
+        setEditMode(false);
+        setEditedFlashcardId(null);
+      } else {
+        console.error("Failed to edit flashcard:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error editing flashcard:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setEditedFlashcardId(null);
+  };
+
   const handleDeleteFlashcard = async (flashcardId) => {
     try {
       const response = await fetch(
@@ -75,7 +131,6 @@ const FlashcardPage = () => {
       console.error("Error deleting flashcard:", error);
     }
   };
-
   return (
     <div className="flashcard-container">
       <UserNavbar />
@@ -89,17 +144,42 @@ const FlashcardPage = () => {
           </Link>
           <button onClick={handleGoToNotes}>Go to notes</button>
         </div>
+
         <div>
-          <div className="flashcard mx-5">
+
+          <div className={`flashcard mx-5 ${editMode ? 'edit-mode' : ''}`}>
+          {editMode && <div className="edit-mode-indicator text-center">EDIT MODE</div>}
+
             <div className="flashcard-content" onClick={handleFlip}>
+
               {flashcards.length > 0 ? (
                 isFlipped ? (
                   <div className="back">
-                    {flashcards[currentCardIndex].answer}
+                    {editMode ? (
+                      <div
+                        className="editable"
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => setEditedAnswer(e.target.innerText)}
+                        dangerouslySetInnerHTML={{ __html: editedAnswer }}
+                      />
+                    ) : (
+                      flashcards[currentCardIndex].answer
+                    )}
                   </div>
                 ) : (
                   <div className="front">
-                    {flashcards[currentCardIndex].question}
+                    {editMode ? (
+                      <div
+                        className="editable"
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => setEditedQuestion(e.target.innerText)}
+                        dangerouslySetInnerHTML={{ __html: editedQuestion }}
+                      />
+                    ) : (
+                      flashcards[currentCardIndex].question
+                    )}
                   </div>
                 )
               ) : (
@@ -109,7 +189,22 @@ const FlashcardPage = () => {
               )}
             </div>
             {flashcards.length > 0 && (
-              <div className="button-container">
+              <div className="button-container d-flex">
+                {editMode ? (
+                  <>
+                    <button onClick={handleSaveEdit}>Save</button>
+                    <button onClick={handleCancelEdit}>Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                      Edit
+                    </button>
+                    <button onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                      Delete
+                    </button>
+                  </>
+                )}
                 <button onClick={handlePrevCard} className="nav-button">
                   &lt; Prev
                 </button>
@@ -121,11 +216,6 @@ const FlashcardPage = () => {
             )}
           </div>
         </div>
-        {flashcards.length > 0 && (
-          <button onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
-            Delete
-          </button>
-        )}
       </div>
     </div>
   );
