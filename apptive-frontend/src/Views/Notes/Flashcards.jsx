@@ -82,7 +82,7 @@ const FlashcardPage = () => {
       <div className="flashcard-main-content">
         <div className="d-flex justify-content-between align-items-center mx-5">
           <Link
-            to={`../${folder_name}/${note_id}`}
+            to={`../${folder_name}`}
             className="back-btn mb-4 mt-4 text-white"
           >
             {"<"} Back
