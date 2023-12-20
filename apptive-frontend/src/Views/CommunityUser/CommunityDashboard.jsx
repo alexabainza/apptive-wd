@@ -3,17 +3,30 @@ import CommunityNote from "./CommunityNote";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
+import {jwtDecode}from 'jwt-decode';
 
-const CommunityDashboard = ({username}) => {
+const CommunityDashboard = () => {
   const [notes, setNotes] = useState([]);
   const [noNotesMessage, setNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
+  const [username, setUsername] = useState("")
 
   const storedToken = localStorage.getItem("token");
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (storedToken) {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        // Store decoded user data in state
+        setUsername(decodedToken.username)
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Handle error decoding token
+      }
+    }
+  }, [storedToken]);
   useEffect(() => {
     const fetchData = async () => {
       if (!storedToken) {
@@ -93,7 +106,7 @@ const CommunityDashboard = ({username}) => {
 
   return (
     <div className="guest-dashboard d-flex flex-column">
-      <UserNavbar />
+      <UserNavbar username={username}/>
 
       <div className="guest-dashboard-contents">
         <h2 className="text-white "><strong>Community Notes</strong></h2>

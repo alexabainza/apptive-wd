@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import {jwtDecode}from 'jwt-decode';
 
 const AddNotesPage = ({ folder }) => {
   const [noteTitle, setNoteTitle] = useState("");
@@ -17,11 +18,17 @@ const AddNotesPage = ({ folder }) => {
   const quillRef = useRef(null);
 
   useEffect(() => {
-    if (username) {
-      // Log the username after it has been updated
-      console.log("Updated username:", username);
+    if (storedToken) {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        // Store decoded user data in state
+        setUsername(decodedToken.username)
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Handle error decoding token
+      }
     }
-  }, [username]); // Run this effect whenever the username changes
+  }, [storedToken]);
 
   const handleAddNote = async (e) => {
     e.preventDefault();

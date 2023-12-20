@@ -4,8 +4,8 @@ import UserNavbar from "../Dashboard/UserNavbar";
 import FlashcardPage from "./Flashcards";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import Tab from "react-bootstrap/Tab";
-import Tabs from "react-bootstrap/Tabs";
+import {jwtDecode}from 'jwt-decode';
+
 
 const IndivNote = () => {
   const navigate = useNavigate();
@@ -15,8 +15,7 @@ const IndivNote = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
   const [username, setUsername] = useState("");
-  const [isPublic, setIsPublic] = useState(note.isPublic);
-  const [key, setKey] = useState("notes");
+
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [highlightedTextQuestion, setHighlightedTextQuestion] = useState(""); // State for green highlight
   const [highlightedTextAnswer, setHighlightedTextAnswer] = useState(""); // State for yellow highlight
@@ -25,6 +24,20 @@ const IndivNote = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
   const quillRef = useRef(null);
+
+  useEffect(() => {
+    if (storedToken) {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        // Store decoded user data in state
+        setUsername(decodedToken.username)
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Handle error decoding token
+      }
+    }
+  }, [storedToken]);
+
   const showSuccessNotificationForDuration = async (duration) => {
     setShowSuccessNotification(true);
 
@@ -45,7 +58,6 @@ const IndivNote = () => {
         if (data != null) {
           setNote(data);
           setEditedNote(data); // Initialize editedNote with the current note data
-          setUsername(data.user_name);
           setIsPublic(data.isPublic); // Set isPublic based on the initial note data
         } else {
           console.error("Error fetching note:", data.message);
@@ -58,8 +70,7 @@ const IndivNote = () => {
 
   const handleGoToFlashcards = () => {
     navigate(`/${folder_name}/${note_id}/flashcards`); // Navigate to "/flashcards" when the Flashcards tab is clicked
-  }
-
+  };
 
   useEffect(() => {
     setUsername(note.user_name);
@@ -168,79 +179,89 @@ const IndivNote = () => {
           <Link to={`../${folder_name}`} className="text-white back-btn mt-4">
             {"<"} Back
           </Link>
-          <button onClick={handleGoToFlashcards}>Go to Flashcards</button>
+          <button onClick={handleGoToFlashcards} className="button-style">
+            Go to Flashcards
+          </button>
         </div>
         {showSuccessNotification && (
           <div className="success-notification text-white px-3 py-1">
             Card created successfully!
           </div>
         )}
-        
-            {note.notes_id && (
-              <>
-                <h1 className="text-white mt-2 mb-3">
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="note_title"
-                      className="form-control"
-                      value={editedNote.note_title}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    note.note_title
-                  )}
-                </h1>
-                {isEditing ? (
-                  <ReactQuill
-                    style={{
-                      resize: "none",
-                      height: "80vh",
-                      overflowY: "scroll",
-                    }}
-                    className="form-control"
-                    ref={quillRef}
-                    theme="snow"
-                    value={editedNote.contents}
-                    onChange={(value) =>
-                      handleInputChange({ target: { name: "contents", value } })
-                    }
-                    placeholder="Enter your notes here..."
-                  />
-                ) : (
-                  <ReactQuill
-                    className="form-control"
-                    name="contents"
-                    value={editedNote.contents}
-                    onChange={handleInputChange}
-                    rows="10"
-                    cols="50"
-                    readOnly
-                  />
-                )}
-                {isEditing && (
-                  <>
-                    <button
-                      onClick={() => handleHighlight("green")}
-                      onMouseDown={() => setLastClickedButton("question")}
-                    >
-                      Flashcard Question (Green)
-                    </button>
-                    <button
-                      onClick={() => handleHighlight("yellow")}
-                      onMouseDown={() => setLastClickedButton("answer")}
-                    >
-                      Flashcard Answer (Yellow)
-                    </button>
-                    <button onClick={handleSaveChanges}>Save Changes</button>
-                    <button onClick={handleGenerateCard}>Generate Card</button>
-                  </>
-                )}
-                {!isEditing && (
-                  <button onClick={() => setIsEditing(true)}>Edit</button>
-                )}
-              </>
+
+        {note.notes_id && (
+          <>
+            <h1 className="text-white mt-2 mb-3">
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="note_title"
+                  className="form-control"
+                  value={editedNote.note_title}
+                  onChange={handleInputChange}
+                />
+              ) : (
+                note.note_title
+              )}
+            </h1>
+            {isEditing ? (
+              <ReactQuill
+                style={{
+                  resize: "none",
+                  height: "80vh",
+                  maxWidth: "100%", // Add this line
+
+                  overflowY: "scroll",
+                }}
+                className="form-control"
+                ref={quillRef}
+                theme="snow"
+                value={editedNote.contents}
+                onChange={(value) =>
+                  handleInputChange({ target: { name: "contents", value } })
+                }
+                placeholder="Enter your notes here..."
+              />
+            ) : (
+              <ReactQuill
+                className="form-control"
+                name="contents"
+                value={editedNote.contents}
+                onChange={handleInputChange}
+                rows="10"
+                cols="50"
+                readOnly
+              />
             )}
+            {isEditing && (
+              <div className="mt-3">
+                <button
+                  className="button-style"
+                  onClick={() => handleHighlight("green")}
+                  onMouseDown={() => setLastClickedButton("question")}
+                >
+                  Flashcard Question (Green)
+                </button>
+                <button
+                  className="button-style"
+                  onClick={() => handleHighlight("yellow")}
+                  onMouseDown={() => setLastClickedButton("answer")}
+                >
+                  Flashcard Answer (Yellow)
+                </button>
+                <button onClick={handleSaveChanges} className="button-style">
+                  Save Changes
+                </button>
+                <button onClick={handleGenerateCard} className="button-style">
+                  Generate Card
+                </button>
+              </div>
+            )}
+            {!isEditing && (
+              <button onClick={() => setIsEditing(true)} className="button-style mt-3">Edit</button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

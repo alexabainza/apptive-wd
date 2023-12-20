@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
+import {jwtDecode}from 'jwt-decode';
+// const { sign, decode, verify } = jsonwebtoken;
+
 
 const FlashcardPage = () => {
   const { folder_name, note_id } = useParams();
@@ -12,7 +15,20 @@ const FlashcardPage = () => {
   const [editedFlashcardId, setEditedFlashcardId] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState("");
   const [editedAnswer, setEditedAnswer] = useState("");
+  const [username, setUsername] = useState("")
   const navigate = useNavigate();
+  useEffect(() => {
+    if (storedToken) {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        // Store decoded user data in state
+        setUsername(decodedToken.username)
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Handle error decoding token
+      }
+    }
+  }, [storedToken]);
 
   useEffect(() => {
     fetch(`http://localhost:3000/${folder_name}/${note_id}/flashcards`, {
@@ -133,7 +149,7 @@ const FlashcardPage = () => {
   };
   return (
     <div className="flashcard-container">
-      <UserNavbar />
+      <UserNavbar username={username} />
       <div className="flashcard-main-content">
         <div className="d-flex justify-content-between align-items-center mx-5">
           <Link
@@ -142,7 +158,7 @@ const FlashcardPage = () => {
           >
             {"<"} Back
           </Link>
-          <button onClick={handleGoToNotes}>Go to notes</button>
+          <button onClick={handleGoToNotes} className="button-style">Go to notes</button>
         </div>
 
         <div>
@@ -197,19 +213,19 @@ const FlashcardPage = () => {
                   </>
                 ) : (
                   <>
-                    <button onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                    <button className="button-style" onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
                       Edit
                     </button>
-                    <button onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                    <button className="button-style" onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
                       Delete
                     </button>
                   </>
                 )}
-                <button onClick={handlePrevCard} className="nav-button">
+                <button onClick={handlePrevCard} className="button-style nav-button">
                   &lt; Prev
                 </button>
                 <div className="card-index">Card {currentCardIndex + 1}</div>
-                <button onClick={handleNextCard} className="nav-button">
+                <button onClick={handleNextCard} className="button-style nav-button">
                   Next &gt;
                 </button>
               </div>
