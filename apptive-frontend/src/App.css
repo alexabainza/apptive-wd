@@ -54,7 +54,7 @@ body {
 }
 .navbar{
     background-image: linear-gradient(78deg, #38102b, #151724, #0f233e);
-    width: 100%;
+    width: 100vw;
 
   /* position: fixed; */
   /* top: 0; */
@@ -467,7 +467,7 @@ padding: 0px 20px;
 
 .individual-note{
   height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
 .add-notes-page{
@@ -750,7 +750,7 @@ padding: 0px 20px;
 /*Flashcards*/
 /* FlashcardPage.css */
 .flashcard-container {
-  width: 100vw;
+  /* width: 100vw; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -766,7 +766,7 @@ padding: 0px 20px;
 }
 
 .flashcard-content {
-  width: 100%;
+  /* width: 100%; */
   height: 80vh;
   border: 1px solid #ccc;
   padding: 20px;
@@ -843,4 +843,38 @@ padding: 0px 20px;
 .sort-by-button{
   /* background-color: red; */
   font-size: 12px;
+}
+
+.switch-label{
+  font-size: 12px;
+}
+
+.indiv-note-tab{
+  font-size: 12px!important;
+}
+
+/* .success-notification{
+  background-color: #d74242;
+  height: 60px;
+  font-size: 15px;
+} */
+
+.success-notification {
+  position: absolute;
+  top: 500px; /* Adjust as needed */
+  right: 30px; /* Adjust as needed */
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 12px;
+  padding: 5px;
+  border-radius: 5px;
+  opacity: 0.9;
+  transition: opacity 0.5s ease-in-out;
+  transition: opacity 1s ease-in-out;
+}
+.success-notification.show {
+  opacity: 0.9;
+}
+.success-notification.hide {
+  opacity: 0;
 }

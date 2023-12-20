@@ -1,9 +1,8 @@
 // FlashcardPage.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from "react-router-dom";
-import UserNavbar from "../Dashboard/UserNavbar";
 
-const FlashcardPage = () => {
+const FlashcardPage = ({ highlightedTextQuestion, highlightedTextAnswer }) => {
     const { user_id, folder_name, note_id } = useParams();
   const [isFlipped, setFlipped] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -21,6 +20,8 @@ const FlashcardPage = () => {
   };
   // Assuming you have some data for your flashcard
   const flashcardData = [
+    { front: highlightedTextQuestion, back: highlightedTextAnswer},
+    // { front:  back: 'Yellowstone National Park' },
     { front: 'Often it is a reserve of natural, semi-natural, or developed land that a government declares or owns in use for conservation of wild nature for posterity and as a symbol of national pride', back: 'national parks' },
     { front: 'was the first national park in the U.S. and is also widely held to be the first national park in the world', back: 'Yellowstone National Park' },
     { front: 'this is the only National Park in Switzerland', back: 'Swiss National Park' },
@@ -30,7 +31,7 @@ const FlashcardPage = () => {
 
 return (
     <div>
-      {/* <UserNavbar /> */}
+
       <div className="flashcard-container">
       
         <div className="flashcard">

@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-const mysql = require("mysql2");
+// const mysql = require("mysql2");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -11,7 +11,7 @@ const cors = require("cors");
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 const { verify, sign } = require("jsonwebtoken");
-
+const mysql = require('mysql2'); // Note the '/promise' at the end
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
@@ -234,6 +234,23 @@ app.get("/guest/community-notes", (req, res) => {
     }
   );
 });
+// app.patch("/:folder_name/:note_id/updateIsPublic", verifyJWT, async (req, res) => {
+//     const userId = req.user.user_id;
+
+//     const { folder_name, note_id } = req.params;
+//     const { isPublic } = req.body;
+
+//     const [folderResults] = await conn.query(
+//         "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
+//         [userId, folder_name]
+//       );
+
+//       console.log("Folder Results:", folderResults);
+  
+// });
+
+
+
 
 app.get("/guest/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
@@ -783,7 +800,7 @@ app.post("/createGuest", (req, res) => {
 
   conn.query(
     "INSERT INTO guests (guest_id) VALUES (?)",
-    ["guest_" + guestId],
+    [guestId],
     (error, result) => {
       if (error) {
         console.error("Error creating guest user:", error);
@@ -859,6 +876,10 @@ app.post("/logVisitedDocument", async (req, res) => {
 });
 
 app.post("/checkIfDocumentViewed", async (req, res) => {
+  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+
+  console.log(req.headers)
+
   const { person_id, note_id } = req.body;
   console.log(
     "Received request to check if document viewed:",
@@ -880,7 +901,7 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
       );
 
     const viewed = viewedDocument.length > 0;
-    console.log(viewed);
+    console.log("viewed? "+ viewed);
 
     return res.status(200).json({ viewed });
   } catch (err) {
@@ -888,3 +909,50 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.get("/getDocumentCount/:person_id", async (req, res) => {
+  const personId = req.params.person_id;
+
+  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+  console.log('Guest Id:', guestId);
+
+  if (!guestId) {
+    return res.status(401).json({
+      success: false,
+      message: 'Guest not authenticated. Please provide guestId.',
+    });
+  }
+  else{
+    try {
+      // Fetch document count from the 'visited_documents' table
+      const [rows] = await conn.execute(
+        "SELECT COUNT(*) as document_count FROM visited_documents WHERE person_id = ?",
+        [personId]
+      );
+  
+      const documentCount = rows[0].document_count;
+      res.json({ document_count: documentCount });
+    } catch (error) {
+      console.error("Error fetching document count", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+  
+});
+
+app.post("/:folder_name/:note_id/makeFlashcards", verifyJWT, (req, res)=>{
+  const { folder_id, flashcard_set_id, user_id, question, answer } = req.body;
+  const { folder_name, note_id } = req.params;
+  const randomId = uuidv4();
+  const flashcard_id = `${note_id}_${randomId}`;
+  try {
+
+  conn.query('INSERT INTO flashcards (flashcard_id, flashcard_set_id, user_id, question, answer) VALUES (?, ?, ?, ?, ?)', [flashcard_id, flashcard_set_id, user_id, question, answer]);
+  res.status(201).json({ flashcard_id });
+  }
+  catch (error) {
+    console.error('Error generating flashcard:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+
+})
