@@ -26,7 +26,11 @@ const IndivNote = () => {
   const quillRef = useRef(null);
 
   useEffect(() => {
-    if (storedToken) {
+    if(!storedToken){
+      navigate("/login");
+
+    }
+    else {
       try {
         const decodedToken = jwtDecode(storedToken);
         // Store decoded user data in state

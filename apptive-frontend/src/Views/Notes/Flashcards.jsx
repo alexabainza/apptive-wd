@@ -18,7 +18,11 @@ const FlashcardPage = () => {
   const [username, setUsername] = useState("")
   const navigate = useNavigate();
   useEffect(() => {
-    if (storedToken) {
+    if(!storedToken){
+      navigate("/login");
+
+    }
+    else{
       try {
         const decodedToken = jwtDecode(storedToken);
         // Store decoded user data in state
