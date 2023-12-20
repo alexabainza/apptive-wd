@@ -983,3 +983,21 @@ app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res)=>{
     }
   );
 })
+
+app.delete("/:folder_name/:note_id/flashcards/:flashcardId/delete", verifyJWT, (req, res) =>{
+  const {folder_name, note_id, flashcardId} = req.params
+  conn.query(
+    "DELETE FROM flashcards WHERE flashcard_id = ?", [flashcardId],
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
+      } else {
+        res.status(201).json({
+          success: true,
+          message: "Note deleted successfully",
+        });
+      }})}
+  )
