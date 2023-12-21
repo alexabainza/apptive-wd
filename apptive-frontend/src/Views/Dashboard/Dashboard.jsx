@@ -147,10 +147,8 @@ function Dashboard() {
         <h2 className="folderDirect text-white">
           <strong>Folders</strong>
         </h2>
-        {noFoldersMessage ? (
-          <p className="text-white">{noFoldersMessage}</p>
-        ) : (
-          folders ? (
+        {folders ? (
+          folders.length > 0 ? (
             <Folders
               user_id={userId}
               username={username}
@@ -159,8 +157,10 @@ function Dashboard() {
               onEditFolder={handleEditFolder}
             />
           ) : (
-            <p>Loading folders...</p>
+            <p className="text-white">{noFoldersMessage || 'You have no folders.'}</p>
           )
+        ) : (
+          <p>Loading folders...</p>
         )}
       </div>
       <AddButton user_id={userId} onFolderAdded={handleFolderAdded} />

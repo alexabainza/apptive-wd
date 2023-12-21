@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Note from "./Note";
 import { Link, useNavigate } from "react-router-dom";
-import { SortUpAlt, SortDownAlt } from "react-bootstrap-icons";
 
 const NotesPage = () => {
   const navigate = useNavigate();
@@ -53,7 +52,6 @@ const NotesPage = () => {
     setSearchQuery(event.target.value);
   };
 
- 
   const handleSort = (criteria) => {
     let sortedNotes = [...notes];
     let newSortOrder = "asc";
@@ -167,32 +165,37 @@ const NotesPage = () => {
             </Link>
           </div>
           <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3 px-0">
-          <div className="dropdown">
-            <button
-              className="sort-by-button btn text-white dropdown-toggle ms-0"
-              type="button"
-              id="sortDropdown"
-              data-bs-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Sort By: {sortBy ? `${sortBy} (${sortOrder === "asc" ? "Ascending" : "Descending"})` : "Select"}
-            </button>
-            <div className="dropdown-menu" aria-labelledby="sortDropdown">
+            <div className="dropdown">
               <button
-                className="dropdown-item"
-                onClick={() => handleSort("Title")}
+                className="sort-by-button btn text-white dropdown-toggle ms-0"
+                type="button"
+                id="sortDropdown"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
               >
-                Title
+                Sort By:{" "}
+                {sortBy
+                  ? `${sortBy} (${
+                      sortOrder === "asc" ? "Ascending" : "Descending"
+                    })`
+                  : "Select"}
               </button>
-              <button
-                className="dropdown-item"
-                onClick={() => handleSort("Last Modified")}
-              >
-                Last Modified
-              </button>
+              <div className="dropdown-menu" aria-labelledby="sortDropdown">
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleSort("Title")}
+                >
+                  Title
+                </button>
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleSort("Last Modified")}
+                >
+                  Last Modified
+                </button>
+              </div>
             </div>
-          </div>
 
             <input
               className="form-control w-25"
@@ -203,36 +206,34 @@ const NotesPage = () => {
             />
           </div>
           <div className="notes-list">
-            {notes.length === 0 ? (
-              <p className="text-white">You have no notes.</p>
-            ) : (
-              notes
-                .filter((note) =>
-                  (note.note_title?.toLowerCase() || "").startsWith(
-                    searchQuery.toLowerCase()
-                  )
-                )
-                .map((note) => (
-                  <div key={note.notes_id}>
-                    <Note
-                      folder_name={note.folder_name}
-                      user_id={note.user_id}
-                      folder_id={note.folder_id}
-                      notes_id={note.notes_id}
-                      title={note.note_title}
-                      last_modified={note.modified_at}
-                      created_at={note.created_at}
-                      content={note.contents}
-                      onDeleteNote={deleteNote}
-                    />
-                  </div>
-                ))
-            )}
+          {notes === null ? (
+  <p className="text-white">Loading...</p>
+) : notes.length === 0 ? (
+  <p className="text-white">
+    {notesMessage || "You have no notes."}
+  </p>
+) : (
+  notes.map((note) => (
+    <div key={note.notes_id}>
+      <Note
+        folder_name={note.folder_name}
+        user_id={note.user_id}
+        folder_id={note.folder_id}
+        notes_id={note.notes_id}
+        title={note.note_title}
+        last_modified={note.modified_at}
+        created_at={note.created_at}
+        content={note.contents}
+        onDeleteNote={deleteNote}
+      />
+    </div>
+  ))
+)}
+
           </div>
         </div>
       </div>
     </>
   );
 };
-
 export default NotesPage;

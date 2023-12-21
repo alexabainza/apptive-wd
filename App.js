@@ -825,7 +825,6 @@ app.post("/logVisitedDocument", async (req, res) => {
   const { person_id, note_id } = req.body;
 
   try {
-    // Check if the document has already been viewed
     const [viewedDocument] = await conn
       .promise()
       .query(
@@ -838,7 +837,6 @@ app.post("/logVisitedDocument", async (req, res) => {
       return res.status(200).json({ message: "Document already viewed" });
     }
 
-    // Check the current count of logged documents
     const [documentCount] = await conn
       .promise()
       .query(
