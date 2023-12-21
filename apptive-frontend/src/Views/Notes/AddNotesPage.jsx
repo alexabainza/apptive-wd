@@ -22,6 +22,7 @@ const AddNotesPage = ({ folder }) => {
       try {
         const decodedToken = jwtDecode(storedToken);
         // Store decoded user data in state
+        console.log("Username is",decodedToken.username)
         setUsername(decodedToken.username)
       } catch (error) {
         console.error("Error decoding token:", error);

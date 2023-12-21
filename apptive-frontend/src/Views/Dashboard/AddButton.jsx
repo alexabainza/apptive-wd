@@ -9,7 +9,7 @@ const AddButton = ({ user_id, onFolderAdded }) => {
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
   
-    const handleAddFolder = async (folderName) => {
+    const handleAddFolder = async (folderName,e) => {
       
       try {
         if (!folderName || folderName.trim() === '') {
@@ -31,7 +31,7 @@ const AddButton = ({ user_id, onFolderAdded }) => {
         const data = await response.json();
   
         if (data.success) {
-          onFolderAdded(folderName);
+          onFolderAdded(folderName, e);
         } else {
           console.error('Error adding folder:', data.message);
         }

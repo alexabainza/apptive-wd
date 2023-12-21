@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Note from "./Note";
 import { Link, useNavigate } from "react-router-dom";
-import { SortUpAlt, SortDownAlt } from "react-bootstrap-icons";
 
 const NotesPage = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState([]); // Initialize with an empty array
   const [notesMessage, setNoNotesMessage] = useState(null);
-  const [isAscending, setIsAscending] = useState(true);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [token, setToken] = useState(null);
   const { user_id, folder_name } = useParams();
   const [username, setUsername] = useState("");
   const storedToken = localStorage.getItem("token");
+  const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
 
   useEffect(() => {
     setToken(storedToken);
@@ -55,25 +54,36 @@ const NotesPage = () => {
 
   const handleSort = (criteria) => {
     let sortedNotes = [...notes];
+    let newSortOrder = "asc";
+
+    // If the same criteria is clicked again, toggle the sort order
+    if (sortBy === criteria) {
+      newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    }
 
     switch (criteria) {
-      case "modifiedDate":
-        sortedNotes.sort(
-          (a, b) => new Date(b.modified_at) - new Date(a.modified_at)
+      case "Last Modified":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? new Date(a.modified_at) - new Date(b.modified_at)
+            : new Date(b.modified_at) - new Date(a.modified_at)
         );
         break;
-      case "alphabeticalOrder":
-        sortedNotes.sort((a, b) => a.note_title.localeCompare(b.note_title));
+      case "Title":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? a.note_title.localeCompare(b.note_title)
+            : b.note_title.localeCompare(a.note_title)
+        );
         break;
-      case "byUser":
-        sortedNotes.sort((a, b) => a.user_name.localeCompare(b.user_name));
-        break;
+
       default:
         break;
     }
 
     setNotes(sortedNotes);
     setSortBy(criteria);
+    setSortOrder(newSortOrder);
   };
 
   const deleteNote = async (noteId) => {
@@ -157,25 +167,30 @@ const NotesPage = () => {
           <div className="guest-dashboard-table-header-main pb-4 mb-2 d-flex justify-content-between p-3 px-0">
             <div className="dropdown">
               <button
-                className="btn btn-primary text-white dropdown-toggle ms-0"
+                className="sort-by-button btn text-white dropdown-toggle ms-0"
                 type="button"
                 id="sortDropdown"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                Sort By: {sortBy || "Select"}
+                Sort By:{" "}
+                {sortBy
+                  ? `${sortBy} (${
+                      sortOrder === "asc" ? "Ascending" : "Descending"
+                    })`
+                  : "Select"}
               </button>
               <div className="dropdown-menu" aria-labelledby="sortDropdown">
                 <button
                   className="dropdown-item"
-                  onClick={() => handleSort("alphabeticalOrder")}
+                  onClick={() => handleSort("Title")}
                 >
                   Title
                 </button>
                 <button
                   className="dropdown-item"
-                  onClick={() => handleSort("modifiedDate")}
+                  onClick={() => handleSort("Last Modified")}
                 >
                   Last Modified
                 </button>
@@ -191,36 +206,34 @@ const NotesPage = () => {
             />
           </div>
           <div className="notes-list">
-            {notes.length === 0 ? (
-              <p className="text-white">You have no notes.</p>
-            ) : (
-              notes
-                .filter((note) =>
-                  (note.note_title?.toLowerCase() || "").startsWith(
-                    searchQuery.toLowerCase()
-                  )
-                )
-                .map((note) => (
-                  <div key={note.notes_id}>
-                    <Note
-                      folder_name={note.folder_name}
-                      user_id={note.user_id}
-                      folder_id={note.folder_id}
-                      notes_id={note.notes_id}
-                      title={note.note_title}
-                      last_modified={note.modified_at}
-                      created_at={note.created_at}
-                      content={note.contents}
-                      onDeleteNote={deleteNote}
-                    />
-                  </div>
-                ))
-            )}
+          {notes === null ? (
+  <p className="text-white">Loading...</p>
+) : notes.length === 0 ? (
+  <p className="text-white">
+    {notesMessage || "You have no notes."}
+  </p>
+) : (
+  notes.map((note) => (
+    <div key={note.notes_id}>
+      <Note
+        folder_name={note.folder_name}
+        user_id={note.user_id}
+        folder_id={note.folder_id}
+        notes_id={note.notes_id}
+        title={note.note_title}
+        last_modified={note.modified_at}
+        created_at={note.created_at}
+        content={note.contents}
+        onDeleteNote={deleteNote}
+      />
+    </div>
+  ))
+)}
+
           </div>
         </div>
       </div>
     </>
   );
 };
-
 export default NotesPage;

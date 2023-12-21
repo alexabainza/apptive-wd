@@ -836,7 +836,7 @@ body {
 
 .success-notification {
   position: absolute;
-  top: 50px; /* Adjust as needed */
+  top: 400px; /* Adjust as needed */
   right: 30px; /* Adjust as needed */
   background-color: #4caf50;
   color: #fff;

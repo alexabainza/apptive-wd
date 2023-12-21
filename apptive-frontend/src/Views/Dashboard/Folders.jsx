@@ -3,6 +3,10 @@ import React from "react";
 import Folder from "./Folder";
 
 const Folders = ({ folders, onDeleteFolder, username, onEditFolder, user_id }) => {
+  if (folders.length === 0) {
+    return <p className="text-white">You have no folders.</p>;
+  }
+  
   return (
     <div className="row">
       {folders.map((folder) => (

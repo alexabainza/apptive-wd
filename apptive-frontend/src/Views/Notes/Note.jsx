@@ -4,13 +4,10 @@ import { Trash } from "react-bootstrap-icons";
 
 const Note = ({
   folder_name,
-  user_id,
-  folder_id,
   notes_id,
   title,
   last_modified,
-  created_at,
-  content,
+
   onDeleteNote,
 }) => {
   const handleDeleteNote = () => {

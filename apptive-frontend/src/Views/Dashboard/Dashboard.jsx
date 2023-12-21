@@ -89,6 +89,8 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
+        console.log('New folder added:', data); // Add this log
+
         setFolders((prevFolders) => [
           ...prevFolders,
           { folder_id: data.folderId, folder_name: newFolderName, notesCount: 0 },
@@ -135,7 +137,8 @@ function Dashboard() {
     } else {
       fetchData();
     }
-  }, [navigate, storedToken]);
+  }, [navigate, storedToken, folders]);
+  console.log('Rendering Dashboard component', folders);
 
   return (
     <div className="user-dashboard mt-0">
@@ -144,10 +147,8 @@ function Dashboard() {
         <h2 className="folderDirect text-white">
           <strong>Folders</strong>
         </h2>
-        {noFoldersMessage ? (
-          <p className="text-white">{noFoldersMessage}</p>
-        ) : (
-          folders ? (
+        {folders ? (
+          folders.length > 0 ? (
             <Folders
               user_id={userId}
               username={username}
@@ -156,8 +157,10 @@ function Dashboard() {
               onEditFolder={handleEditFolder}
             />
           ) : (
-            <p>Loading folders...</p>
+            <p className="text-white">{noFoldersMessage || 'You have no folders.'}</p>
           )
+        ) : (
+          <p>Loading folders...</p>
         )}
       </div>
       <AddButton user_id={userId} onFolderAdded={handleFolderAdded} />
