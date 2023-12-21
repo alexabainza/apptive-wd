@@ -19,11 +19,6 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="textnav nav-item ml-5">
-              <Link className="navbar-feat nav-link text-white" href="#">
-                Contact Us
-              </Link>
-            </li>
-            <li className="textnav nav-item ml-5">
               <Link className="navbar-feat nav-link text-white" to="/aboutus">
                 About Us
               </Link>
