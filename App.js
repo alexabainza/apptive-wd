@@ -111,7 +111,7 @@ app.post("/register", async (req, res) => {
       );
 
     // Generate a new token for the registered user
-    const token = generateToken(id);
+    const token = generateToken(id, username);
 
     return res.status(201).json({
       message: "User registered successfully",

@@ -89,6 +89,8 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
+        console.log('New folder added:', data); // Add this log
+
         setFolders((prevFolders) => [
           ...prevFolders,
           { folder_id: data.folderId, folder_name: newFolderName, notesCount: 0 },
@@ -135,7 +137,8 @@ function Dashboard() {
     } else {
       fetchData();
     }
-  }, [navigate, storedToken]);
+  }, [navigate, storedToken, folders]);
+  console.log('Rendering Dashboard component', folders);
 
   return (
     <div className="user-dashboard mt-0">
