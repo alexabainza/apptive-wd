@@ -109,7 +109,7 @@ const AddNotesPage = ({ folder }) => {
               Flashcard Answer (yellow)
             </button>
           </div>
-          <input type="submit" value="Submit" />
+          <input type="submit" value="Submit" className="button-style"/>
         </div>
       </form>
     </div>

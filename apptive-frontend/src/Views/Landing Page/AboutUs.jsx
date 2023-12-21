@@ -38,8 +38,8 @@ export const AboutUs = () => {
             </div>
          </div>
          <div className="visionCont d-flex flex-column justify-content-center align-items-center mx-auto">
-            <h5>Vision</h5>
-            <p>An efficient and convenient approach to test one’s knowledge that allows direct source and relation from the user’s notes while studying. Consequently promoting collaboration as it allows community sharing of notes and flashcards.</p>
+            <h5 className="text-white">Vision</h5>
+            <p className="text-white">An efficient and convenient approach to test one’s knowledge that allows direct source and relation from the user’s notes while studying. Consequently promoting collaboration as it allows community sharing of notes and flashcards.</p>
          </div>
       </div>
    );
