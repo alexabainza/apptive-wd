@@ -49,7 +49,8 @@ body {
   width: 100%;
 }
 .navbar {
-  background-image: linear-gradient(78deg, #38102b, #151724, #0f233e);
+  /* background-image: linear-gradient(78deg, #38102b, #151724, #0f233e); */
+  background-color: transparent;
   width: 100vw;
   display: flex;
   justify-content: space-between;
@@ -411,8 +412,10 @@ body {
 }
 
 .notes-main-page-content {
-  margin: 0px 20vw;
-  width: 49vw;
+  /* margin: 0px 20vw;
+  width: 49vw; */
+  margin-top: 5vh;
+  padding: 0px 200px;
 }
 
 .note-list-item {
@@ -679,11 +682,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 1000px;
-  height: 500px;
-  margin: 0 auto;
-  /* background-color: black; */
-  margin-left: 28%;
+  margin-top: 10%;
 }
 
 .folderPic {
@@ -721,13 +720,12 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
 .flashcard-main-content{
   width: 100vw;
 }
 .flashcard-content {
   /* width: 100%; */
-  height: 80vh;
+  height: 70vh;
   border: 1px solid #ccc;
   padding: 20px;
   text-align: center;
@@ -862,8 +860,64 @@ body {
   margin-right: 10px;
 }
 
-
 .view-profile-main{
   width: 100vw;
   min-height: 100vh;
+}
+
+.butt {
+  background-color:#d74242;
+  margin-left: 8px;
+}
+
+/* ABOUT US */
+.headerteam {
+  /* background-color: black; */
+  width: 140vh;
+  height: auto;
+}
+
+.aboutUs {
+  color: #F0F0F0;
+}
+
+.teamApptive {
+  color: #37425F;
+}
+
+/* TEAM CARD */
+.headerteam {
+  margin-top: 90px;
+}
+
+.memberCard {
+  width: 300px;
+}
+
+.imageURL {
+  height: 150px;
+  width: auto;
+  margin-bottom: 16px;
+}
+
+.memberCard h4 {
+  margin-bottom: 0px;
+  font-size: 20px;
+}
+
+.visionCont {
+  background-color: #19243D;
+  width: 140vh;
+  height: 150px;
+  border-radius: 16px;
+  margin-top: 90px;
+}
+
+.visionCont h5 {
+  color: #313A53;
+}
+
+.visionCont p {
+  color: #313A53;
+  text-align: center;
 }

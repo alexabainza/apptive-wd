@@ -89,7 +89,7 @@ const AddNotesPage = ({ folder }) => {
           />
           <ReactQuill
             theme="snow"
-            style={{ resize: "none", height: "80vh", overflowY: "scroll" }}
+            style={{ resize: "none", height: "65vh", overflowY: "scroll" }}
             className="form-control"
             ref={quillRef}
             value={contents}
@@ -102,10 +102,10 @@ const AddNotesPage = ({ folder }) => {
             }}
           />
           <div className="my-2">
-            <button type="button" onClick={() => handleHighlight("green")}>
+            <button className="butt" type="button" onClick={() => handleHighlight("green")}>
               Flashcard Question (Green)
             </button>
-            <button type="button" onClick={() => handleHighlight("yellow")}>
+            <button className="butt" type="button" onClick={() => handleHighlight("yellow")}>
               Flashcard Answer (yellow)
             </button>
           </div>
