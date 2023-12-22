@@ -165,9 +165,10 @@ const FlashcardPage = () => {
           <button onClick={handleGoToNotes} className="button-style">Go to notes</button>
         </div>
 
-        <div>
+        <div className="text-white d-flex justify-content-center mt-4">
 
-          <div className={`flashcard mx-5 ${editMode ? 'edit-mode' : ''}`}>
+          <div className={`flashcard ${editMode ? 'edit-mode' : ''}`}>
+          <div className="card-index d-flex justify-content-center mb-2"><strong>Card {currentCardIndex + 1}</strong></div>
           {editMode && <div className="edit-mode-indicator text-center">EDIT MODE</div>}
 
             <div className="flashcard-content" onClick={handleFlip}>
@@ -209,7 +210,7 @@ const FlashcardPage = () => {
               )}
             </div>
             {flashcards.length > 0 && (
-              <div className="button-container d-flex">
+              <div className="button-container d-flex justify-content-between">
                 {editMode ? (
                   <>
                     <button onClick={handleSaveEdit}>Save</button>
@@ -217,21 +218,23 @@ const FlashcardPage = () => {
                   </>
                 ) : (
                   <>
-                    <button className="button-style" onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
-                      Edit
+                    <button onClick={handlePrevCard} className="button-style nav-button">
+                    &lt; Prev
                     </button>
-                    <button className="button-style" onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
-                      Delete
+                    <div>
+                      <button className="button-style" onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                        Edit
+                      </button>
+                      <button className="button-style" onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                        Delete
+                      </button>
+                    </div>
+
+                    <button onClick={handleNextCard} className="button-style nav-button">
+                      Next &gt;
                     </button>
                   </>
                 )}
-                <button onClick={handlePrevCard} className="button-style nav-button">
-                  &lt; Prev
-                </button>
-                <div className="card-index">Card {currentCardIndex + 1}</div>
-                <button onClick={handleNextCard} className="button-style nav-button">
-                  Next &gt;
-                </button>
               </div>
             )}
           </div>
