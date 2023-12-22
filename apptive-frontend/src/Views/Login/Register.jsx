@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import apptiveLogo from '../../assets/APPTIVE_LOGO.png';
+import apptiveLogo from "../../assets/APPTIVE_LOGO.png";
 
 const Register = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState(""); // New state for email error
-  const [combinedError, setCombinedError] = useState("");
-
+  const [emailError, setEmailError] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,7 +25,7 @@ const Register = () => {
       setMessage("All fields must be filled in.");
       return;
     }
-  
+
     let userData = {
       id: generateId(),
       username: username,
@@ -37,7 +34,7 @@ const Register = () => {
       lastname: lastname,
       email: email,
     };
-  
+
     try {
       const response = await fetch("http://localhost:3000/register", {
         method: "POST",
@@ -46,14 +43,14 @@ const Register = () => {
         },
         body: JSON.stringify(userData),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Error during registration");
       }
-  
-      localStorage.setItem('token', data.token);
+
+      localStorage.setItem("token", data.token);
 
       navigate(`/dashboard`);
       setFirstname("");
@@ -62,29 +59,19 @@ const Register = () => {
       setUsername("");
       setEmail("");
       setEmailError("");
-      setCombinedError("");
       setUsernameError("");
+    } catch (error) {
+      setUsernameError("");
+      setEmailError("");
+      if (error.message.toLowerCase().includes("username")) {
+        setUsernameError(error.message);
+      } else if (error.message.toLowerCase().includes("email")) {
+        setEmailError(error.message);
+      } else {
+        setUsernameError("Error during registration");
+      }
     }
-   catch (error) {
-
-    setUsernameError("");
-    setEmailError("");
-  
-    // Check if the error message contains information about email or username
-    if (error.message.toLowerCase().includes("username")) {
-      setUsernameError(error.message);
-    } else if (error.message.toLowerCase().includes("email")) {
-      setEmailError(error.message);
-    } else {
-      // If the error message doesn't contain specific information, set a generic error
-      setUsernameError("Error during registration");
-    }
-  }
-  
-  
   };
-  
-  
 
   return (
     <div className="register-whole-page d-flex flex-row">
@@ -97,10 +84,15 @@ const Register = () => {
       <div className="reigster-right-side w-50 mb-2 px-4 pt-5 d-flex flex-row justify-content-center align-items-start">
         <div className="register-right-contents w-75 d-flex flex-column justify-content-center">
           <div className="register-header text-center mb-2">
-          <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
+            <Link
+              className="navbar-app-name navbar-brand text-white fs-3"
+              to="/"
+            >
               <img className="imageLogo" src={apptiveLogo} />
             </Link>
-            <h2 className="text-white"><strong>Welcome back</strong></h2>
+            <h2 className="text-white">
+              <strong>Welcome back</strong>
+            </h2>
             <p className="fs-5 text-white">Sign in to continue</p>
           </div>
 
@@ -144,7 +136,7 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            {emailError&& <p style={{ color: "red" }}>{emailError}</p>}
+            {emailError && <p style={{ color: "red" }}>{emailError}</p>}
 
             <div className="form-group mt-2">
               <label className="text-white">
@@ -186,15 +178,13 @@ const Register = () => {
               </div>
             </div>
             <button type="submit" className="register-submit-button my-3">
-            <strong>Submit</strong>
+              <strong>Submit</strong>
             </button>
           </form>
-          {/* {combinedError && <p style={{ color: "red" }}>{combinedError}</p>} */}
-
           <small className="text-white text-center">
             Already registered?{" "}
             <Link to="/login" style={{ color: "#D74242" }}>
-            <strong>Login</strong>
+              <strong>Login</strong>
             </Link>
           </small>
         </div>

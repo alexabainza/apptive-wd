@@ -20,8 +20,7 @@ const Select = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Guest-Id": existingGuestId, // This sets the Guest-Id header
-
+          "Guest-Id": existingGuestId,
         },
         body: JSON.stringify({}),
       });
@@ -30,8 +29,6 @@ const Select = () => {
         const data = await response.json();
 
         localStorage.setItem("guestId", data.guestId);
-
-        console.log(`Guest user created successfully ${data.guestId}`);
         redirectToGuestDashboard(data.guestId);
       } else {
         console.error("Failed to create guest user");
@@ -47,7 +44,6 @@ const Select = () => {
 
   const handleClearLocalStorageClick = () => {
     localStorage.removeItem("guestId");
-    console.log("Local storage cleared");
   };
 
   return (

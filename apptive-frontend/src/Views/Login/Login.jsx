@@ -6,7 +6,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState(""); // New state for the message
+  const [message, setMessage] = useState("");
   const [loginStatus, setLoginStatus] = useState(false);
   const navigate = useNavigate();
 
@@ -18,8 +18,6 @@ const Login = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        // Check if the response indicates authentication
         if (data.message === "you are valid") {
           console.log("User is authenticated");
         } else {
@@ -45,20 +43,13 @@ const Login = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        console.log("sdgfdsgsloginpage")
-
         if(data.auth){
-        // if (data.success) {
-          // Redirect to the dashboard after successful login
           const userId = data.user_id;
           localStorage.setItem("token", data.token)
           setLoginStatus(true)
           navigate(`/dashboard`);
         } else {
           setLoginStatus(false)
-
-          // Handle unsuccessful login
           setMessage(`Login failed: ${data.message}`);
         }
       })
