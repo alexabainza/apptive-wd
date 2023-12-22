@@ -1,16 +1,9 @@
-// Inside Folder.jsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 const Folder = ({
-  user_id,
   folderId,
   folderName,
-  username,
-  description,
-  favorited,
   noOfNotes,
-  createdAt,
-  modifiedAt,
   onDeleteFolder,
   onEditFolder,
 }) => {

@@ -1,5 +1,4 @@
-// CreateModal.js
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 const CreateModal = ({ isOpen, onClose, onAddFolder }) => {
   const [folderName, setFolderName] = useState("");
@@ -11,17 +10,19 @@ const CreateModal = ({ isOpen, onClose, onAddFolder }) => {
   }, [isOpen]);
   const handleAddFolder = () => {
     if (folderName.trim() !== "") {
-      // Call the onAddFolder callback with the folder name
       onAddFolder(folderName);
     }
-    onClose(); // Close the modal regardless of the result
+    onClose();
   };
 
   return (
     <div
       className={`create-modal ${isOpen ? "open" : ""}`}
-      style={{ backgroundColor: "#37425F", borderRadius: "10px", padding: "20px"}}
-
+      style={{
+        backgroundColor: "#37425F",
+        borderRadius: "10px",
+        padding: "20px",
+      }}
     >
       <div className="modal-content">
         <h3 className="text-white">Add Folder</h3>

@@ -1,15 +1,14 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
 import apptiveLogo from "../../assets/APPTIVE_LOGO.png";
+import { Link, useNavigate } from "react-router-dom";
 
-const UserNavbar = ({username, token}) => {
+const UserNavbar = ({ username, token }) => {
   const navigate = useNavigate();
   const handleProfile = () => {
     navigate(`/profile`);
   };
 
   const handleDashboard = () => {
-    console.log("username is + " + username)
     navigate(`/dashboard`, { state: { username } });
   };
   const handleLogout = async () => {
@@ -17,7 +16,7 @@ const UserNavbar = ({username, token}) => {
       const logoutResponse = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
-          Authorization: `${token}`,
+          Authorization: token,
         },
       });
 
@@ -36,10 +35,7 @@ const UserNavbar = ({username, token}) => {
     <>
       <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-* px-4">
         <div className="navbar-left">
-          <Link
-            className="navbar-app-name navbar-brand text-white fs-3"
-            to="/"
-          >
+          <Link className="navbar-app-name navbar-brand text-white fs-3" to="/">
             <img className="imageLogo" src={apptiveLogo} />
           </Link>
         </div>
