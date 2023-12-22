@@ -32,7 +32,7 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
-        const user = data.user[0];
+        const [user] = data.user;
         setUsername(user.user_name);
         setUserId(user.user_id);
         setFolders(data.user);
@@ -165,15 +165,15 @@ function Dashboard() {
         case 'Title':
           sortedFoldersList.sort((a, b) =>
             sortOrder === 'asc'
-              ? a.folder_name.localeCompare(b.folder_name)
-              : b.folder_name.localeCompare(a.folder_name)
+              ? (a.folder_name || '').localeCompare(b.folder_name || '')
+              : (b.folder_name || '').localeCompare(a.folder_name || '')
           );
           break;
         case 'Created At':
           sortedFoldersList.sort((a, b) =>
             sortOrder === 'asc'
-              ? new Date(a.created_at) - new Date(b.created_at)
-              : new Date(b.created_at) - new Date(a.created_at)
+              ? new Date(a.created_at || '') - new Date(b.created_at || '')
+              : new Date(b.created_at || '') - new Date(a.created_at || '')
           );
           break;
         default:
@@ -182,7 +182,7 @@ function Dashboard() {
     }
 
     return sortedFoldersList.filter((folder) =>
-      folder.folder_name.toLowerCase().includes(searchQuery.toLowerCase())
+      (folder.folder_name || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Note from "./Note";
 
@@ -22,31 +21,37 @@ const NotesPage = () => {
       return;
     }
 
-    fetch(`http://localhost:3000/${folder_name}`, {
-      headers: {
-        Authorization: token,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          if (data.length === 0) {
-            setNoNotesMessage("You have no notes.");
-          } else {
-            setUsername(data[0].user_name);
-            setNotes(data);
-          }
-        } else {
-          console.error(data.message);
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/${folder_name}`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch notes");
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          setUsername(data[0].user_name);
+          setNotes(data);
+        } else {
+          setNoNotesMessage("You have no notes.");
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error.message);
+      }
+    };
+
+    fetchNotes();
   }, [token, folder_name, navigate]);
 
   const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
+    const newValue = event.target.value || "";
+    setSearchQuery(newValue);
   };
 
   const handleSort = (criteria) => {
@@ -129,14 +134,19 @@ const NotesPage = () => {
     }
   };
 
-  const filteredNotes = notes.filter((note) =>
-    note.note_title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredNotes =
+    notes && Array.isArray(notes)
+      ? notes
+          .filter((note) => note.note_title) // Filter out notes with undefined or null note_title
+          .filter((note) =>
+            note.note_title.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+      : [];
 
   return (
     <>
       <div className="notes-main-page">
-        <UserNavbar username={username} token={token} />
+        <UserNavbar username={username} />
         <div className="notes-main-page-content">
           <div className="notes-main-page-header mb-2 d-flex justify-content-between">
             <div className="d-flex align-items-center">
@@ -146,10 +156,7 @@ const NotesPage = () => {
               >
                 <h2>Folders</h2>
               </Link>
-              <h2
-                className="px-3"
-                style={{ color: "#d74242", fontWeight: 800 }}
-              >
+              <h2 className="px-3" style={{ color: "#d74242", fontWeight: 800 }}>
                 {">"}
               </h2>
               <h2 className="text-white">{folder_name}</h2>
@@ -175,9 +182,7 @@ const NotesPage = () => {
               >
                 Sort By:{" "}
                 {sortBy
-                  ? `${sortBy} (${
-                      sortOrder === "asc" ? "Ascending" : "Descending"
-                    })`
+                  ? `${sortBy} (${sortOrder === "asc" ? "Ascending" : "Descending"})`
                   : "Select"}
               </button>
               <div className="dropdown-menu" aria-labelledby="sortDropdown">
@@ -209,7 +214,7 @@ const NotesPage = () => {
               <p className="text-white">Loading...</p>
             ) : filteredNotes.length === 0 ? (
               <p className="text-white">
-                {notesMessage || "No matching notes found."}
+                {notesMessage || "No notes found."}
               </p>
             ) : (
               filteredNotes.map((note) => (
