@@ -820,11 +820,11 @@ app.post("/createGuest", (req, res) => {
     }
   );
 });
-
 app.post("/logVisitedDocument", async (req, res) => {
   const { person_id, note_id } = req.body;
 
   try {
+    // Check if the document has already been viewed
     const [viewedDocument] = await conn
       .promise()
       .query(
@@ -837,30 +837,10 @@ app.post("/logVisitedDocument", async (req, res) => {
       return res.status(200).json({ message: "Document already viewed" });
     }
 
-    const [documentCount] = await conn
-      .promise()
-      .query(
-        "SELECT COUNT(*) AS document_count FROM visited_documents WHERE person_id = ?",
-        [person_id]
-      );
-
-    const { document_count } = documentCount[0];
-    console.log(`Current document count: ${document_count}`);
-
-    if (document_count >= 3) {
-      console.error("User has three logged entries in visited_documents.");
-      return res.status(403).json({
-        error: "document_limit_exceeded",
-        documentCount: document_count,
-        message: "User has three logged entries in visited_documents.",
-      });
-    }
-
     // Insert a record into the visited_documents table
-    const insertSql =
-      "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
-    const insertValues = [person_id, note_id];
-    await conn.promise().query(insertSql, insertValues);
+    await conn
+      .promise()
+      .query("INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)", [person_id, note_id]);
 
     console.log("Record inserted successfully");
 
@@ -873,70 +853,6 @@ app.post("/logVisitedDocument", async (req, res) => {
   }
 });
 
-app.post("/checkIfDocumentViewed", async (req, res) => {
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
-
-  console.log(req.headers)
-
-  const { person_id, note_id } = req.body;
-  console.log(
-    "Received request to check if document viewed:",
-    person_id,
-    note_id
-  );
-
-  if (!person_id || !note_id) {
-    return res.status(400).json({ error: "Bad Request" });
-  }
-
-  try {
-    // Check if the document has been viewed by the user
-    const [viewedDocument] = await conn
-      .promise()
-      .query(
-        "SELECT * FROM visited_documents WHERE person_id = ? AND note_id = ?",
-        [person_id, note_id]
-      );
-
-    const viewed = viewedDocument.length > 0;
-    console.log("viewed? "+ viewed);
-
-    return res.status(200).json({ viewed });
-  } catch (err) {
-    console.error("Error checking if document viewed:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.get("/getDocumentCount/:person_id", async (req, res) => {
-  const personId = req.params.person_id;
-
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
-  console.log('Guest Id:', guestId);
-
-  if (!guestId) {
-    return res.status(401).json({
-      success: false,
-      message: 'Guest not authenticated. Please provide guestId.',
-    });
-  }
-  else{
-    try {
-      // Fetch document count from the 'visited_documents' table
-      const [rows] = await conn.execute(
-        "SELECT COUNT(*) as document_count FROM visited_documents WHERE person_id = ?",
-        [personId]
-      );
-  
-      const documentCount = rows[0].document_count;
-      res.json({ document_count: documentCount });
-    } catch (error) {
-      console.error("Error fetching document count", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-  
-});
 
 app.post("/:folder_name/:note_id/makeFlashcards", verifyJWT, (req, res)=>{
   const { folder_id, flashcard_set_id, user_id, question, answer } = req.body;
