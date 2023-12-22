@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UserNavbar from "../Dashboard/UserNavbar";
-import Navbar from "../Navbar/Navbar";
 import { Button, Form } from "react-bootstrap";
-import profile from "../../assets/profile-user.svg";
 import { jwtDecode } from "jwt-decode";
+import React, { useEffect, useState } from "react";
+import UserNavbar from "../Dashboard/UserNavbar";
+import profile from "../../assets/profile-user.svg";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -24,11 +23,9 @@ const Profile = () => {
     } else {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -40,7 +37,7 @@ const Profile = () => {
       try {
         const response = await fetch(`http://localhost:3000/profile`, {
           headers: {
-            Authorization: `${storedToken}`, // Include "Bearer" before the token
+            Authorization: `${storedToken}`,
           },
         });
 
@@ -53,39 +50,32 @@ const Profile = () => {
           }
         } else {
           console.error("Failed to fetch user data:", response.status);
-          // Handle unauthorized or other errors here
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
-    fetchData(); // Fetch user data
-
-  }, [token]); // Add token as a dependency
+    fetchData();
+  }, [token]);
 
   const handleLogout = async () => {
     try {
-      // Call the logout endpoint on the server
       const logoutResponse = await fetch("http://localhost:3000/logout", {
         method: "POST",
         headers: {
-          Authorization: `${token}`, // Include "Bearer" before the token
+          Authorization: `${token}`,
         },
       });
 
       if (logoutResponse.ok) {
-        // Remove the token from local storage
         localStorage.removeItem("token");
-        // Navigate to the login page or perform other logout actions
         navigate("/login");
       } else {
         console.error("Failed to logout:", logoutResponse.status);
-        // Handle logout failure here
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      // Handle logout error here
     }
   };
 
@@ -138,7 +128,6 @@ const Profile = () => {
   const handleCancelEdit = () => {
     setIsEditing(false);
   };
-
 
   return (
     <div className="profile-page mt-0">
@@ -205,8 +194,7 @@ const Profile = () => {
               </>
             )}
           </div>
-          {/* <div className="d-flex"> */}
-            {!isEditing && (
+          {!isEditing && (
             <Button
               className="editProfile button-style"
               onClick={handleEditToggle}
@@ -214,15 +202,7 @@ const Profile = () => {
               Edit Profile
             </Button>
           )}
-          {/* <Button
-            className="signoutProfile button-style"
-            onClick={handleLogout}
-          >
-            Sign out
-          </Button> */}
-          </div>
-          
-        // </div>
+        </div>
       )}
     </div>
   );

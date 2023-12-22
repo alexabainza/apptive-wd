@@ -21,11 +21,9 @@ const ViewProfile = () => {
     if (storedToken) {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
         setUser_Username(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -124,7 +122,6 @@ const ViewProfile = () => {
                 </>
               )}
               {storedToken && user_username === username && !isEditing && (
-                // Render edit button if the viewed profile is the same as the logged-in user and not in editing mode
                 <Button
                   className="editProfile button-style"
                   onClick={handleEditToggle}
@@ -133,7 +130,6 @@ const ViewProfile = () => {
                 </Button>
               )}
               {isEditing && (
-                // Render edit form if in editing mode
                 <Form className="mt-4 d-flex flex-column justify-content-center align-items-center">
                   <Form.Group controlId="editFirstName" className="w-50">
                     <Form.Label className="mb-0">
