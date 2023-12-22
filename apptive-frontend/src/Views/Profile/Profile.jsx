@@ -61,6 +61,7 @@ const Profile = () => {
     };
 
     fetchData(); // Fetch user data
+
   }, [token]); // Add token as a dependency
 
   const handleLogout = async () => {
@@ -137,6 +138,7 @@ const Profile = () => {
   const handleCancelEdit = () => {
     setIsEditing(false);
   };
+
 
   return (
     <div className="profile-page mt-0">
