@@ -5,7 +5,6 @@ const CommunityGuestNote = ({ note }) => {
   const navigate = useNavigate();
   const guestId = localStorage.getItem("guestId");
   const [showAlert, setShowAlert] = useState(false);
-
   const handleNoteClick = async () => {
     try {
       const response = await fetch("http://localhost:3000/checkIfDocumentViewed", {
@@ -20,13 +19,17 @@ const CommunityGuestNote = ({ note }) => {
         }),
       });
   
+      if (!response.ok) {
+        console.error("Failed to check if the document is viewed");
+        return;
+      }
+  
       const data = await response.json();
   
       // Check if the user has viewed 3 different documents
-      if (data.documentCount >= 3) {
+      if (data.document_count >= 3) {
         console.log("User has viewed 3 different documents. Cannot open more.");
         // Show an alert or take appropriate action
-        alert("no.");
         setShowAlert(true);
       } else if (data.viewed) {
         // Log the visited document
@@ -48,7 +51,6 @@ const CommunityGuestNote = ({ note }) => {
         // User hasn't viewed this note, and document count hasn't reached 3
         console.log("User hasn't viewed this note. Cannot open.");
         // Show an alert or take appropriate action
-        alert("no.");
         setShowAlert(true);
       }
     } catch (error) {
