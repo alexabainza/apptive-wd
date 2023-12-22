@@ -1,12 +1,9 @@
 * {
-  /* font-family: 'Montserrat', sans-serif; */
   font-family: "Poppins", sans-serif;
 }
 
 body {
   background-image: linear-gradient(32deg, #38102b, #151724, #0f233e);
-  /* padding-top: 20px; */
-  /* padding: 20px; */
 }
 
 /* NAVBAR */
@@ -101,15 +98,9 @@ body {
 .fs-md {
   font-size: 1.25rem;
 }
-/* .login-whole-page{
-  padding: 20px;
-  width: 100%;
-  height: 100vh;
-} */
 
 .login-whole-page {
   min-height: 100vh;
-  /* min-width: 100vw; */
   overflow: hidden;
 }
 
@@ -253,7 +244,6 @@ body {
 
 .register-whole-page {
   min-height: 100vh;
-  /* min-width: 100vw; */
   overflow: hidden;
 }
 
@@ -348,7 +338,6 @@ body {
   width: 35vh;
   height: 24vh;
   background-color: #37425f;
-  /* border: #ddd 1px solid; */
   border-radius: 10px;
   flex-direction: column;
 }
@@ -381,8 +370,8 @@ body {
   justify-content: center;
   width: 50px;
   height: 50px;
-  background-color: #4caf50; /* Green color, adjust as needed */
-  color: #fff; /* White text color */
+  background-color: #4caf50;
+  color: #fff;
   border-radius: 50%;
   font-size: 24px;
   text-decoration: none;
@@ -412,8 +401,6 @@ body {
 }
 
 .notes-main-page-content {
-  /* margin: 0px 20vw;
-  width: 49vw; */
   margin-top: 5vh;
   padding: 0px 200px;
 }
@@ -466,7 +453,6 @@ body {
 }
 
 .note-delete-icon:hover {
-  /* border: none!important; */
   color: rgb(255, 60, 60) !important;
 }
 
@@ -500,13 +486,10 @@ body {
   width: 300px;
   background-color: rgb(212, 192, 192);
   border-radius: 10px;
-  /* width: 80px;
-  height: 80px; */
 }
 
 .folder-options {
   margin-left: 4px;
-  /* background-color: #d74242!important; */
 }
 .note-list-title-entry {
   cursor: pointer;
@@ -534,7 +517,6 @@ body {
   border-bottom: #ffffff 1px solid;
   padding-bottom: 10px;
   margin-bottom: 10px;
-  /* solid 2x rgba(55, 66, 95, 0.151); */
 }
 
 /* GUEST DASHBOARD */
@@ -581,18 +563,15 @@ body {
 .addButtonCircle {
   color: #d74242;
   background-color: white;
-  /* margin-bottom: 24px;
-  margin-right: 24px; */
   border-radius: 50px;
   cursor: pointer;
 }
-/*PROFILE*/
+
 /* PROFILE */
 .tagBox {
   background-color: transparent;
   display: flex;
   position: absolute;
-  /* top: 186px;             directly under navbar */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -600,7 +579,7 @@ body {
   height: auto;
   margin: auto;
   align-items: center;
-  flex-direction: column; /*for text*/
+  flex-direction: column;
   justify-content: center;
   text-align: justify;
 }
@@ -612,7 +591,6 @@ body {
 .profile-page {
   height: 100vh;
   width: 100vw;
-  /* display: flex; */
 }
 
 .profileFullname {
@@ -626,7 +604,6 @@ body {
   height: auto;
   background-color: white;
   border-radius: 100%;
-  /* border: 1px solid */
 }
 
 .profileUsername {
@@ -649,7 +626,7 @@ body {
   width: 400px;
   height: 400px;
   align-items: center;
-  flex-direction: column; /*for text*/
+  flex-direction: column;
   justify-content: center;
   text-align: justify;
   border-radius: 24px;
@@ -668,13 +645,13 @@ body {
 }
 
 .signoutLink {
-  color: inherit; /* Inherit color from parent */
-  text-decoration: none; /* Remove underline */
+  color: inherit;
+  text-decoration: none;
 }
 
 .signoutLink:hover {
-  color: inherit; /* Inherit color from parent */
-  text-decoration: none; /* Remove underline */
+  color: inherit;
+  text-decoration: none;
 }
 
 .ftContainer {
@@ -703,10 +680,8 @@ body {
 }
 
 /*Flashcards*/
-/* FlashcardPage.css */
 .flashcard-container {
   width: 100vw;
-  /* display: flex; */
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -724,7 +699,6 @@ body {
   width: 100vw;
 }
 .flashcard-content {
-  /* width: 100%; */
   background-color: #ffffff1e;
   height: 55vh;
   padding: 20px;
@@ -755,8 +729,6 @@ body {
 }
 
 .button-container {
-  /* display: flex;
-  justify-content: space-between; */
   margin-top: 20px;
 }
 
@@ -766,61 +738,56 @@ body {
 }
 
 /*PLS REGISTER MODAL*/
-/* Add this CSS to your stylesheet */
-/* Add this CSS to your stylesheet */
 
 .registration-modal .modal-content {
-  background-color: #f8f9fa; /* Set your desired background color */
-  color: #212529; /* Set your desired text color */
-  width: 100vw; /* Make the modal cover the full width of the viewport */
-  max-width: none; /* Remove max-width restriction */
-  margin: 0; /* Remove default margin */
+  background-color: #f8f9fa;
+  color: #212529;
+  width: 100vw;
+  max-width: none;
+  margin: 0;
 }
 
 .registration-modal .modal-dialog {
-  margin: 0; /* Remove default margin */
+  margin: 0;
 }
 
 .registration-modal .modal-body {
-  padding: 1rem; /* Add some padding to the modal body */
+  padding: 1rem;
 }
 
 .registration-modal .modal-header {
-  background-color: #007bff; /* Set your desired header background color */
-  color: #fff; /* Set your desired header text color */
-  padding: 1rem; /* Add some padding to the header */
+  background-color: #007bff;
+  color: #fff;
+  padding: 1rem;
 }
 
 .registration-modal .modal-footer {
-  background-color: #007bff; /* Set your desired footer background color */
-  color: #fff; /* Set your desired footer text color */
-  padding: 1rem; /* Add some padding to the footer */
+  background-color: #007bff;
+  color: #fff;
+  padding: 1rem;
 }
 
-/* Style the close button */
 .registration-modal .modal-header .close {
   color: #fff;
-  font-size: 1.5rem; /* Adjust the close button font size */
+  font-size: 1.5rem;
 }
 
-/* Override the default Bootstrap modal backdrop */
 .registration-modal .modal-backdrop {
   background-color: rgba(
     0,
     0,
     0,
     0.5
-  ); /* Set your desired backdrop color and opacity */
+  );
 }
 
 .table-header {
-  background-color: #3b85cf !important; /* Choose your desired background color */
+  background-color: #3b85cf !important;
   color: rgb(93, 54, 54) !important;
 }
 
 /* SORT BY BUTTON */
 .sort-by-button {
-  /* background-color: red; */
   font-size: 12px;
 }
 
@@ -832,16 +799,10 @@ body {
   font-size: 12px !important;
 }
 
-/* .success-notification{
-  background-color: #d74242;
-  height: 60px;
-  font-size: 15px;
-} */
-
 .success-notification {
   position: absolute;
-  top: 400px; /* Adjust as needed */
-  right: 30px; /* Adjust as needed */
+  top: 400px;
+  right: 30px;
   background-color: #4caf50;
   color: #fff;
   font-size: 12px;
@@ -876,7 +837,6 @@ body {
 
 /* ABOUT US */
 .headerteam {
-  /* background-color: black; */
   width: 140vh;
   height: auto;
 }
