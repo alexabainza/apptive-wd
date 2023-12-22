@@ -8,10 +8,10 @@ const saltRounds = 10;
 const { v4: generateUniqueId } = require("uuid"); // Add this line
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 const { verify, sign } = require("jsonwebtoken");
-const mysql = require('mysql2'); // Note the '/promise' at the end
+const mysql = require("mysql2"); // Note the '/promise' at the end
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
@@ -24,27 +24,26 @@ const conn = mysql.createConnection({
 });
 
 const generateToken = (user_id, username) => {
-  return jwt.sign({ user_id, username}, "jwtSecret", {
+  return jwt.sign({ user_id, username }, "jwtSecret", {
     expiresIn: 60 * 60 * 24 * 30 * 1000, // Set the expiration time as needed
   });
 };
 
 const verifyJWT = (req, res, next) => {
   //authorize if the user is allowed
-  const token = req.headers['authorization'];
-  if (!token) 
-    return res.status(400).json({ error: 'User not authenticated' });
+  const token = req.headers["authorization"];
+  if (!token) return res.status(400).json({ error: "User not authenticated" });
 
   try {
-    const validToken = jwt.verify(token, 'jwtSecret');
+    const validToken = jwt.verify(token, "jwtSecret");
     req.authenticated = true;
-    req.user = validToken;  // Set the decoded token in req.user
+    req.user = validToken; // Set the decoded token in req.user
     return next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired' });
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token expired" });
     }
-    return res.status(401).json({ error: 'Token invalid' });
+    return res.status(401).json({ error: "Token invalid" });
   }
 };
 
@@ -125,7 +124,6 @@ app.post("/register", async (req, res) => {
   }
 });
 
-
 app.post("/login", async (req, res) => {
   const username = req.body.username.trim();
   const password = req.body.password.trim();
@@ -148,8 +146,8 @@ app.post("/login", async (req, res) => {
 
         if (isMatch) {
           const user_id = data[0].user_id;
-          const token = generateToken(user_id, username)
-          
+          const token = generateToken(user_id, username);
+
           res.json({
             auth: true,
             token: token,
@@ -171,7 +169,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/isUserAuthenticated", (req, res) => {
-  res.send({message: "you are valid"});
+  res.send({ message: "you are valid" });
 });
 
 app.get("/community-notes", verifyJWT, (req, res) => {
@@ -186,7 +184,6 @@ app.get("/community-notes", verifyJWT, (req, res) => {
           message: "Unexpected error",
         });
       } else {
-
         if (data.length > 0) {
           res.status(200).json({ success: true, data });
         } else {
@@ -202,15 +199,15 @@ app.get("/community-notes", verifyJWT, (req, res) => {
   );
 });
 
-
 app.get("/guest/community-notes", (req, res) => {
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
   if (!guestId) {
     return res.status(401).json({
       success: false,
-      message: 'Guest not authenticated. Please provide guestId.',
+      message: "Guest not authenticated. Please provide guestId.",
     });
-  }  conn.query(
+  }
+  conn.query(
     "SELECT n.*, uc.user_name AS user_name, f.folder_name AS folder_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id JOIN folders f ON n.folder_id = f.folder_id WHERE n.isPublic = 1",
     (error, data) => {
       if (error) {
@@ -220,7 +217,6 @@ app.get("/guest/community-notes", (req, res) => {
           message: "Unexpected error",
         });
       } else {
-
         if (data.length > 0) {
           res.status(200).json({ success: true, data });
         } else {
@@ -246,15 +242,12 @@ app.get("/guest/community-notes", (req, res) => {
 //       );
 
 //       console.log("Folder Results:", folderResults);
-  
+
 // });
-
-
-
 
 app.get("/guest/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
+  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
 
   console.log("Received notes_id:", note_id);
 
@@ -353,7 +346,9 @@ app.get("/profile", verifyJWT, (req, res) => {
     (error, data) => {
       if (error) {
         console.error(error);
-        res.status(500).json({ error: "unexpected_error", message: error.message });
+        res
+          .status(500)
+          .json({ error: "unexpected_error", message: error.message });
       } else {
         if (data.length > 0) {
           const user = {
@@ -405,7 +400,11 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
 
             if (resultCredentials.length > 0) {
               // User is registered
-              res.json({ success: true, userType: "registered", data: resultCredentials });
+              res.json({
+                success: true,
+                userType: "registered",
+                data: resultCredentials,
+              });
             } else {
               // User is invalid
               res.json({ success: true, userType: "invalid", data: null });
@@ -416,7 +415,7 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
     }
   );
 });
-app.get('/dashboard', verifyJWT, async (req, res) => {
+app.get("/dashboard", verifyJWT, async (req, res) => {
   const userId = req.user.user_id;
 
   try {
@@ -445,13 +444,21 @@ app.get('/dashboard', verifyJWT, async (req, res) => {
     );
 
     if (!userData || userData.length === 0) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     return res.status(200).json({ success: true, user: userData });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, error: 'unexpected_error', message: error.message });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error: "unexpected_error",
+        message: error.message,
+      });
   }
 });
 
@@ -483,28 +490,34 @@ app.post("/dashboard/addFolder", verifyJWT, (req, res) => {
     }
   );
 });
-app.patch('/edit-profile', verifyJWT, (req, res) => {
+app.patch("/edit-profile", verifyJWT, (req, res) => {
   const { firstname, lastname } = req.body;
   const userId = req.user.user_id;
 
-    conn.query(
-      'UPDATE user_credentials SET firstname = ?, lastname = ? WHERE user_id = ?',
-      [firstname, lastname, userId],
-      (error, updateResult) => {
-        if (error) {
-          console.error('Error editing profile:', error);
-          return res.status(500).json({ success: false, message: 'Internal server error' });
-        }
-
-        if (updateResult.affectedRows > 0) {
-          return res.json({ success: true, message: 'Profile updated successfully' });
-        } else {
-          return res.status(404).json({ success: false, message: 'User not found' });
-        }
+  conn.query(
+    "UPDATE user_credentials SET firstname = ?, lastname = ? WHERE user_id = ?",
+    [firstname, lastname, userId],
+    (error, updateResult) => {
+      if (error) {
+        console.error("Error editing profile:", error);
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
-    );
-  });
 
+      if (updateResult.affectedRows > 0) {
+        return res.json({
+          success: true,
+          message: "Profile updated successfully",
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+    }
+  );
+});
 
 app.patch("/dashboard/updateFolder/:folder_id", verifyJWT, (req, res) => {
   const userId = req.user.user_id;
@@ -550,12 +563,10 @@ app.delete("/dashboard/deleteFolder/:folder_id", verifyJWT, (req, res) => {
     (deleteNoteError, deleteNoteData) => {
       if (deleteNoteError) {
         console.error(deleteNoteError);
-        res
-          .status(500)
-          .json({
-            error: "unexpected_error",
-            message: deleteNoteError.message,
-          });
+        res.status(500).json({
+          error: "unexpected_error",
+          message: deleteNoteError.message,
+        });
       } else {
         conn.query(
           "DELETE from folders WHERE user_id = ? AND folder_id = ?",
@@ -586,9 +597,9 @@ app.get("/:folder_name", verifyJWT, (req, res) => {
   // Use LEFT JOIN to include users with no notes
   conn.query(
     "SELECT f.folder_name, n.*, u.user_name FROM folders f " +
-    "LEFT JOIN notes n ON f.folder_id = n.folder_id AND n.user_id = ? " +
-    "LEFT JOIN user_credentials u ON u.user_id = ? " +
-    "WHERE f.user_id = ? AND f.folder_name = ?",
+      "LEFT JOIN notes n ON f.folder_id = n.folder_id AND n.user_id = ? " +
+      "LEFT JOIN user_credentials u ON u.user_id = ? " +
+      "WHERE f.user_id = ? AND f.folder_name = ?",
     [user_id, user_id, user_id, folder_name],
     (error, data) => {
       if (error) {
@@ -601,16 +612,37 @@ app.get("/:folder_name", verifyJWT, (req, res) => {
   );
 });
 
+app.patch(
+  "/:folder_name/:note_id/togglePublicPrivate",
+  verifyJWT,
+  async (req, res) => {
+    const { folder_name, note_id } = req.params;
+    const { isPublic } = req.body;
 
-app.get("/:folder_name/:notes_id",verifyJWT, (req, res) => {
+    try {
+      conn.query("UPDATE notes SET isPublic = ? WHERE notes_id = ?", [
+        isPublic,
+        note_id,
+      ]);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Error toggling public/private status:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  }
+);
+
+app.get("/:folder_name/:notes_id", verifyJWT, (req, res) => {
   const folder_name = req.params.folder_name;
   const user_id = req.user.user_id;
   const note_id = req.params.notes_id;
   conn.query(
     "SELECT n.*, u.user_name FROM notes n " +
-    "INNER JOIN folders f ON f.folder_id = n.folder_id " +
-    "LEFT JOIN user_credentials u ON u.user_id = n.user_id " +
-    "WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ? AND n.notes_id = ?",
+      "INNER JOIN folders f ON f.folder_id = n.folder_id " +
+      "LEFT JOIN user_credentials u ON u.user_id = n.user_id " +
+      "WHERE n.user_id = ? AND f.user_id = ? AND f.folder_name = ? AND n.notes_id = ?",
     [user_id, user_id, folder_name, note_id],
 
     (error, data) => {
@@ -667,8 +699,8 @@ app.post("/:folder_name/addNote", verifyJWT, async (req, res) => {
     const result = await new Promise((resolve, reject) => {
       conn.query(
         "SELECT f.folder_id, u.user_name FROM folders f " +
-        "LEFT JOIN user_credentials u ON u.user_id = f.user_id " +
-        "WHERE f.user_id = ? AND f.folder_name = ?",
+          "LEFT JOIN user_credentials u ON u.user_id = f.user_id " +
+          "WHERE f.user_id = ? AND f.folder_name = ?",
         [userId, folderName],
         (error, result) => {
           if (error) {
@@ -712,9 +744,7 @@ app.post("/:folder_name/addNote", verifyJWT, async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ error: "unexpected_error", message: error.message });
+    res.status(500).json({ error: "unexpected_error", message: error.message });
   }
 });
 
@@ -785,12 +815,10 @@ app.patch("/:folder_name/:note_id/updateNote", verifyJWT, (req, res) => {
             (updateError, data) => {
               if (updateError) {
                 console.error(updateError);
-                res
-                  .status(500)
-                  .json({
-                    error: "unexpected_error",
-                    message: updateError.message,
-                  });
+                res.status(500).json({
+                  error: "unexpected_error",
+                  message: updateError.message,
+                });
               } else {
                 if (data.affectedRows > 0) {
                   res.status(200).json({
@@ -896,7 +924,7 @@ app.post("/logVisitedDocument", async (req, res) => {
   }
 });
 app.post("/checkIfDocumentViewed", async (req, res) => {
-  const guestId = req.headers['guest-id'];
+  const guestId = req.headers["guest-id"];
 
   const { person_id, note_id } = req.body;
   console.log(
@@ -940,60 +968,57 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
   }
 });
 
-
-
 app.get("/getDocumentCount/:person_id", async (req, res) => {
   const personId = req.params.person_id;
 
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
-  console.log('Guest Id:', guestId);
+  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
+  console.log("Guest Id:", guestId);
 
   if (!guestId) {
     return res.status(401).json({
       success: false,
-      message: 'Guest not authenticated. Please provide guestId.',
+      message: "Guest not authenticated. Please provide guestId.",
     });
-  }
-  else{
+  } else {
     try {
       // Fetch document count from the 'visited_documents' table
       const [rows] = await conn.execute(
         "SELECT COUNT(*) as document_count FROM visited_documents WHERE person_id = ?",
         [personId]
       );
-  
+
       const documentCount = rows[0].document_count;
-      console.log("document count from app.js: ", documentCount)
+      console.log("document count from app.js: ", documentCount);
       res.json({ document_count: documentCount });
     } catch (error) {
       console.error("Error fetching document count", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-  
 });
 
-app.post("/:folder_name/:note_id/makeFlashcards", verifyJWT, (req, res)=>{
+app.post("/:folder_name/:note_id/makeFlashcards", verifyJWT, (req, res) => {
   const { folder_id, flashcard_set_id, user_id, question, answer } = req.body;
   const { folder_name, note_id } = req.params;
   const randomId = uuidv4();
   const flashcard_id = `${note_id}_${randomId}`;
   try {
-
-  conn.query('INSERT INTO flashcards (flashcard_id, flashcard_set_id, user_id, question, answer) VALUES (?, ?, ?, ?, ?)', [flashcard_id, flashcard_set_id, user_id, question, answer]);
-  res.status(201).json({ flashcard_id });
+    conn.query(
+      "INSERT INTO flashcards (flashcard_id, flashcard_set_id, user_id, question, answer) VALUES (?, ?, ?, ?, ?)",
+      [flashcard_id, flashcard_set_id, user_id, question, answer]
+    );
+    res.status(201).json({ flashcard_id });
+  } catch (error) {
+    console.error("Error generating flashcard:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-  catch (error) {
-    console.error('Error generating flashcard:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+});
 
-})
-
-app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res)=>{
-  const {folder_name, note_id} = req.params
+app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res) => {
+  const { folder_name, note_id } = req.params;
   conn.query(
-    "SELECT * FROM flashcards WHERE flashcard_set_id = ?", [note_id],
+    "SELECT * FROM flashcards WHERE flashcard_set_id = ?",
+    [note_id],
     (error, data) => {
       if (error) {
         console.error(error);
@@ -1002,7 +1027,6 @@ app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res)=>{
           message: "Unexpected error",
         });
       } else {
-
         if (data.length > 0) {
           res.status(200).json({ success: true, data });
         } else {
@@ -1015,52 +1039,64 @@ app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res)=>{
       }
     }
   );
-})
+});
 
-app.delete("/:folder_name/:note_id/flashcards/:flashcardId/delete", verifyJWT, (req, res) =>{
-  const {folder_name, note_id, flashcardId} = req.params
-  conn.query(
-    "DELETE FROM flashcards WHERE flashcard_id = ?", [flashcardId],
-    (error, data) => {
-      if (error) {
-        console.error(error);
-        res
-          .status(500)
-          .json({ error: "unexpected_error", message: error.message });
-      } else {
-        res.status(201).json({
-          success: true,
-          message: "Note deleted successfully",
-        });
-      }})}
-  )
-
-  app.patch('/:folder_name/:note_id/flashcards/:flashcard_id/edit', (req, res) => {
-    const { folder_name, note_id, flashcard_id } = req.params;
-    const { question, answer } = req.body;
-  
-    conn.query("UPDATE flashcards SET question = ?, answer = ?,  modified_at = NOW() WHERE flashcard_id = ?",
-    [question, answer, flashcard_id],
-    
-    (error, data) => {
-      if (error) {
-        console.error(error);
-        res.status(500).json({
-          error: "unexpected_error",
-          message: error.message,
-        });
-      } else {
-        if (data.affectedRows > 0) {
-          res.status(200).json({
-            success: true,
-            message: "Flashcard updated successfully",
-          });
+app.delete(
+  "/:folder_name/:note_id/flashcards/:flashcardId/delete",
+  verifyJWT,
+  (req, res) => {
+    const { folder_name, note_id, flashcardId } = req.params;
+    conn.query(
+      "DELETE FROM flashcards WHERE flashcard_id = ?",
+      [flashcardId],
+      (error, data) => {
+        if (error) {
+          console.error(error);
+          res
+            .status(500)
+            .json({ error: "unexpected_error", message: error.message });
         } else {
-          res.status(404).json({
-            success: false,
-            message: "Folder not found",
+          res.status(201).json({
+            success: true,
+            message: "Note deleted successfully",
           });
         }
       }
-    })
-    });
+    );
+  }
+);
+
+app.patch(
+  "/:folder_name/:note_id/flashcards/:flashcard_id/edit",
+  (req, res) => {
+    const { folder_name, note_id, flashcard_id } = req.params;
+    const { question, answer } = req.body;
+
+    conn.query(
+      "UPDATE flashcards SET question = ?, answer = ?,  modified_at = NOW() WHERE flashcard_id = ?",
+      [question, answer, flashcard_id],
+
+      (error, data) => {
+        if (error) {
+          console.error(error);
+          res.status(500).json({
+            error: "unexpected_error",
+            message: error.message,
+          });
+        } else {
+          if (data.affectedRows > 0) {
+            res.status(200).json({
+              success: true,
+              message: "Flashcard updated successfully",
+            });
+          } else {
+            res.status(404).json({
+              success: false,
+              message: "Folder not found",
+            });
+          }
+        }
+      }
+    );
+  }
+);

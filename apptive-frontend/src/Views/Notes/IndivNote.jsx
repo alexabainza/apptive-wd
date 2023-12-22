@@ -4,8 +4,7 @@ import UserNavbar from "../Dashboard/UserNavbar";
 import FlashcardPage from "./Flashcards";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {jwtDecode}from 'jwt-decode';
-
+import { jwtDecode } from "jwt-decode";
 
 const IndivNote = () => {
   const navigate = useNavigate();
@@ -15,6 +14,7 @@ const IndivNote = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
   const [username, setUsername] = useState("");
+  const [isPublic, setIsPublic] = useState(false); // New state for public/private status
 
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [highlightedTextQuestion, setHighlightedTextQuestion] = useState(""); // State for green highlight
@@ -26,15 +26,13 @@ const IndivNote = () => {
   const quillRef = useRef(null);
 
   useEffect(() => {
-    if(!storedToken){
+    if (!storedToken) {
       navigate("/login");
-
-    }
-    else {
+    } else {
       try {
         const decodedToken = jwtDecode(storedToken);
         // Store decoded user data in state
-        setUsername(decodedToken.username)
+        setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
         // Handle error decoding token
@@ -137,6 +135,31 @@ const IndivNote = () => {
     }
   };
 
+  const handleTogglePublicPrivate = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/${folder_name}/${note_id}/togglePublicPrivate`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: storedToken,
+          },
+          body: JSON.stringify({
+            isPublic: !isPublic, // Toggle the value
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to toggle public/private status");
+      }
+
+      setIsPublic(!isPublic); // Update the local state
+    } catch (error) {
+      console.error("Error toggling public/private status:", error.message);
+    }
+  };
   const handleGenerateCard = async () => {
     // Pass highlighted texts to FlashcardPage when "Generate Card" is clicked
     setShowFlashcardPage(true);
@@ -259,11 +282,36 @@ const IndivNote = () => {
                 <button onClick={handleGenerateCard} className="button-style">
                   Generate Card
                 </button>
+                <button
+                  onClick={handleTogglePublicPrivate}
+                  className="button-style"
+                >
+                  {isPublic ? "Make Note Private" : "Make Note Public"}
+                </button>
               </div>
             )}
-            {!isEditing && (
-              <button onClick={() => setIsEditing(true)} className="button-style mt-3">Edit</button>
-            )}
+            <div className="d-flex">
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="button-style mt-3"
+                >
+                  Edit
+                </button>
+              )}
+
+              {!isEditing && (
+                <div className="mt-3">
+                  {/* ... existing code */}
+                  <button
+                    onClick={handleTogglePublicPrivate}
+                    className="button-style"
+                  >
+                    {isPublic ? "Make Note Private" : "Make Note Public"}
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
