@@ -6,19 +6,15 @@ export const Landing = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    // Redirect to another page when the "Get Started" button is clicked
-    navigate("/select"); // Replace "/your-target-route" with the desired route
+    navigate("/select");
   };
 
   useEffect(() => {
-    // Disable scrolling when the component mounts
     document.body.style.overflow = "hidden";
-    // Re-enable scrolling when the component is unmounted
-  return () => {
-  document.body.style.overflow = "visible";
-  };
+    return () => {
+      document.body.style.overflow = "visible";
+    };
   }, []);
-
 
   return (
     <div className="d-flex flex-column">
@@ -33,8 +29,8 @@ export const Landing = () => {
           </h1>
           <p className="text-white fs-md mt-2 w-50">
             Compile and collect your notes in one application with a feature
-            that allows you to create flashcards alongside your notes. Take a quiz
-            with your flashcards to test your knowledge.
+            that allows you to create flashcards alongside your notes. Take a
+            quiz with your flashcards to test your knowledge.
           </p>
           <button className="landing-home-button" onClick={handleGetStarted}>
             <strong>Get Started</strong>
