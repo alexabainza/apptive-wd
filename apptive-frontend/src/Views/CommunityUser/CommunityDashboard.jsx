@@ -1,36 +1,33 @@
 import React, { useEffect, useState } from "react";
-import CommunityNote from "./CommunityNote";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import UserNavbar from "../Dashboard/UserNavbar";
-import {jwtDecode}from 'jwt-decode';
+import CommunityNote from "./CommunityNote";
 
 const CommunityDashboard = () => {
   const [notes, setNotes] = useState([]);
   const [noNotesMessage, setNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
-  const [username, setUsername] = useState("")
-
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [username, setUsername] = useState("");
   const storedToken = localStorage.getItem("token");
   const navigate = useNavigate();
+
   useEffect(() => {
     if (storedToken) {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
-        setUsername(decodedToken.username)
+        setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
   useEffect(() => {
     const fetchData = async () => {
       if (!storedToken) {
-        // Redirect to the login page if there is no stored token
         navigate("/login");
         return;
       }
@@ -59,7 +56,6 @@ const CommunityDashboard = () => {
     fetchData();
   }, [storedToken]);
 
-  console.log(notes);
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -68,7 +64,6 @@ const CommunityDashboard = () => {
     let sortedNotes = [...notes];
     let newSortOrder = "asc";
 
-    // If the same criteria is clicked again, toggle the sort order
     if (sortBy === criteria) {
       newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     }
@@ -106,10 +101,12 @@ const CommunityDashboard = () => {
 
   return (
     <div className="guest-dashboard d-flex flex-column">
-      <UserNavbar username={username}/>
+      <UserNavbar username={username} />
 
       <div className="guest-dashboard-contents">
-        <h2 className="text-white "><strong>Community Notes</strong></h2>
+        <h2 className="text-white ">
+          <strong>Community Notes</strong>
+        </h2>
 
         <div className="guest-dashboard-table-header-main pb-4  d-flex justify-content-between py-3">
           <div className="dropdown">
@@ -121,7 +118,12 @@ const CommunityDashboard = () => {
               aria-haspopup="true"
               aria-expanded="false"
             >
-              Sort By: {sortBy ? `${sortBy} (${sortOrder === "asc" ? "Ascending" : "Descending"})` : "Select"}
+              Sort By:{" "}
+              {sortBy
+                ? `${sortBy} (${
+                    sortOrder === "asc" ? "Ascending" : "Descending"
+                  })`
+                : "Select"}
             </button>
             <div className="dropdown-menu" aria-labelledby="sortDropdown">
               <button

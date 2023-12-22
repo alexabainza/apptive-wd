@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import UserNavbar from "../Dashboard/UserNavbar";
 import { jwtDecode } from "jwt-decode";
+import UserNavbar from "../Dashboard/UserNavbar";
 
 const CommunityIndivNote = () => {
   const { note_id } = useParams();
@@ -13,11 +13,9 @@ const CommunityIndivNote = () => {
     if (storedToken) {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -32,7 +30,6 @@ const CommunityIndivNote = () => {
         .then((data) => {
           if (data.error) {
             console.error("Error fetching note:", data.error);
-            // Handle the error, e.g., show a message to the user
           } else {
             setNote(data);
           }
@@ -42,11 +39,10 @@ const CommunityIndivNote = () => {
         });
     }
   }, [note_id]);
-  console.log("Username from commindivnote is " + username);
 
   return (
     <div className="community-indiv-note">
-      <UserNavbar username={username}/>
+      <UserNavbar username={username} />
       <div
         className="community-indiv-note-contents mt-2 text-white"
         style={{ margin: "0px 50px" }}
