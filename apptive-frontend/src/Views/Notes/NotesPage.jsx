@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Note from "./Note";
-import { Link, useNavigate } from "react-router-dom";
 
 const NotesPage = () => {
   const navigate = useNavigate();
-  const [notes, setNotes] = useState([]); // Initialize with an empty array
+  const { user_id, folder_name } = useParams();
+  const storedToken = localStorage.getItem("token");
+  const [token, setToken] = useState(storedToken);
+  const [notes, setNotes] = useState([]);
   const [notesMessage, setNoNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
-  const [token, setToken] = useState(null);
-  const { user_id, folder_name } = useParams();
   const [username, setUsername] = useState("");
-  const storedToken = localStorage.getItem("token");
-  const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
 
   useEffect(() => {
-    setToken(storedToken);
-
-    if (!storedToken) {
+    if (!token) {
       navigate("/login");
       return;
     }
 
     fetch(`http://localhost:3000/${folder_name}`, {
       headers: {
-        Authorization: storedToken,
+        Authorization: token,
       },
     })
       .then((response) => response.json())
@@ -36,7 +34,6 @@ const NotesPage = () => {
             setNoNotesMessage("You have no notes.");
           } else {
             setUsername(data[0].user_name);
-
             setNotes(data);
           }
         } else {
@@ -46,7 +43,7 @@ const NotesPage = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, [user_id, folder_name]);
+  }, [token, folder_name, navigate]);
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -56,19 +53,11 @@ const NotesPage = () => {
     let sortedNotes = [...notes];
     let newSortOrder = "asc";
 
-    // If the same criteria is clicked again, toggle the sort order
     if (sortBy === criteria) {
       newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     }
 
     switch (criteria) {
-      case "Last Modified":
-        sortedNotes.sort((a, b) =>
-          newSortOrder === "asc"
-            ? new Date(a.modified_at) - new Date(b.modified_at)
-            : new Date(b.modified_at) - new Date(a.modified_at)
-        );
-        break;
       case "Title":
         sortedNotes.sort((a, b) =>
           newSortOrder === "asc"
@@ -76,7 +65,13 @@ const NotesPage = () => {
             : b.note_title.localeCompare(a.note_title)
         );
         break;
-
+      case "Last Modified":
+        sortedNotes.sort((a, b) =>
+          newSortOrder === "asc"
+            ? new Date(a.modified_at) - new Date(b.modified_at)
+            : new Date(b.modified_at) - new Date(a.modified_at)
+        );
+        break;
       default:
         break;
     }
@@ -133,6 +128,10 @@ const NotesPage = () => {
       console.error("Error saving note:", error.message);
     }
   };
+
+  const filteredNotes = notes.filter((note) =>
+    note.note_title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
@@ -206,34 +205,34 @@ const NotesPage = () => {
             />
           </div>
           <div className="notes-list">
-          {notes === null ? (
-  <p className="text-white">Loading...</p>
-) : notes.length === 0 ? (
-  <p className="text-white">
-    {notesMessage || "You have no notes."}
-  </p>
-) : (
-  notes.map((note) => (
-    <div key={note.notes_id}>
-      <Note
-        folder_name={note.folder_name}
-        user_id={note.user_id}
-        folder_id={note.folder_id}
-        notes_id={note.notes_id}
-        title={note.note_title}
-        last_modified={note.modified_at}
-        created_at={note.created_at}
-        content={note.contents}
-        onDeleteNote={deleteNote}
-      />
-    </div>
-  ))
-)}
-
+            {notes === null ? (
+              <p className="text-white">Loading...</p>
+            ) : filteredNotes.length === 0 ? (
+              <p className="text-white">
+                {notesMessage || "No matching notes found."}
+              </p>
+            ) : (
+              filteredNotes.map((note) => (
+                <div key={note.notes_id}>
+                  <Note
+                    folder_name={note.folder_name}
+                    user_id={note.user_id}
+                    folder_id={note.folder_id}
+                    notes_id={note.notes_id}
+                    title={note.note_title}
+                    last_modified={note.modified_at}
+                    created_at={note.created_at}
+                    content={note.contents}
+                    onDeleteNote={deleteNote}
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
     </>
   );
 };
+
 export default NotesPage;

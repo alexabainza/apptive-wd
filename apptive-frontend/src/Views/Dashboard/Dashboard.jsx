@@ -10,6 +10,9 @@ function Dashboard() {
   const [userId, setUserId] = useState('');
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortBy, setSortBy] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const storedToken = localStorage.getItem('token');
 
   const fetchData = async () => {
@@ -89,7 +92,7 @@ function Dashboard() {
       const data = await response.json();
 
       if (data.success) {
-        console.log('New folder added:', data); // Add this log
+        console.log('New folder added:', data);
 
         setFolders((prevFolders) => [
           ...prevFolders,
@@ -138,7 +141,52 @@ function Dashboard() {
       fetchData();
     }
   }, [navigate, storedToken, folders]);
-  console.log('Rendering Dashboard component', folders);
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSort = (criteria) => {
+    let newSortOrder = 'asc';
+
+    if (sortBy === criteria) {
+      newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    }
+
+    setSortBy(criteria);
+    setSortOrder(newSortOrder);
+  };
+
+  const sortAndFilterFolders = () => {
+    let sortedFoldersList = [...folders];
+
+    if (sortBy) {
+      switch (sortBy) {
+        case 'Title':
+          sortedFoldersList.sort((a, b) =>
+            sortOrder === 'asc'
+              ? a.folder_name.localeCompare(b.folder_name)
+              : b.folder_name.localeCompare(a.folder_name)
+          );
+          break;
+        case 'Created At':
+          sortedFoldersList.sort((a, b) =>
+            sortOrder === 'asc'
+              ? new Date(a.created_at) - new Date(b.created_at)
+              : new Date(b.created_at) - new Date(a.created_at)
+          );
+          break;
+        default:
+          break;
+      }
+    }
+
+    return sortedFoldersList.filter((folder) =>
+      folder.folder_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  const sortedAndFilteredFolders = sortAndFilterFolders();
 
   return (
     <div className="user-dashboard mt-0">
@@ -147,17 +195,47 @@ function Dashboard() {
         <h2 className="folderDirect text-white">
           <strong>Folders</strong>
         </h2>
-        {folders ? (
-          folders.length > 0 ? (
+        <div className="guest-dashboard-table-header-main pb-4  d-flex justify-content-between py-3">
+          <div className="dropdown">
+            <button
+              className="sort-by-button btn text-white dropdown-toggle ms-0"
+              type="button"
+              id="sortDropdown"
+              data-bs-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Sort By: {sortBy ? `${sortBy} (${sortOrder === 'asc' ? 'Ascending' : 'Descending'})` : 'Select'}
+            </button>
+            <div className="dropdown-menu" aria-labelledby="sortDropdown">
+              <button className="dropdown-item" onClick={() => handleSort('Title')}>
+                Title
+              </button>
+              <button className="dropdown-item" onClick={() => handleSort('Created At')}>
+                Created At
+              </button>
+            </div>
+          </div>
+
+          <input
+            className="search-notes form-control w-25"
+            type="text"
+            placeholder="Search notes"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
+        {sortedAndFilteredFolders ? (
+          sortedAndFilteredFolders.length > 0 ? (
             <Folders
               user_id={userId}
               username={username}
-              folders={folders}
+              folders={sortedAndFilteredFolders}
               onDeleteFolder={handleFolderDeleted}
               onEditFolder={handleEditFolder}
             />
           ) : (
-            <p className="text-white">{noFoldersMessage || 'You have no folders.'}</p>
+            <p className="text-white">{noFoldersMessage || 'No matching folders found.'}</p>
           )
         ) : (
           <p>Loading folders...</p>

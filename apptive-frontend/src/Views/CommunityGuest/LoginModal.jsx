@@ -16,7 +16,7 @@ const LoginModal = ({ showModal, handleClose, handleLogin }) => {
         </p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handleLogin}>
+        <Button style={{ backgroundColor: "#d74242" }} onClick={handleLogin}>
           Sign In
         </Button>
       </Modal.Footer>
