@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import LoginModal from "./LoginModal"; // Import the LoginModal component
+
 const CommunityGuestNote = ({ note }) => {
   const navigate = useNavigate();
   const guestId = localStorage.getItem("guestId");
   const [showAlert, setShowAlert] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false); // State for login modal
+
   const handleNoteClick = async () => {
     try {
       const response = await fetch(
@@ -33,8 +37,8 @@ const CommunityGuestNote = ({ note }) => {
       if (data.document_count >= 3 && !data.viewed) {
         console.log("User has viewed 3 different documents. Cannot open more.");
         // Show an alert or take appropriate action
-        setShowAlert(true);
-        alert("dfds");
+        setShowLoginModal(true);
+        // alert("dfds");
       } else if (data.document_count < 3 && !data.viewed) {
         await fetch("http://localhost:3000/logVisitedDocument", {
           method: "POST",
@@ -48,7 +52,6 @@ const CommunityGuestNote = ({ note }) => {
           }),
         });
         navigate(`/guest/community-notes/${note.notes_id}`);
-
       } else if (data.viewed) {
         console.log("Document has already been viewed.");
         navigate(`/guest/community-notes/${note.notes_id}`);
@@ -62,10 +65,9 @@ const CommunityGuestNote = ({ note }) => {
       console.error("Error checking if document viewed:", error);
     }
   };
-
   useEffect(() => {
-    // Effect to reset showAlert state when the component unmounts
-    return () => setShowAlert(false);
+    // Effect to reset state when the component unmounts
+    return () => setShowLoginModal(false);
   }, []);
 
   return (
@@ -86,7 +88,11 @@ const CommunityGuestNote = ({ note }) => {
       <td className="text-center" style={{ fontSize: "16px" }}>
         {new Date(note.modified_at).toLocaleString()}
       </td>
-
+      <LoginModal
+        showModal={showLoginModal}
+        handleClose={() => setShowLoginModal(false)}
+        handleLogin={() => navigate("/register")}
+      />
     </tr>
   );
 };
