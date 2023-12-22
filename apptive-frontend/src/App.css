@@ -328,7 +328,7 @@ body {
 }
 
 .profile-page {
-  min-height: 100vh;
+  min-height: 100%;
   width: 100vw;
 }
 
@@ -924,4 +924,10 @@ body {
 .visionCont p {
   color: #313A53;
   text-align: center;
+}
+
+.cancel-button-style{
+  background-color: gray;
+  font-size: 12px!important;
+  margin-right: 10px;
 }

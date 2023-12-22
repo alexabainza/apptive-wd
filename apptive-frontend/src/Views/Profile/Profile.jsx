@@ -2,43 +2,40 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Navbar from "../Navbar/Navbar";
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import profile from "../../assets/profile-user.svg";
+import { jwtDecode } from "jwt-decode";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
-  const [userType, setUserType] = useState("");
-  const [token, setToken] = useState("");
+  const [storedToken] = useState(localStorage.getItem("token"));
+  const [username, setUsername] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [token, setToken] = useState();
+  const [editedUserData, setEditedUserData] = useState({
+    firstname: "",
+    lastname: "",
+  });
+
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!storedToken) {
+      navigate("/login");
+    } else {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        // Store decoded user data in state
+        setUsername(decodedToken.username);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        // Handle error decoding token
+      }
+    }
+  }, [storedToken]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
-
-    const fetchUserType = async () => {
-      try {
-        const userTypeResponse = await fetch(`http://localhost:3000/check-user-type`, {
-          headers: {
-            Authorization: `${storedToken}`, // Include "Bearer" before the token
-          },
-        });
-
-        if (userTypeResponse.ok) {
-          const userTypeData = await userTypeResponse.json();
-          if (userTypeData.success) {
-            setUserType(userTypeData.userType);
-          } else {
-            console.error(userTypeData.message);
-          }
-        } else {
-          console.error("Failed to fetch user type:", userTypeResponse.status);
-          // Handle unauthorized or other errors here
-        }
-      } catch (error) {
-        console.error("Error fetching user type:", error);
-      }
-    };
-
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:3000/profile`, {
@@ -63,9 +60,7 @@ const Profile = () => {
       }
     };
 
-    fetchUserType(); // Fetch user type first
     fetchData(); // Fetch user data
-
   }, [token]); // Add token as a dependency
 
   const handleLogout = async () => {
@@ -92,34 +87,141 @@ const Profile = () => {
       // Handle logout error here
     }
   };
+
+  const handleEditToggle = () => {
+    setIsEditing((prevIsEditing) => !prevIsEditing);
+    setEditedUserData({
+      firstname: userData?.firstname || "",
+      lastname: userData?.lastname || "",
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUserData((prevUserData) => ({
+      ...prevUserData,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/edit-profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(editedUserData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            ...editedUserData,
+          }));
+          setIsEditing(false);
+        } else {
+          console.error(result.message);
+        }
+      } else {
+        console.error("Failed to edit profile:", response.status);
+      }
+    } catch (error) {
+      console.error("Error editing profile:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
   return (
     <div className="profile-page mt-0">
-      {userType === "registered" ? (
-        <UserNavbar username={userData?.username} />
-      ) : userType === "guest" ? (
-        <Navbar />
-      ) : null}
-      <div className="tagBox">
-        {userData && (
+      <UserNavbar username={username} />
+      {userData && (
+        <div className="tagBox">
           <div className="profileCont text-center text-#E3E3E3">
             <img className="profileIcon" src={profile} alt="Profile Icon" />
-            <h3 className="profileFullname">
-              <strong>{`${userData.firstname} ${userData.lastname}`}</strong>
-            </h3>
-            <p className="profileUsername">
-              <strong>@{userData.username}</strong>
-            </p>
-            <p>Email:</p>
-            <p className="profileEmail">{userData.email}</p>
-            <p className="profileUserID">
-              <small>User ID: {userData.user_id}</small>
-            </p>
+            {isEditing ? (
+              <Form className="mt-4 d-flex flex-column justify-content-center align-items-center">
+                <Form.Group controlId="editFirstName" className="w-50">
+                  <Form.Label className="mb-0">
+                    <small>First Name</small>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="firstname"
+                    value={editedUserData.firstname}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group controlId="editLastName" className="w-50">
+                  <Form.Label className="mb-0">
+                    <small>Last Name</small>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="lastname"
+                    value={editedUserData.lastname}
+                    onChange={handleInputChange}
+                    className="mb-3"
+                  />
+                </Form.Group>
+                <div className="d-flex">
+                  <Button
+                    variant="primary"
+                    className="button-style"
+                    onClick={handleSaveChanges}
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="cancel-button-style"
+                    onClick={handleCancelEdit}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </Form>
+            ) : (
+              <>
+                <h3 className="profileFullname">
+                  <strong>{`${userData.firstname} ${userData.lastname}`}</strong>
+                </h3>
+                <p className="profileUsername">
+                  <strong>@{userData.username}</strong>
+                </p>
+                <p>Email:</p>
+                <p className="profileEmail">{userData.email}</p>
+                <p className="profileUserID">
+                  <small>User ID: {userData.user_id}</small>
+                </p>
+              </>
+            )}
           </div>
-        )}
-        <Button className="signoutProfile" onClick={handleLogout}>
-          Sign out
-        </Button>
-      </div>
+          {/* <div className="d-flex"> */}
+            {!isEditing && (
+            <Button
+              className="editProfile button-style"
+              onClick={handleEditToggle}
+            >
+              Edit Profile
+            </Button>
+          )}
+          {/* <Button
+            className="signoutProfile button-style"
+            onClick={handleLogout}
+          >
+            Sign out
+          </Button> */}
+          </div>
+          
+        // </div>
+      )}
     </div>
   );
 };

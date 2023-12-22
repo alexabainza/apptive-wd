@@ -483,6 +483,29 @@ app.post("/dashboard/addFolder", verifyJWT, (req, res) => {
     }
   );
 });
+app.patch('/edit-profile', verifyJWT, (req, res) => {
+  const { firstname, lastname } = req.body;
+  const userId = req.user.user_id;
+
+    conn.query(
+      'UPDATE user_credentials SET firstname = ?, lastname = ? WHERE user_id = ?',
+      [firstname, lastname, userId],
+      (error, updateResult) => {
+        if (error) {
+          console.error('Error editing profile:', error);
+          return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+
+        if (updateResult.affectedRows > 0) {
+          return res.json({ success: true, message: 'Profile updated successfully' });
+        } else {
+          return res.status(404).json({ success: false, message: 'User not found' });
+        }
+      }
+    );
+  });
+
+
 app.patch("/dashboard/updateFolder/:folder_id", verifyJWT, (req, res) => {
   const userId = req.user.user_id;
   const folderId = req.params.folder_id;
