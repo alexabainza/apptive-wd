@@ -234,7 +234,7 @@ const FlashcardPage = () => {
                       Next &gt;
                     </button>
                   </>
-                )}
+                )} 
               </div>
             )}
           </div>
