@@ -872,11 +872,8 @@ app.post("/logVisitedDocument", async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 app.post("/checkIfDocumentViewed", async (req, res) => {
-  const guestId = req.headers['guest-id'];  // Assuming guestId is sent in the headers
-
-  console.log(req.headers)
+  const guestId = req.headers['guest-id'];
 
   const { person_id, note_id } = req.body;
   console.log(
@@ -899,14 +896,28 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
       );
 
     const viewed = viewedDocument.length > 0;
-    console.log("viewed? "+ viewed);
 
-    return res.status(200).json({ viewed });
+    // Fetch document count from the 'visited_documents' table
+    const [rows = []] = await conn
+      .promise()
+      .query(
+        "SELECT COUNT(*) as document_count FROM visited_documents WHERE person_id = ?",
+        [person_id]
+      );
+
+    const documentCount = rows[0].document_count;
+
+    console.log("viewed? " + viewed);
+    console.log("documentCount: " + documentCount);
+
+    return res.status(200).json({ viewed, document_count: documentCount });
   } catch (err) {
     console.error("Error checking if document viewed:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 app.get("/getDocumentCount/:person_id", async (req, res) => {
   const personId = req.params.person_id;
@@ -929,6 +940,7 @@ app.get("/getDocumentCount/:person_id", async (req, res) => {
       );
   
       const documentCount = rows[0].document_count;
+      console.log("document count from app.js: ", documentCount)
       res.json({ document_count: documentCount });
     } catch (error) {
       console.error("Error fetching document count", error);

@@ -1,42 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-
 const CommunityGuestNote = ({ note }) => {
   const navigate = useNavigate();
   const guestId = localStorage.getItem("guestId");
   const [showAlert, setShowAlert] = useState(false);
   const handleNoteClick = async () => {
     try {
-      const response = await fetch("http://localhost:3000/checkIfDocumentViewed", {
-        method: "POST",
-        headers: {
-          'Guest-Id': guestId,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          person_id: guestId,
-          note_id: note.notes_id,
-        }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:3000/checkIfDocumentViewed",
+        {
+          method: "POST",
+          headers: {
+            "Guest-Id": guestId,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            person_id: guestId,
+            note_id: note.notes_id,
+          }),
+        }
+      );
+
       if (!response.ok) {
         console.error("Failed to check if the document is viewed");
         return;
       }
-  
+
       const data = await response.json();
-  
-      // Check if the user has viewed 3 different documents
-      if (data.document_count >= 3) {
+      console.log("Data from server:", data);
+      console.log("Document count: ", data.document_count);
+
+      if (data.document_count >= 3 && !data.viewed) {
         console.log("User has viewed 3 different documents. Cannot open more.");
         // Show an alert or take appropriate action
         setShowAlert(true);
-      } else if (data.viewed) {
-        // Log the visited document
+        alert("dfds");
+      } else if (data.document_count < 3 && !data.viewed) {
         await fetch("http://localhost:3000/logVisitedDocument", {
           method: "POST",
           headers: {
-            'Guest-Id': guestId,
+            "Guest-Id": guestId,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -44,23 +47,24 @@ const CommunityGuestNote = ({ note }) => {
             note_id: note.notes_id,
           }),
         });
-  
+        navigate(`/guest/community-notes/${note.notes_id}`);
+
+      } else if (data.viewed) {
+        console.log("Document has already been viewed.");
+        navigate(`/guest/community-notes/${note.notes_id}`);
+
+        // Log the visited document
+
         // Navigate to the desired page
         navigate(`/guest/community-notes/${note.notes_id}`);
-      } else {
-        // User hasn't viewed this note, and document count hasn't reached 3
-        console.log("User hasn't viewed this note. Cannot open.");
-        // Show an alert or take appropriate action
-        setShowAlert(true);
       }
     } catch (error) {
       console.error("Error checking if document viewed:", error);
     }
   };
-  
 
   useEffect(() => {
-    // Effect to reset showAlert state when component unmounts
+    // Effect to reset showAlert state when the component unmounts
     return () => setShowAlert(false);
   }, []);
 
@@ -82,11 +86,7 @@ const CommunityGuestNote = ({ note }) => {
       <td className="text-center" style={{ fontSize: "16px" }}>
         {new Date(note.modified_at).toLocaleString()}
       </td>
-      {showAlert && (
-        <div className="alert alert-danger" role="alert">
-          You have viewed 3 different documents. Cannot open more.
-        </div>
-      )}
+
     </tr>
   );
 };
