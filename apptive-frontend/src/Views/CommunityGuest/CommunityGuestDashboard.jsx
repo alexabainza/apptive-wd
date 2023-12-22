@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../Navbar/Navbar";
-import CommunityNote from "./CommunityGuestNote";
 import { useParams, useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
-
+import Navbar from "../Navbar/Navbar";
+import CommunityNote from "./CommunityGuestNote";
 
 const CommunityGuestDashboard = () => {
   const { person_id } = useParams();
@@ -11,26 +10,22 @@ const CommunityGuestDashboard = () => {
   const [noNotesMessage, setNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // Add sortOrder state
-
+  const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate()
-
   const guestId = localStorage.getItem("guestId");
-  console.log("Guest ID:", guestId);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (!guestId) {
-          console.log("No guestId found, navigating to login");
-          navigate("/login"); // Navigate to the login page if guestId is not present
+          navigate("/login");
           return;
         }
 
         const response = await fetch(
           `http://localhost:3000/guest/community-notes`, {
             headers: {
-                'Guest-Id': localStorage.getItem("guestId"),
+                'Guest-Id': guestId,
             }
           }
         );
@@ -50,7 +45,7 @@ const CommunityGuestDashboard = () => {
     };
 
     fetchData();
-  }, [person_id, guestId, navigate]); // Add navigate to the dependency array
+  }, [person_id, guestId, navigate]);
 
 
   const handleSearch = (event) => {
@@ -62,7 +57,6 @@ const CommunityGuestDashboard = () => {
     let sortedNotes = [...notes];
     let newSortOrder = "asc";
 
-    // If the same criteria is clicked again, toggle the sort order
     if (sortBy === criteria) {
       newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     }
