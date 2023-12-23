@@ -21,12 +21,9 @@ const AddNotesPage = ({ folder }) => {
     if (storedToken) {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
-        console.log("Username is",decodedToken.username)
         setUsername(decodedToken.username)
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -46,8 +43,7 @@ const AddNotesPage = ({ folder }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUsername(data.username); // Extract username from the response
-        console.log("username from add notes page: " + data.username);
+        setUsername(data.username);
       } else {
         console.error("Error saving note:", response.statusText);
       }
@@ -58,17 +54,6 @@ const AddNotesPage = ({ folder }) => {
     }
   };
 
-  const handleHighlight = (color) => {
-    const quill = quillRef.current.getEditor();
-    const range = quill.getSelection();
-
-    if (range) {
-      const isHighlighted = quill.getFormat(range.index, range.length).background === color;
-      quill.formatText(range.index, range.length, {
-        background: isHighlighted ? null : color,
-      });
-    }
-  };
 
   return (
     <div className="add-notes-page">

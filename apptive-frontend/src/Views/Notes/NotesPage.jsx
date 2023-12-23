@@ -137,7 +137,7 @@ const NotesPage = () => {
   const filteredNotes =
     notes && Array.isArray(notes)
       ? notes
-          .filter((note) => note.note_title) // Filter out notes with undefined or null note_title
+          .filter((note) => note.note_title)
           .filter((note) =>
             note.note_title.toLowerCase().includes(searchQuery.toLowerCase())
           )

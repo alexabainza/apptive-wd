@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import UserNavbar from "../Dashboard/UserNavbar";
-import {jwtDecode}from 'jwt-decode';
-// const { sign, decode, verify } = jsonwebtoken;
-
+import { jwtDecode } from "jwt-decode";
 
 const FlashcardPage = () => {
   const { folder_name, note_id } = useParams();
@@ -15,21 +13,17 @@ const FlashcardPage = () => {
   const [editedFlashcardId, setEditedFlashcardId] = useState(null);
   const [editedQuestion, setEditedQuestion] = useState("");
   const [editedAnswer, setEditedAnswer] = useState("");
-  const [username, setUsername] = useState("")
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
-    if(!storedToken){
+    if (!storedToken) {
       navigate("/login");
-
-    }
-    else{
+    } else {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
-        setUsername(decodedToken.username)
+        setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -59,14 +53,14 @@ const FlashcardPage = () => {
 
   const handleNextCard = () => {
     setCurrentCardIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
-    setFlipped(false); // Reset flip state when moving to the next card
+    setFlipped(false);
   };
 
   const handlePrevCard = () => {
     setCurrentCardIndex(
       (prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length
     );
-    setFlipped(false); // Reset flip state when moving to the previous card
+    setFlipped(false);
   };
 
   const handleGoToNotes = () => {
@@ -101,7 +95,6 @@ const FlashcardPage = () => {
       );
 
       if (response.ok) {
-        // Flashcard edited successfully, update the local state
         setFlashcards((prevFlashcards) =>
           prevFlashcards.map((flashcard) =>
             flashcard.flashcard_id === editedFlashcardId
@@ -138,7 +131,6 @@ const FlashcardPage = () => {
       );
 
       if (response.ok) {
-        // Flashcard deleted successfully, update the local state
         setFlashcards((prevFlashcards) =>
           prevFlashcards.filter(
             (flashcard) => flashcard.flashcard_id !== flashcardId
@@ -162,17 +154,21 @@ const FlashcardPage = () => {
           >
             {"<"} Back
           </Link>
-          <button onClick={handleGoToNotes} className="button-style">Go to notes</button>
+          <button onClick={handleGoToNotes} className="button-style">
+            Go to notes
+          </button>
         </div>
 
         <div className="text-white d-flex justify-content-center mt-4">
-
-          <div className={`flashcard ${editMode ? 'edit-mode' : ''}`}>
-          <div className="card-index d-flex justify-content-center mb-2"><strong>Card {currentCardIndex + 1}</strong></div>
-          {editMode && <div className="edit-mode-indicator text-center">EDIT MODE</div>}
+          <div className={`flashcard ${editMode ? "edit-mode" : ""}`}>
+            <div className="card-index d-flex justify-content-center mb-2">
+              <strong>Card {currentCardIndex + 1}</strong>
+            </div>
+            {editMode && (
+              <div className="edit-mode-indicator text-center">EDIT MODE</div>
+            )}
 
             <div className="flashcard-content" onClick={handleFlip}>
-
               {flashcards.length > 0 ? (
                 isFlipped ? (
                   <div className="back">
@@ -213,24 +209,48 @@ const FlashcardPage = () => {
               <div className="button-container d-flex justify-content-between">
                 {editMode ? (
                   <>
-                    <button onClick={handleSaveEdit} className="button-style">Save</button>
-                    <button onClick={handleCancelEdit} className="button-style">Cancel</button>
+                    <button onClick={handleSaveEdit} className="button-style">
+                      Save
+                    </button>
+                    <button onClick={handleCancelEdit} className="button-style">
+                      Cancel
+                    </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handlePrevCard} className="button-style nav-button">
-                    &lt; Prev
+                    <button
+                      onClick={handlePrevCard}
+                      className="button-style nav-button"
+                    >
+                      &lt; Prev
                     </button>
                     <div>
-                      <button className="button-style" onClick={() => handleEditFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                      <button
+                        className="button-style"
+                        onClick={() =>
+                          handleEditFlashcard(
+                            flashcards[currentCardIndex].flashcard_id
+                          )
+                        }
+                      >
                         Edit
                       </button>
-                      <button className="button-style" onClick={() => handleDeleteFlashcard(flashcards[currentCardIndex].flashcard_id)}>
+                      <button
+                        className="button-style"
+                        onClick={() =>
+                          handleDeleteFlashcard(
+                            flashcards[currentCardIndex].flashcard_id
+                          )
+                        }
+                      >
                         Delete
                       </button>
                     </div>
 
-                    <button onClick={handleNextCard} className="button-style nav-button">
+                    <button
+                      onClick={handleNextCard}
+                      className="button-style nav-button"
+                    >
                       Next &gt;
                     </button>
                   </>

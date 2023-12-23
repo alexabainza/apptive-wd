@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import UserNavbar from "../Dashboard/UserNavbar";
-import FlashcardPage from "./Flashcards";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { jwtDecode } from "jwt-decode";
 
 const IndivNote = () => {
   const navigate = useNavigate();
@@ -12,17 +11,14 @@ const IndivNote = () => {
   const [note, setNote] = useState({});
   const [editedNote, setEditedNote] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  const [showFlashcardPage, setShowFlashcardPage] = useState(false); // State to control the visibility of FlashcardPage
+  const [showFlashcardPage, setShowFlashcardPage] = useState(false);
   const [username, setUsername] = useState("");
-  const [isPublic, setIsPublic] = useState(false); // New state for public/private status
-
+  const [isPublic, setIsPublic] = useState(false);
   const [lastClickedButton, setLastClickedButton] = useState(null);
-  const [highlightedTextQuestion, setHighlightedTextQuestion] = useState(""); // State for green highlight
-  const [highlightedTextAnswer, setHighlightedTextAnswer] = useState(""); // State for yellow highlight
-
+  const [highlightedTextQuestion, setHighlightedTextQuestion] = useState("");
+  const [highlightedTextAnswer, setHighlightedTextAnswer] = useState("");
   const storedToken = localStorage.getItem("token");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-
   const quillRef = useRef(null);
 
   useEffect(() => {
@@ -31,11 +27,9 @@ const IndivNote = () => {
     } else {
       try {
         const decodedToken = jwtDecode(storedToken);
-        // Store decoded user data in state
         setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
-        // Handle error decoding token
       }
     }
   }, [storedToken]);
@@ -43,7 +37,6 @@ const IndivNote = () => {
   const showSuccessNotificationForDuration = async (duration) => {
     setShowSuccessNotification(true);
 
-    // Wait for the specified duration and then hide the notification
     await new Promise((resolve) => setTimeout(resolve, duration));
 
     setShowSuccessNotification(false);
@@ -56,11 +49,10 @@ const IndivNote = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         if (data != null) {
           setNote(data);
-          setEditedNote(data); // Initialize editedNote with the current note data
-          setIsPublic(data.isPublic); // Set isPublic based on the initial note data
+          setEditedNote(data);
+          setIsPublic(data.isPublic);
         } else {
           console.error("Error fetching note:", data.message);
         }
@@ -71,7 +63,7 @@ const IndivNote = () => {
   }, [note_id]);
 
   const handleGoToFlashcards = () => {
-    navigate(`/${folder_name}/${note_id}/flashcards`); // Navigate to "/flashcards" when the Flashcards tab is clicked
+    navigate(`/${folder_name}/${note_id}/flashcards`);
   };
 
   useEffect(() => {
@@ -146,7 +138,7 @@ const IndivNote = () => {
             Authorization: storedToken,
           },
           body: JSON.stringify({
-            isPublic: !isPublic, // Toggle the value
+            isPublic: !isPublic,
           }),
         }
       );
@@ -155,13 +147,12 @@ const IndivNote = () => {
         throw new Error("Failed to toggle public/private status");
       }
 
-      setIsPublic(!isPublic); // Update the local state
+      setIsPublic(!isPublic);
     } catch (error) {
       console.error("Error toggling public/private status:", error.message);
     }
   };
   const handleGenerateCard = async () => {
-    // Pass highlighted texts to FlashcardPage when "Generate Card" is clicked
     setShowFlashcardPage(true);
     try {
       const response = await fetch(
@@ -174,8 +165,8 @@ const IndivNote = () => {
           },
           body: JSON.stringify({
             folder_id: note.folder_id,
-            flashcard_set_id: note_id, // Assuming note_id is the flashcard_set_id
-            user_id: note.user_id, // Replace userId with the actual user ID
+            flashcard_set_id: note_id,
+            user_id: note.user_id,
             question: highlightedTextQuestion,
             answer: highlightedTextAnswer,
           }),
@@ -185,11 +176,8 @@ const IndivNote = () => {
         throw new Error("Failed to generate flashcard");
       }
 
-      // Optionally, you can handle the response if needed
       const data = await response.json();
-      // alert("card created successfully!")
       showSuccessNotificationForDuration(3000);
-      // Reset highlighted texts after generating the flashcard
       setHighlightedTextQuestion("");
       setHighlightedTextAnswer("");
     } catch (error) {
@@ -236,7 +224,7 @@ const IndivNote = () => {
                 style={{
                   resize: "none",
                   height: "80vh",
-                  maxWidth: "100%", // Add this line
+                  maxWidth: "100%",
 
                   overflowY: "scroll",
                 }}
@@ -302,7 +290,6 @@ const IndivNote = () => {
 
               {!isEditing && (
                 <div className="mt-3">
-                  {/* ... existing code */}
                   <button
                     onClick={handleTogglePublicPrivate}
                     className="button-style"
