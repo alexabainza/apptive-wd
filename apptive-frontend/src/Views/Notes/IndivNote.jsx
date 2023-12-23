@@ -4,10 +4,12 @@ import { jwtDecode } from "jwt-decode";
 import UserNavbar from "../Dashboard/UserNavbar";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import LoginModal from "../CommunityGuest/LoginModal";
 
 const IndivNote = () => {
   const navigate = useNavigate();
   const { folder_name, note_id } = useParams();
+
   const [note, setNote] = useState({});
   const [editedNote, setEditedNote] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -20,10 +22,12 @@ const IndivNote = () => {
   const storedToken = localStorage.getItem("token");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const quillRef = useRef(null);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   useEffect(() => {
     if (!storedToken) {
-      navigate("/login");
+      // Open the alert modal if the user is not logged in
+      setIsAlertModalOpen(true);
     } else {
       try {
         const decodedToken = jwtDecode(storedToken);
@@ -41,6 +45,7 @@ const IndivNote = () => {
 
     setShowSuccessNotification(false);
   };
+
   useEffect(() => {
     fetch(`http://localhost:3000/${folder_name}/${note_id}`, {
       headers: {
@@ -60,7 +65,7 @@ const IndivNote = () => {
       .catch((error) => {
         console.error("Error fetching note:", error);
       });
-  }, [note_id]);
+  }, [note_id, storedToken]);
 
   const handleGoToFlashcards = () => {
     navigate(`/${folder_name}/${note_id}/flashcards`);
@@ -108,6 +113,7 @@ const IndivNote = () => {
       console.error("Error saving changes:", error.message);
     }
   };
+
   const handleHighlight = (color) => {
     const quill = quillRef.current.getEditor();
     const range = quill.getSelection();
@@ -152,8 +158,16 @@ const IndivNote = () => {
       console.error("Error toggling public/private status:", error.message);
     }
   };
+
   const handleGenerateCard = async () => {
+    if (!highlightedTextQuestion || !highlightedTextAnswer) {
+      // Open the alert modal if either question or answer is empty
+      setIsAlertModalOpen(true);
+      return;
+    }
+
     setShowFlashcardPage(true);
+
     try {
       const response = await fetch(
         `http://localhost:3000/${folder_name}/${note_id}/makeFlashcards`,
@@ -172,6 +186,7 @@ const IndivNote = () => {
           }),
         }
       );
+
       if (!response.ok) {
         throw new Error("Failed to generate flashcard");
       }
@@ -225,7 +240,6 @@ const IndivNote = () => {
                   resize: "none",
                   height: "80vh",
                   maxWidth: "100%",
-
                   overflowY: "scroll",
                 }}
                 className="form-control"
@@ -302,6 +316,16 @@ const IndivNote = () => {
           </>
         )}
       </div>
+
+      {/* Modal for Alert */}
+      <LoginModal
+        showModal={isAlertModalOpen}
+        handleClose={() => setIsAlertModalOpen(false)}
+        handleLogin={() => setIsAlertModalOpen(false)}
+        title="Values required!"
+        message="You need to highlight text for both question and answer."
+        exitbutton="Okay"
+      />
     </div>
   );
 };

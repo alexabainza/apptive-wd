@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {jwtDecode}from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const AddNotesPage = ({ folder }) => {
   const [noteTitle, setNoteTitle] = useState("");
@@ -21,7 +21,7 @@ const AddNotesPage = ({ folder }) => {
     if (storedToken) {
       try {
         const decodedToken = jwtDecode(storedToken);
-        setUsername(decodedToken.username)
+        setUsername(decodedToken.username);
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -32,14 +32,17 @@ const AddNotesPage = ({ folder }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:3000/${folder_name}/addNote`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: storedToken,
-        },
-        body: JSON.stringify({ noteTitle, contents }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/${folder_name}/addNote`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: storedToken,
+          },
+          body: JSON.stringify({ noteTitle, contents }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -53,7 +56,6 @@ const AddNotesPage = ({ folder }) => {
       console.error("Error saving note:", error.message);
     }
   };
-
 
   return (
     <div className="add-notes-page">
@@ -86,7 +88,7 @@ const AddNotesPage = ({ folder }) => {
               }
             }}
           />
-          <input type="submit" value="Submit" className="button-style"/>
+          <input type="submit" value="Submit" className="button-style" />
         </div>
       </form>
     </div>

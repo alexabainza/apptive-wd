@@ -76,6 +76,9 @@ const CommunityGuestNote = ({ note }) => {
         {new Date(note.modified_at).toLocaleString()}
       </td>
       <LoginModal
+        title="Login required!"
+        message="You have used up your free document visits. Please register to continue."
+        exitbutton="Register"
         showModal={showLoginModal}
         handleClose={() => setShowLoginModal(false)}
         handleLogin={() => navigate("/register")}

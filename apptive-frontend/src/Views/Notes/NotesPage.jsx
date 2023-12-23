@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import UserNavbar from "../Dashboard/UserNavbar";
 import Note from "./Note";
 
@@ -7,7 +8,6 @@ const NotesPage = () => {
   const navigate = useNavigate();
   const { user_id, folder_name } = useParams();
   const storedToken = localStorage.getItem("token");
-  const [token, setToken] = useState(storedToken);
   const [notes, setNotes] = useState([]);
   const [notesMessage, setNoNotesMessage] = useState(null);
   const [sortBy, setSortBy] = useState(null);
@@ -16,7 +16,20 @@ const NotesPage = () => {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    if (!token) {
+    if (!storedToken) {
+      navigate("/login");
+    } else {
+      try {
+        const decodedToken = jwtDecode(storedToken);
+        setUsername(decodedToken.username);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, [storedToken]);
+
+  useEffect(() => {
+    if (!storedToken) {
       navigate("/login");
       return;
     }
@@ -25,7 +38,7 @@ const NotesPage = () => {
       try {
         const response = await fetch(`http://localhost:3000/${folder_name}`, {
           headers: {
-            Authorization: token,
+            Authorization: storedToken,
           },
         });
 
@@ -36,7 +49,6 @@ const NotesPage = () => {
         const data = await response.json();
 
         if (Array.isArray(data) && data.length > 0) {
-          setUsername(data[0].user_name);
           setNotes(data);
         } else {
           setNoNotesMessage("You have no notes.");
@@ -47,7 +59,7 @@ const NotesPage = () => {
     };
 
     fetchNotes();
-  }, [token, folder_name, navigate]);
+  }, [storedToken, folder_name, navigate]);
 
   const handleSearch = (event) => {
     const newValue = event.target.value || "";
@@ -93,7 +105,7 @@ const NotesPage = () => {
         {
           method: "DELETE",
           headers: {
-            Authorization: token,
+            Authorization: storedToken,
           },
         }
       );
@@ -118,7 +130,7 @@ const NotesPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: token,
+            Authorization: storedToken,
           },
           body: JSON.stringify(noteDetails),
         }
