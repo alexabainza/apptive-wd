@@ -26,7 +26,6 @@ const IndivNote = () => {
 
   useEffect(() => {
     if (!storedToken) {
-      // Open the alert modal if the user is not logged in
       setIsAlertModalOpen(true);
     } else {
       try {
@@ -161,7 +160,6 @@ const IndivNote = () => {
 
   const handleGenerateCard = async () => {
     if (!highlightedTextQuestion || !highlightedTextAnswer) {
-      // Open the alert modal if either question or answer is empty
       setIsAlertModalOpen(true);
       return;
     }
@@ -317,7 +315,6 @@ const IndivNote = () => {
         )}
       </div>
 
-      {/* Modal for Alert */}
       <LoginModal
         showModal={isAlertModalOpen}
         handleClose={() => setIsAlertModalOpen(false)}
