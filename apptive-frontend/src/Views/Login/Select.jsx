@@ -66,9 +66,9 @@ const Select = () => {
             </Link>
           </div>
 
-          <button onClick={handleClearLocalStorageClick}>
+          {/* <button onClick={handleClearLocalStorageClick}>
             Clear Local Storage
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

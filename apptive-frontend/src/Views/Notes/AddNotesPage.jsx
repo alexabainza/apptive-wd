@@ -101,14 +101,6 @@ const AddNotesPage = ({ folder }) => {
               }
             }}
           />
-          <div className="my-2">
-            <button className="butt" type="button" onClick={() => handleHighlight("green")}>
-              Flashcard Question (Green)
-            </button>
-            <button className="butt" type="button" onClick={() => handleHighlight("yellow")}>
-              Flashcard Answer (yellow)
-            </button>
-          </div>
           <input type="submit" value="Submit" className="button-style"/>
         </div>
       </form>

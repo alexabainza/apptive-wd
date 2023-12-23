@@ -1,17 +1,14 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-// const mysql = require("mysql2");
-const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
-const saltRounds = 10;
-const { v4: generateUniqueId } = require("uuid"); // Add this line
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
-const { verify, sign } = require("jsonwebtoken");
-const mysql = require("mysql2"); // Note the '/promise' at the end
+const mysql = require("mysql2");
+
+const { v4: uuidv4 } = require("uuid");
+const { v4: generateUniqueId } = require("uuid");
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
@@ -25,19 +22,18 @@ const conn = mysql.createConnection({
 
 const generateToken = (user_id, username) => {
   return jwt.sign({ user_id, username }, "jwtSecret", {
-    expiresIn: 60 * 60 * 24 * 30 * 1000, // Set the expiration time as needed
+    expiresIn: 60 * 60 * 24 * 30 * 1000,
   });
 };
 
 const verifyJWT = (req, res, next) => {
-  //authorize if the user is allowed
   const token = req.headers["authorization"];
   if (!token) return res.status(400).json({ error: "User not authenticated" });
 
   try {
     const validToken = jwt.verify(token, "jwtSecret");
     req.authenticated = true;
-    req.user = validToken; // Set the decoded token in req.user
+    req.user = validToken;
     return next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {
@@ -51,13 +47,6 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-app.get("/getUsers", (req, res) => {
-  conn.query(`SELECT * FROM user_credentials`, (error, data) => {
-    console.log(error);
-    res.send(data);
-  });
-});
-
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
@@ -68,7 +57,6 @@ const isUsernameTaken = async (username) => {
   return existingUser.length > 0;
 };
 
-// Function to check if an email is already in use
 const isEmailTaken = async (email) => {
   const [existingEmail] = await conn
     .promise()
@@ -76,13 +64,10 @@ const isEmailTaken = async (email) => {
   return existingEmail.length > 0;
 };
 
-// Function to generate a JWT token
-
 app.post("/register", async (req, res) => {
   const { id, username, password, firstname, lastname, email } = req.body;
 
   try {
-    // Check if the username already exists
     const isUsernameExist = await isUsernameTaken(username);
     if (isUsernameExist) {
       return res.status(400).json({
@@ -91,7 +76,6 @@ app.post("/register", async (req, res) => {
       });
     }
 
-    // Check if the email is already in use
     const isEmailExist = await isEmailTaken(email);
     if (isEmailExist) {
       return res.status(400).json({
@@ -100,7 +84,6 @@ app.post("/register", async (req, res) => {
       });
     }
 
-    // If username and email are not taken, proceed with user registration
     const hashedPassword = await bcrypt.hash(password, 10);
     await conn
       .promise()
@@ -109,7 +92,6 @@ app.post("/register", async (req, res) => {
         [id, username, firstname, lastname, email, hashedPassword]
       );
 
-    // Generate a new token for the registered user
     const token = generateToken(id, username);
 
     return res.status(201).json({
@@ -157,12 +139,10 @@ app.post("/login", async (req, res) => {
             },
           });
         } else {
-          console.log("Incorrect Password:", password);
           res.json({ auth: false, message: "wrong username/password" });
         }
       } else {
         res.json({ auth: false, message: "no user exists" });
-        // res.status(404).json({ success: false, message: "User not found" });
       }
     }
   );
@@ -189,7 +169,7 @@ app.get("/community-notes", verifyJWT, (req, res) => {
         } else {
           res.status(200).json({
             success: true,
-            person_id: person_id, // Include the person_id in the response
+            person_id: person_id,
 
             message: "No notes yet.",
           });
@@ -200,7 +180,7 @@ app.get("/community-notes", verifyJWT, (req, res) => {
 });
 
 app.get("/guest/community-notes", (req, res) => {
-  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
+  const guestId = req.headers["guest-id"];
   if (!guestId) {
     return res.status(401).json({
       success: false,
@@ -222,7 +202,7 @@ app.get("/guest/community-notes", (req, res) => {
         } else {
           res.status(200).json({
             success: true,
-            guestId: guestId, // Include the guestId in the response
+            guestId: guestId,
             message: "No notes yet.",
           });
         }
@@ -230,26 +210,11 @@ app.get("/guest/community-notes", (req, res) => {
     }
   );
 });
-// app.patch("/:folder_name/:note_id/updateIsPublic", verifyJWT, async (req, res) => {
-//     const userId = req.user.user_id;
 
-//     const { folder_name, note_id } = req.params;
-//     const { isPublic } = req.body;
-
-//     const [folderResults] = await conn.query(
-//         "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
-//         [userId, folder_name]
-//       );
-
-//       console.log("Folder Results:", folderResults);
-
-// });
 
 app.get("/guest/community-notes/:note_id", (req, res) => {
   const note_id = req.params.note_id;
-  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
-
-  console.log("Received notes_id:", note_id);
+  const guestId = req.headers["guest-id"];
 
   conn.query(
     "SELECT n.*, uc.user_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id WHERE n.notes_id = ?",
@@ -263,7 +228,7 @@ app.get("/guest/community-notes/:note_id", (req, res) => {
           res.status(404).json({ error: "Note not found" });
         } else {
           res.setHeader("Content-Type", "application/json");
-          const note = data[0]; // Assuming there is only one matching note
+          const note = data[0];
           res.json(note);
         }
       }
@@ -272,7 +237,6 @@ app.get("/guest/community-notes/:note_id", (req, res) => {
 });
 app.get("/community-notes/:note_id", verifyJWT, (req, res) => {
   const note_id = req.params.note_id;
-  console.log("Received notes_id:", note_id);
 
   conn.query(
     "SELECT n.*, uc.user_name FROM notes n JOIN user_credentials uc ON n.user_id = uc.user_id WHERE n.notes_id = ?",
@@ -286,7 +250,7 @@ app.get("/community-notes/:note_id", verifyJWT, (req, res) => {
           res.status(404).json({ error: "Note not found" });
         } else {
           res.setHeader("Content-Type", "application/json");
-          const note = data[0]; // Assuming there is only one matching note
+          const note = data[0];
           res.json(note);
         }
       }
@@ -308,8 +272,6 @@ app.get("/viewProfile/:username", (req, res) => {
           message: "Error fetching user details",
         });
       } else {
-        console.log("Query result:", result); // Log the query result
-
         if (result.length > 0) {
           const userDetails = {
             user_id: result[0].user_id,
@@ -319,13 +281,11 @@ app.get("/viewProfile/:username", (req, res) => {
             email: result[0].email,
             user_type: result[0].user_type,
           };
-          console.log("User details:", userDetails);
           res.status(200).json({
             success: true,
             user: userDetails,
           });
         } else {
-          console.log("User not found for username:", username);
           res.status(404).json({
             success: false,
             error: "user_not_found",
@@ -337,7 +297,6 @@ app.get("/viewProfile/:username", (req, res) => {
   );
 });
 app.get("/profile", verifyJWT, (req, res) => {
-  // The user information is available in req.user after the verifyJWT middleware
   const { user_id } = req.user;
 
   conn.query(
@@ -380,10 +339,7 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
         return;
       }
 
-      console.log("Guests Query Result:", resultGuests);
-
       if (resultGuests.length > 0) {
-        // User is a guest
         res.json({ success: true, userType: "guest", data: resultGuests });
       } else {
         conn.query(
@@ -396,17 +352,13 @@ app.get("/check-user-type", verifyJWT, (req, res) => {
               return;
             }
 
-            console.log("Credentials Query Result:", resultCredentials);
-
             if (resultCredentials.length > 0) {
-              // User is registered
               res.json({
                 success: true,
                 userType: "registered",
                 data: resultCredentials,
               });
             } else {
-              // User is invalid
               res.json({ success: true, userType: "invalid", data: null });
             }
           }
@@ -463,7 +415,6 @@ app.get("/dashboard", verifyJWT, async (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  // You may want to do additional cleanup or logging here
   res.json({ success: true, message: "Logout successful" });
 });
 
@@ -594,7 +545,6 @@ app.get("/:folder_name", verifyJWT, (req, res) => {
   const folder_name = req.params.folder_name;
   const user_id = req.user.user_id;
 
-  // Use LEFT JOIN to include users with no notes
   conn.query(
     "SELECT f.folder_name, n.*, u.user_name FROM folders f " +
       "LEFT JOIN notes n ON f.folder_id = n.folder_id AND n.user_id = ? " +
@@ -654,9 +604,8 @@ app.get("/:folder_name/:notes_id", verifyJWT, (req, res) => {
           res.status(404).send("Note not found");
         } else {
           res.setHeader("Content-Type", "application/json");
-          const note = data[0]; // Assuming there is only one matching note
+          const note = data[0];
           res.json(note);
-          // console.log(note);
         }
       }
     }
@@ -714,18 +663,14 @@ app.post("/:folder_name/addNote", verifyJWT, async (req, res) => {
 
     if (result.length > 0) {
       const folderId = result[0].folder_id;
-      const username = result[0].user_name; // Extract username from the result
+      const username = result[0].user_name;
 
-      console.log("user name from app js is " + username);
-
-      // Send the username back to the frontend immediately
       res.status(200).json({
         success: true,
         message: "Username retrieved successfully",
         username: username,
       });
 
-      // Insert the note in the background
       conn.query(
         "INSERT INTO notes(user_id, folder_id, notes_id, note_title, contents) VALUES (?, ?, ?, ?, ?)",
         [userId, folderId, note_id, req.body.noteTitle, req.body.contents],
@@ -753,7 +698,6 @@ app.delete("/:folder_name/delete/:note_id", verifyJWT, (req, res) => {
   const folderName = req.params.folder_name;
   const note_id = req.params.note_id;
 
-  // Query to get folder_id based on folder_name
   conn.query(
     "SELECT folder_id FROM folders WHERE user_id = ? AND folder_name = ?",
     [userId, folderName],
@@ -846,9 +790,7 @@ app.patch("/:folder_name/:note_id/updateNote", verifyJWT, (req, res) => {
 });
 
 app.post("/createGuest", (req, res) => {
-  const guestId = generateUniqueId(); // Replace with your actual logic for generating IDs
-  console.log("Create guest path called");
-
+  const guestId = generateUniqueId();
   conn.query(
     "INSERT INTO guests (guest_id) VALUES (?)",
     [guestId],
@@ -861,11 +803,10 @@ app.post("/createGuest", (req, res) => {
           message: "Error creating guest user",
         });
       } else {
-        console.log(`Guest user created successfully: ${guestId}`);
         res.status(200).json({
           success: true,
           message: "Guest user created successfully",
-          guestId: guestId, // Include the guestId in the response
+          guestId: guestId,
         });
       }
     }
@@ -884,7 +825,6 @@ app.post("/logVisitedDocument", async (req, res) => {
       );
 
     if (viewedDocument.length > 0) {
-      console.log("Document has already been viewed. Skipping logging.");
       return res.status(200).json({ message: "Document already viewed" });
     }
 
@@ -896,7 +836,6 @@ app.post("/logVisitedDocument", async (req, res) => {
       );
 
     const { document_count } = documentCount[0];
-    console.log(`Current document count: ${document_count}`);
 
     if (document_count >= 3) {
       console.error("User has three logged entries in visited_documents.");
@@ -906,14 +845,12 @@ app.post("/logVisitedDocument", async (req, res) => {
         message: "User has three logged entries in visited_documents.",
       });
     }
+    
 
-    // Insert a record into the visited_documents table
     const insertSql =
       "INSERT INTO visited_documents (person_id, note_id) VALUES (?, ?)";
     const insertValues = [person_id, note_id];
     await conn.promise().query(insertSql, insertValues);
-
-    console.log("Record inserted successfully");
 
     return res
       .status(200)
@@ -927,18 +864,12 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
   const guestId = req.headers["guest-id"];
 
   const { person_id, note_id } = req.body;
-  console.log(
-    "Received request to check if document viewed:",
-    person_id,
-    note_id
-  );
 
   if (!person_id || !note_id) {
     return res.status(400).json({ error: "Bad Request" });
   }
 
   try {
-    // Check if the document has been viewed by the user
     const [viewedDocument] = await conn
       .promise()
       .query(
@@ -948,7 +879,6 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
 
     const viewed = viewedDocument.length > 0;
 
-    // Fetch document count from the 'visited_documents' table
     const [rows = []] = await conn
       .promise()
       .query(
@@ -957,9 +887,6 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
       );
 
     const documentCount = rows[0].document_count;
-
-    console.log("viewed? " + viewed);
-    console.log("documentCount: " + documentCount);
 
     return res.status(200).json({ viewed, document_count: documentCount });
   } catch (err) {
@@ -971,8 +898,7 @@ app.post("/checkIfDocumentViewed", async (req, res) => {
 app.get("/getDocumentCount/:person_id", async (req, res) => {
   const personId = req.params.person_id;
 
-  const guestId = req.headers["guest-id"]; // Assuming guestId is sent in the headers
-  console.log("Guest Id:", guestId);
+  const guestId = req.headers["guest-id"];
 
   if (!guestId) {
     return res.status(401).json({
@@ -981,14 +907,12 @@ app.get("/getDocumentCount/:person_id", async (req, res) => {
     });
   } else {
     try {
-      // Fetch document count from the 'visited_documents' table
       const [rows] = await conn.execute(
         "SELECT COUNT(*) as document_count FROM visited_documents WHERE person_id = ?",
         [personId]
       );
 
       const documentCount = rows[0].document_count;
-      console.log("document count from app.js: ", documentCount);
       res.json({ document_count: documentCount });
     } catch (error) {
       console.error("Error fetching document count", error);
@@ -1032,7 +956,6 @@ app.get("/:folder_name/:note_id/flashcards", verifyJWT, (req, res) => {
         } else {
           res.status(200).json({
             success: true,
-            // person_id: person_id, // Include the person_id in the response
             message: "No flashcards yet.",
           });
         }
