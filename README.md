@@ -1,5 +1,5 @@
 ﻿# apptive-webdev
-i To be restructured soon.
+* To be restructured soon.
 
 This repository contains our Web Dev 2/Information Management 2 final project.
 
